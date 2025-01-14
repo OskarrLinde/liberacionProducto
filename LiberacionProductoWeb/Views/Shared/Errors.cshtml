@@ -1,0 +1,31 @@
+﻿@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@model LiberacionProductoWeb.Models.ConfigViewModels.ConfiguracionUsuarioVM;
+@inject IStringLocalizer<Resource> resource;
+@{
+    Layout = "_Layout_back";
+    ViewData["Title"] = "Error";
+}
+
+<!-- begin #content -->
+<div id="content" class="content">
+    <h2 class="page-header">Servicio no disponible, favor de intentar más tarde.</h2>
+    <br />
+    <p>@Model.MensajeError</p>
+    <!-- end page-header -->
+</div>
+<!-- end #content -->
+@section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+
+    </environment>
+
+    <script>
+        $(document).ready(function () {
+            App.init();
+            Demo.init();
+        });
+    </script>
+    }

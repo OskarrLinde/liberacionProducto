@@ -1,0 +1,50 @@
+# Archivos de configuración específicos del usuario
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Directorios generados por compilación
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+Debug/
+Release/
+
+# Archivos temporales de Visual Studio
+*.cache
+*.pdb
+*.pidb
+*.tlog
+*.log
+*.vspscc
+*.vssscc
+.vs/
+
+# Archivos de paquetes NuGet
+*.nupkg
+*.snupkg
+.nuget/packages/
+packages/
+project.lock.json
+project.fragment.lock.json
+
+# Archivos generados por sistemas externos
+*.swp
+*.class
+*.pyc
+*.java
+
+# Configuración de usuario en VS Code
+.vscode/
+*.code-workspace
+
+# Otros
+*.db
+*.sqlite
+*.mdf
+*.ldf
+*.bak
+*.sql
+Thumbs.db

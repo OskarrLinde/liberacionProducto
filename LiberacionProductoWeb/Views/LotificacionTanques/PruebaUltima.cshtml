@@ -1,0 +1,200 @@
+﻿@model LotificacionViewModel;
+@using LiberacionProductoWeb.Models.Lotificacion
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@using Microsoft.Extensions.Configuration;
+
+@inject IStringLocalizer<Resource> resource;
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Listado de Lotes";
+    Layout = "~/Views/Shared/_LayoutCatalogs.cshtml";
+
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+}
+
+@await Html.PartialAsync("~/Views/Shared/_NavigationCatalogs.cshtml")
+
+<table id="lotificacionTable" class="display" style="width:100%"> 
+    <thead> 
+        <tr> 
+            <th></th> 
+            <th>idAnalisis</th> 
+            <th>No. Lote</th> 
+            <th>Lote de Origen</th> 
+            <th>Tanque</th> 
+            <th>Nivel Inicial</th> 
+            <th>Nivel Final</th> 
+            <th>Comentarios</th>
+            <th>Fecha Alta</th> 
+            <th>Estatus</th>
+            <th>Estatus Revisión</th> 
+            <th>Creado por</th> 
+        </tr> 
+        <tr>
+            <th></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+            <th><input type="text" placeholder="" /></th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section Styles {
+
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/catalogs.js"></script>
+    </environment>
+
+    <script>
+
+    $(document).ready(function () {
+
+        App.init();
+        Demo.init();
+    });
+
+        $(document).ready(function () { console.log('Document ready, initializing DataTable...'); // Función para normalizar cadenas eliminando acentos 
+        function normalizeString(str) 
+        { 
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); 
+        } // Extender la función de búsqueda de DataTables para normalizar las cadenas 
+        $.fn.dataTable.ext.type.search.string = function(data) { return !data ? '' : typeof data === 'string' ? normalizeString(data) : data; }; // Inicializar DataTable
+
+            $.ajax({
+                type: 'GET',
+                url: pb.base + '/LotificacionTanques/ObtenerAnalisisTanque',
+                success: function (response) {
+                    console.log(response);
+                    var table = $('#lotificacionTable').DataTable({
+                        "ordering": false, // Deshabilitar la opción de ordenar
+                        "data": response,
+                        "columns": [
+                            {
+                                "className": 'details-control',
+                                "orderable": false,
+                                "data": null,
+                                "defaultContent": ''
+                            },
+                            { "data": "idAnalisis" },
+                            { "data": "idLote" },
+                            { "data": "loteOrigen" },
+                            { "data": "idTanque" },
+                            { "data": "nivelIni" },
+                            { "data": "nivelFin" },
+                            { "data": "comentarios" },
+                            { "data": "fechaAlta" },
+                            { "data": "estatus" },
+                            {
+                                "data": null,
+                                "defaultContent": "N/A",
+                                "render": function (data, type, row, meta) {
+                                    return "N/A"; // Valor predeterminado para la columna "Estatus Revisión"
+                                }
+                            },
+                            { "data": "usrAlta" }
+                        ],
+                        "order": [[1, 'desc']],
+                        "language": {
+                            "emptyTable": "No hay datos disponibles en la tabla", "info": "Mostrando _START_ a _END_ de _TOTAL_ registros", "infoEmpty": "Mostrando 0 a 0 de 0 registros", "infoFiltered": "(filtrado de _MAX_ registros totales)", "lengthMenu": "Mostrar _MENU_ registros", "loadingRecords": "Cargando...", "processing": "Procesando...", "search": "Buscar:", "zeroRecords": "No se encontraron registros coincidentes", "paginate": { "first": "Primero", "last": "Último", "next": "Siguiente", "previous": "Anterior" },
+                            "aria": { "sortAscending": "", "sortDescending": "" }
+                        },
+                        "initComplete": function (settings, json) {
+                            // Aplicar la búsqueda en cada columna
+                            this.api().columns().every(function () {
+                                var that = this; $('input', this.header()).on('keyup change clear', function () {
+                                    var searchValue = normalizeString(this.value); // Normalizar la cadena de búsqueda
+                                    if (that.search() !== searchValue) { that.search(searchValue).draw(); }
+                                });
+                            });
+                        }, "drawCallback": function (settings) { console.log('DataTable draw completed'); }
+                    });
+                    // Añadir evento de clic para abrir/cerrar detalles
+                    $('#lotificacionTable tbody').on('click', 'td.details-control', function () { var tr = $(this).closest('tr'); var row = table.row(tr); if (row.child.isShown()) { row.child.hide(); tr.removeClass('shown'); } else { var detalle = row.data().detalles; row.child(generarDetalle(detalle)).show(); tr.addClass('shown'); } });
+                    // Función para generar el contenido del detalle
+                    function generarDetalle(detalleData) {
+                        var detalleHtml = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'; detalleData.forEach(function (item) { detalleHtml += '<tr>' + '<td>Id Parámetro:</td>' + '<td>' + item.id_parametro + '</td>' + '<td>Valor Límite Inferior:</td>' + '<td>' + item.valor_limite_inf + '</td>' + '<td>Valor Límite Superior:</td>' + '<td>' + item.valor_limite_sup + '</td>' + '<td>Valor Análisis:</td>' + '<td>' + item.valor_analisis + '</td>' + '<td>Id Analizador:</td>' + '<td>' + item.id_analizador + '</td>' + '<td>Id Método:</td>' + '<td>' + item.id_metodo + '</td>' + '</tr>'; }); detalleHtml += '</table>'; return detalleHtml;
+                    }
+                
+
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error al obtner los datos: ' + error);
+                }
+            });
+        });
+                
+    </script>
+}

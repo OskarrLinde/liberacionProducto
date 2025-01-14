@@ -1,0 +1,195 @@
+﻿@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Helpers;
+@using LiberacionProductoWeb.Models;
+@model LiberacionProductoWeb.Models.SechToolViewModels.SechToolDistributionBatchVM;
+
+@inject IStringLocalizer<Resource> resource;
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@{
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userFirstName = "";
+    var userRole = "";
+    var imagenUsuario = "";
+    var logOut = resource.GetString("LogOut");
+    if (claimsIdentity != null)
+    {
+
+        var name = claimsIdentity.Name;
+        if (name != null)
+        {
+            var FullName = UserManager.FindByNameAsync(name);
+            userFirstName = FullName.Result.NombreUsuario;
+
+        }
+
+        var role = claimsIdentity.FindFirst(System.Security.Claims.ClaimTypes.Role);
+        if (role != null)
+        {
+            userRole = role.Value.ToString();
+        }
+
+        var imagen = claimsIdentity.FindFirst("ImagenUsuario");
+        if (!String.IsNullOrEmpty(imagen?.Value))
+        {
+            imagenUsuario = imagen.Value;
+        }
+        else
+        {
+            imagenUsuario = "/images/users/user-icon.png";
+        }
+    }
+}
+
+<div id="header" class="header navbar navbar-default navbar-fixed-top">
+    <!-- begin container-fluid -->
+    <div class="container-fluid">
+        <!-- begin mobile sidebar expand / collapse button -->
+        <div class="navbar-header">
+            <a href="@Url.Action("Access", "Access")" class="navbar-brand">
+                <img src="~/img/logo.png" class="logo" alt="" />
+                Sistema Liberación de Productos
+            </a>
+            <button type="button" class="navbar-toggle" data-click="sidebar-toggled">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <!-- end mobile sidebar expand / collapse button -->
+        <!-- begin navbar-right -->
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="javascript:;" data-toggle="dropdown">
+                    <div class="row" style="display: inline-block">
+                        <label class="text-white"> @DateTime.Now.ToString("yyyy-MM-dd")</label>
+                        <i class="fas fa-user">
+                            <label class="text-white"> @userFirstName.ToString()</label>
+                        </i>
+                    </div>
+                </a>
+            </li>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="dropdown navbar-user">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+                        <span class="hidden"> <i class="fa fa-cog"></i></span> <b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu pull-right">
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_CATALOGO_DE_USUARIOS))
+                        {
+                            <li><a href="@Url.Action("Usuarios", "Usuarios")">Usuarios</a></li>
+                        }
+                        @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_CATALOGO_DE_ROLES))
+                        {
+                            <li><a href="@Url.Action("Perfiles", "Perfiles")">Roles</a></li>
+                        }
+
+                        <li class="divider"></li>
+
+                        @* @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.CONSULTAR_CATALOGO_GENERAL))
+                    {
+                    <li><a href="@Url.Action("General", "Catalogs")">General</a></li>
+                    } *@
+
+                        <li><a href="@Url.Action("Planta", "CertCatalogos")">Planta</a></li>
+
+                        <li><a href="@Url.Action("Pais", "CertCatalogos")">País</a></li>
+
+                        <li><a href="@Url.Action("TipoSuministro", "CertCatalogos")">Tipo de Suministro</a></li>
+
+                        <li><a href="@Url.Action("Producto", "CertCatalogos")">Producto</a></li>
+
+                        <li><a href="@Url.Action("Metodo", "CertCatalogos")">Métodos Analíticos</a></li>
+
+                        <li><a href="@Url.Action("Tanque", "CertCatalogos")">Tanques</a></li>
+
+                        <li><a href="@Url.Action("StatusPipa", "CertCatalogos")">Status Pipa</a></li>
+
+                        <li><a href="@Url.Action("TipoTransporte", "CertCatalogos")">Tipo de Transporte</a></li>
+
+                        <li><a href="@Url.Action("Parametro", "CertCatalogos")">Parámetro</a></li>
+
+                        <li><a href="@Url.Action("Grado", "CertCatalogos")">Grado</a></li>
+
+                        <li><a href="@Url.Action("Transporte", "CertCatalogos")">Unidad de Transporte</a></li>
+
+                        <li><a href="@Url.Action("UnidadMedida", "CertCatalogos")">Unidad de Medida</a></li>
+
+                        <li><a href="@Url.Action("RolAlias", "CertCatalogos")">Funciones Países</a></li>
+
+                        <li><a href="@Url.Action("ProductoGrados", "CertCatalogos")">Producto Grados</a></li>
+
+                        <li><a href="@Url.Action("AnalizadorParametros", "CertCatalogos")">Analizador Parámetros</a></li>
+
+                        <li><a href="@Url.Action("PlantaProducto", "CertCatalogos")">Planta Productos</a></li>
+
+                        <li><a href="@Url.Action("EspecificacionMaster", "CertCatalogos")">Especificación Planta Producto</a></li>
+
+                        <li><a href="@Url.Action("EspecificacionMaster2", "CertCatalogos")">Especificación Cliente</a></li>
+
+                        <li><a href="@Url.Action("EspecificacionMaster3", "CertCatalogos")" class="btn btn-white m-r-5">Especificación Producto Grado</a></li>
+
+                        <li data-toggle="modal" data-target="#exampleModalCenter"><a>Acerca de</a></li>
+                    </ul>
+                </li>
+            }
+            <li>
+                <a href="javascript:void();" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fas fa-sign-out-alt dropdown-menu-dark"></i>@logOut
+                </a>
+            </li>
+        </ul>
+        <!-- end navbar-right -->
+    </div>
+    <!-- end container-fluid -->
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">¿Deseas cerrar sesión ?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Al cerrar sesión se guardarán los cambios.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-success" onclick="saveOnClose()">Sí</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Acerca de</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <br />
+                <br />
+                Versión de sistema 1.3.1
+                <br />
+                <br />
+                <br />
+            </div>
+            <div class="modal-footer">
+                Sistema Liberación de Productos
+            </div>
+        </div>
+    </div>
+</div>

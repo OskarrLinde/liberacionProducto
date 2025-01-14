@@ -1,0 +1,42 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using LiberacionProductoWeb.Models.LayoutLeyendsViewModels;
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-6-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                    data-parent="#step-6-accordion" href="#step-6-collapse-three" aria-expanded="true">
+                    <i id="icon-6" class="fa fa-plus-circle pull-right"></i>
+                    @Model.LayoutLeyends.Where(x=>x.Step.Equals(LayoutLeyendsProductionOrderSteps.StepSix.Value) && x.Type.Equals(LayoutLeyendsType.ProductionOrder.Value)).Select(x=>x.Title).FirstOrDefault()
+                </a>
+            </h3>
+        </div>
+        <div id="step-6-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                @Html.Raw(@Model.LayoutLeyends.Where(x=>x.Step.Equals(LayoutLeyendsProductionOrderSteps.StepSix.Value) && x.Type.Equals(LayoutLeyendsType.ProductionOrder.Value)).Select(x=>x.Text).FirstOrDefault())
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-group" id="step-7-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                    data-parent="#step-7-accordion" href="#step-7-collapse-three" aria-expanded="true">
+                    <i class="fa fa-plus-circle pull-right"></i>
+                    @Model.LayoutLeyends.Where(x=>x.Step.Equals(LayoutLeyendsProductionOrderSteps.StepSeven.Value) && x.Type.Equals(LayoutLeyendsType.ProductionOrder.Value)).Select(x=>x.Title).FirstOrDefault()
+                </a>
+            </h3>
+        </div>
+        <div id="step-7-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                @Html.Raw(@Model.LayoutLeyends.Where(x=>x.Step.Equals(LayoutLeyendsProductionOrderSteps.StepSeven.Value) && x.Type.Equals(LayoutLeyendsType.ProductionOrder.Value)).Select(x=>x.Text).FirstOrDefault())
+            </div>
+        </div>
+    </div>
+</div>

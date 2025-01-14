@@ -1,0 +1,23 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using LiberacionProductoWeb.Models.LayoutLeyendsViewModels;
+@model LiberacionProductoWeb.Models.ProductionOrderViewModels.ProductionOrderViewModel;
+@inject IViewLocalizer Localizer
+
+<div class="panel-group" id="step-2-accordion">
+    <div class="panel panel-primary overflow-hidden">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                   data-parent="#step-2-accordion" href="#step-2-collapse-three" aria-expanded="true">
+                    <i id="icon-2" class="fa fa-plus-circle pull-right"></i>
+                    @Model.LayoutLeyends.Where(x=>x.Step.Equals(LayoutLeyendsProductionOrderSteps.StepTwo.Value) && x.Type.Equals(LayoutLeyendsType.ProductionOrder.Value)).Select(x=>x.Title).FirstOrDefault()
+                </a>
+            </h3>
+        </div>
+        <div id="step-2-collapse-three" class="@Model.ShowPanelSteps" style="">
+            <div class="panel-body">
+                @Html.Raw(@Model.LayoutLeyends.Where(x=>x.Step.Equals(LayoutLeyendsProductionOrderSteps.StepTwo.Value) && x.Type.Equals(LayoutLeyendsType.ProductionOrder.Value)).Select(x=>x.Text).FirstOrDefault())
+            </div>
+        </div>
+    </div>
+</div>

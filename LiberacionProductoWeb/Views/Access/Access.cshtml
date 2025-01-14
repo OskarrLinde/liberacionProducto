@@ -1,0 +1,116 @@
+﻿@model LiberacionProductoWeb.Models.ConfigViewModels.ConfiguracionUsuarioVM;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+
+@{
+	ViewData["Title"] = "Iconos de acceso";
+	Layout = "~/Views/Shared/_LayoutAccess.cshtml";
+}
+
+<div class="section-container section-with-top-border p-b-10">
+	<div class="row" style="text-align:center;">
+		<div class="col-lg-12 m-b-15">
+			@* <a href="@Model.PathECB" class="btn btn-blue" style="border-radius:10px"> *@
+			<a href="@Url.Action("Clientes", "CertCatalogos")" class="btn btn-blue" style="border-radius:10px">
+				<img src="~/img/access/especificaciones_de_clientes_bulk.png" alt="" style="width:25%; border-radius:10px" />
+				Especificaciones de Clientes Bulk
+			</a>
+		</div>
+	</div>
+	<div class="row" style="text-align:center;">
+		<div class="col-lg-12 m-b-15">
+			@* <a href="@Model.PathCAB" class="btn btn-blue" style="border-radius:10px"> *@
+			<a href="@Url.Action("Catalogs", "CertCatalogos")" class="btn btn-blue" style="border-radius:10px">
+				<img src="~/img/access/certificados_analiticos_bulk.png" alt="" style="width:25%; border-radius:10px" />
+				Certificados Analíticos Bulk
+			</a>
+		</div>
+	</div>
+	<div class="row" style="text-align:center;">
+		<div class="col-lg-12 m-b-15">
+			@* <a href="@Model.PathCPM" class="btn btn-blue" style="border-radius:10px"> *@
+			<a href="@Url.Action("Index", "Home")" class="btn btn-blue" style="border-radius:10px">
+				<img src="~/img/access/certificados_producto_medicinal_bulk.png" alt="" style="width:25%; border-radius:10px" />
+				Certificados Producto Medicinal
+			</a>
+		</div>
+	</div>
+</div>
+
+@section Styles {
+
+
+	<link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+	<link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+	<link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+	<link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+	<link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+	<link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+	<link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+	<link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+	<link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+
+}
+
+@section scripts {
+
+	<environment names="Development,Staging,Production">
+		<script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+		<script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+		<script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+		<script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+		<script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+		<script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+		<script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+
+		<script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+		<script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+		<script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+		<script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+		<script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+		<script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+		<script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+		<script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+		<script src="~/js/demo.min.js"></script>
+		<script src="~/js/apps.min.js"></script>
+		<script src="~/js/catalogs.js"></script>
+	</environment>
+
+	<script>
+		$(function () {
+
+			if ('@Model.MensajeError'.length > 1) {
+				$('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+			}
+		});
+
+		$(function () {
+
+			if ('@Model.MensajeInfo'.length > 1) {
+				$('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+			}
+		});
+
+		$(document).ready(function () {
+
+			App.init();
+			Demo.init();
+		});
+	</script>
+}

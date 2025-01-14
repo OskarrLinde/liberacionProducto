@@ -1,0 +1,618 @@
+﻿@model LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsVM
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Helpers;
+@using LiberacionProductoWeb.Models.CheckListViewModels;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@inject IStringLocalizer<Resource> resource;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cambios a los textos del checklist";
+    var url = Context.Request.Host.Value;
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userId = "";
+    if (claimsIdentity != null)
+    {
+        var name = claimsIdentity.Name;
+        if (name != null)
+        {
+            var FullUserInfo = await UserManager.FindByNameAsync(name);
+            userId = FullUserInfo.Id;
+        }
+    }
+}
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+<!-- begin #content -->
+<div id="content" class="content">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="javascript:;">Catálogos</a></li>
+        <li class="breadcrumb-item active">Cambios a los textos del checklist</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Cambios a los textos del checklist</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-5">
+        <br />
+        <form method="post" asp-action="CrearEditar" id="CheckListForm">
+            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_LAYOUT_CHECKLIST))
+            {
+                <button name="Guardar" hidden class='btn btn' id="Guardar" onclick="ShowModal(false)" type="button" style="background-color:transparent">
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+                <button class='btn btn' name="Editar" id="Editar" type="button" style="background-color:transparent">
+                    <i class="fa fa-edit"></i> Editar
+                </button>
+                <button class='btn btn' hidden name="Cancelar" id="Cancelar" type="button" style="background-color:transparent">
+                    <i class="fa fa-trash"></i> Cancelar
+                </button>
+                <button name="view" hidden class='btn btn' id="view" onclick="VistaPrevia()" type="button" style="background-color:transparent">
+                    <i class="fa fa-binoculars"></i> Vista previa
+                </button>
+                <button name="Publicar" hidden class='btn btn' id="Publicar" onclick="ShowModal(true)" type="button" style="background-color:transparent">
+                    <i class="fa fa-save"></i> Publicar
+                </button>
+            }
+
+            <br />
+            <div class="container" id="pdfEdit" style="pointer-events: none; color:silver">
+                <br />
+                <div id="step1">
+                    <div class="panel-group" id="step-1-accordion">
+                        <div class="panel panel-primary overflow-hidden">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <a class="accordion-toggle accordion" data-toggle="collapse" data-parent="#step-1-accordion"
+                                       href="#step-1-collapse-three" aria-expanded="true">
+                                        <i id="icon-1" class="fa fa-plus-circle pull-right"></i>
+                                    </a>
+                                    <input type="text" class="form-control" asp-for="TitleOne" placeholder="Inspección visual de pipas al recibo">
+                                    <label id="TitleOne-error" class="text-danger"></label>
+                                </h3>
+                            </div>
+                            <div id="step-1-collapse-three" class="" style="">
+                                <div class="panel-body">
+                                    <input type="text" class="form-control" asp-for="LeyendOne" placeholder="IMPORTANTE: La calificación de cualquier elemento en esta sección como 'NO CUMPLE', implica que la pipa NO reúne las condiciones necesarias para ser llenado o liberada, por lo cuál deberán definirse las acciones a seguir y, documentarse en este registro para su seguimiento">
+                                    <label id="LeyendOne-error" class="text-danger"></label>
+                                </div>
+                                <div class="panel-body ">
+                                    <div class="table-responsive">
+                                        <div class="table-responsive">
+                                            <table id="tbl-check" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" class="text-left">Requisito a evaluar \ criterios</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepOne" id="StepOne"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepTwo" id="StepTwo"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepThree" id="StepThree"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepFor" id="StepFor"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepFive" id="StepFive"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <br>
+                <hr />
+                <div id="step2">
+                    <div class="panel-group" id="step-2-accordion">
+                        <div class="panel panel-primary overflow-hidden">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                       data-parent="#step-2-accordion" href="#step-2-collapse-three" aria-expanded="true">
+                                        <i id="icon-2" class="fa fa-plus-circle pull-right"></i>
+                                    </a>
+                                    <input type="text" class="form-control" asp-for="TitleTwo" placeholder="LLenado y verificación de pipas">
+                                    <label id="TitleTwo-error" class="text-danger"></label>
+                                </h3>
+                            </div>
+                            <div id="step-2-collapse-three" class="" style="">
+                                <div class="panel-body">
+                                    <input type="text" class="form-control" asp-for="LeyendTwo" placeholder="IMPORTANTE: Esta sección contituye una verificación para asegurar que quien realiza el llenado de la pipa ha considerado las actividades definidas en el manual de BPM y prerrequisitos, así como en los procedimientos aplicables cualquier cosa o desviación se notificará inmediatamente al personal en turno responsable de la localidad, para la toma de acciones , las cuales deberán documentarse en este registro para su control.">
+                                    <label id="LeyendTwo-error" class="text-danger"></label>
+                                </div>
+                                <div class="panel-body ">
+                                    <div class="table-responsive">
+                                        <div class="table-responsive">
+                                            <table id="tbl-checktwo" class="table table-striped table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" class="text-left">Requisito a evaluar \ criterios</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepSix" id="StepSix"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepSeven" id="StepSeven"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepEight" id="StepEight"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepNine" id="StepNine"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepTen" id="StepTen"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-justify">
+                                                            <textarea class="form-control col-md-12" asp-for="StepEleven" id="StepEleven"></textarea>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*///modals*@
+            <div class="modal fade" id="ModalSave" tabindex="-1" role="dialog" aria-labelledby="ModalSaveLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ModalSaveLabel">
+                                @*¿Deseas publicar la información?*@
+                                <div style="font-size:20px" class="modal-title" id="mheader"></div>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal" name="Guardarchecklist" id="Guardarchecklist">Si</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Styles {
+    <style>
+        .colorWhite {
+            background-color: white
+        }
+    </style>
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/FixedHeader/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/plugins/tinymce/skins/ui/tinymce-5/skin.min.css" rel="stylesheet" />
+    <link href="~/css/production-order.css" rel="stylesheet" />
+}
+    <!-- end #content -->
+    @section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/plugins/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/js/linde.js"></script>
+        <script src="~/js/production-order/production-order-index.js"></script>
+    </environment>
+    <script>
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        $(".accordion-toggle").click(function () {
+            if ($(this).find("i").hasClass("fa-minus-circle")) {
+                $(this).find("i").removeClass("fa-minus-circle").addClass("fa-plus-circle");
+            } else {
+                $(this).find("i").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+
+            }
+
+        });
+        $(document).ready(function () {
+            App.init();
+            Demo.init();
+            $('#step-1-collapse-three').addClass('show');
+            $('#step-2-collapse-three').addClass('show');
+            $('#step-3-collapse-three').addClass('show');
+            $('#step-4-collapse-three').addClass('show');
+            $('#step-5-collapse-three').addClass('show');
+            $('#step-6-collapse-three').addClass('show');
+            $('#step-7-collapse-three').addClass('show');
+            $('#step-8-collapse-three').addClass('show');
+            $('#step-9-collapse-three').addClass('show');
+            $('#step-10-collapse-three').addClass('show');
+            $('#step-11-collapse-three').addClass('show');
+
+            $("#Editar").on("click", function () {
+                $("#Editar").attr('hidden', true);
+                $("#pdfEdit").removeAttr("style");
+                $("#Cancelar").attr('hidden', false);
+                $("#Guardar").attr('hidden', false);
+                $("#view").attr('hidden', false);
+                $("#Publicar").attr('hidden', false);
+            });
+            $("#Cancelar").on("click", function () {
+                $("#Guardar").attr('hidden', false);
+                window.location.reload();
+            });
+            tinymce.init({
+                selector: '#StepOne',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepTwo',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepThree',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepFor',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepFive',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepSix',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepSeven',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepEight',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepNine',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepTen',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepEleven',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+        });
+        async function CrearEditar(active) {
+            $.ajax({
+                type: "POST",
+                url: "/LayoutLeyends/CrearEditarChecklist?active=" + active,
+                data: serializeChecklist(),
+                dataType: "json",
+                success: function (response) {
+                    console.log(response)
+                    if (response.result == "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: "Se guardó con éxito",
+                            class_name: "gritter-light"
+                        })
+                        //window.location.reload();
+                    }
+                    else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+
+                        return false;
+                    }
+                }
+            });
+
+        }
+        async function Save(event) {
+            CrearEditar(true);
+        }
+        function serializeChecklist() {
+            var style = "font-family: 'Arial'; font-size: 9pt;";
+            let StepOne = tinymce.get("StepOne").getContent().includes("div");
+            let StepTwo = tinymce.get("StepTwo").getContent().includes("div");
+            let StepThree = tinymce.get("StepThree").getContent().includes("div");
+            let StepFor = tinymce.get("StepFor").getContent().includes("div");
+            let StepFive = tinymce.get("StepFive").getContent().includes("div");
+            let StepSix = tinymce.get("StepSix").getContent().includes("div");
+            let StepSeven = tinymce.get("StepSeven").getContent().includes("div");
+            let StepEight = tinymce.get("StepEight").getContent().includes("div");
+            let StepNine = tinymce.get("StepNine").getContent().includes("div");
+            let StepTen = tinymce.get("StepTen").getContent().includes("div");
+            let StepEleven = tinymce.get("StepEleven").getContent().includes("div");
+            let LayoutLeyendsCheckLists = [];
+
+            LayoutLeyendsCheckLists.push({
+                "Title": "Condiciones de caja de válvulas :" + "\r\n" +
+                "Limpia, libre de objetos con tapones colocados en las conexiones de carga / descarga",
+                "Text": StepOne ? tinymce.get("StepOne").getContent() : `<div style="${style}">` + tinymce.get("StepOne").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepOne.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListIV.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Estado físico de mangueras y conexiones :" + "\r\n" +
+                "En un buen estado, sin fracturas o desgaste excesivo, sin evidencia de desprendimiento de rebabas.",
+                "Text": StepTwo ? tinymce.get("StepTwo").getContent() : `<div style="${style}">` + tinymce.get("StepTwo").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepTwo.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListIV.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Seguridad de caja y portamangueras :" + "\r\n" +
+                "Puertas de caja de válvulas en buen estado, cerradas y con candados colocados, portamangueras con tapa en buen estado y pasador colocado.",
+                "Text": StepThree ? tinymce.get("StepThree").getContent() : `<div style="${style}">` + tinymce.get("StepThree").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepThree.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListIV.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title":  "Condiciones de portamangueras :" + "\r\n" +
+                "En un buen estado, limpio, libre de objetos, maguera con tapón colocado.",
+                "Text": StepFor ? tinymce.get("StepFor").getContent() : `<div style="${style}">` + tinymce.get("StepFor").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepFor.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListIV.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Condiciones del personal :"  + "\r\n" +
+                "Con equipo de seguridad, adecuado y en buen estado, uniforme en buen estado, libre de roturas y rasgaduras significativas y, en condiciones apropiadas de higiene.",
+                "Text": StepFive ? tinymce.get("StepFive").getContent() : `<div style="${style}">` + tinymce.get("StepFive").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepFive.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListIV.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Purgado de línea de transferencia de acuerdo al procedimiento de llenado de pipas aplicable a la localidad.",
+                "Text": StepSix ? tinymce.get("StepSix").getContent() : `<div style="${style}">` + tinymce.get("StepSix").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepSix.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Sellos de conexiones para el llenado, en buen estado, sin fracturas o evidencia de desgaste excesivo.",
+                "Text": StepSeven ? tinymce.get("StepSeven").getContent() : `<div style="${style}">` + tinymce.get("StepSeven").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepSeven.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Colocación de sellos foliados en válvula de descarga (cuando aplique).",
+                "Text": StepEight ? tinymce.get("StepEight").getContent() : `<div style="${style}">` + tinymce.get("StepEight").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepEight.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Colocación de tapones en conexiones de carga/ descarga y maguera de transferencia de producto.",
+                "Text": StepNine ? tinymce.get("StepNine").getContent() : `<div style="${style}">` + tinymce.get("StepNine").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepNine.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+
+            LayoutLeyendsCheckLists.push({
+                "Title": "Colocación de candado(s) en caja de válvulas y, pasador en la tapa del portamangueras.",
+                "Text": StepTen ? tinymce.get("StepTen").getContent() : `<div style="${style}">` + tinymce.get("StepTen").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepTen.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": "Entrega de los certificados de calidad al conductor (cuando aplique).",
+                "Text": StepEleven ? tinymce.get("StepEleven").getContent() : `<div style="${style}">` + tinymce.get("StepEleven").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.StepEleven.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": $("#TitleOne").val(),
+                "Text": $("#LeyendOne").val(),
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.LeyendOne.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListIV.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            LayoutLeyendsCheckLists.push({
+                "Title": $("#TitleTwo").val(),
+                "Text": $("#LeyendTwo").val(),
+                "Step": '@LiberacionProductoWeb.Models.CheckListViewModels.CheckListSteps.LeyendTwo.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.CheckListFP.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": "CheckList"
+            });
+            return {
+                "LayoutLeyendsCheckLists": LayoutLeyendsCheckLists,
+            }
+        }
+        async function VistaPrevia(event) {
+            $.ajax({
+                type: "POST",
+                url: "/LayoutLeyends/CrearEditarPreviewCheckList",
+                data: serializeChecklist(),
+                dataType: "json",
+                success: function (response) {
+                    valorAccion = response.message;
+                    if (response.result == "Ok") {
+                        $.gritter.add({
+                            title: "Mensaje",
+                            text: "Se mostrará vista previa",
+                            class_name: "gritter-light"
+                        })
+                        window.open('@Url.Action("PreviewCheckList", "LayoutLeyends")', "_blank");
+                    }
+                    else {
+                        $.gritter.add({
+                            title: "Ocurrió un error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+
+                        return false;
+                    }
+                }
+            });
+        }
+        async function ShowModal(active) {
+            if (active) {
+                $('#mheader').text("¿Deseas publicar la información?");
+                $('#Guardarchecklist').attr("onclick", "CrearEditar(true)")
+
+            } else {
+                $('#mheader').text("¿Deseas guardar la información?");
+                $('#Guardarchecklist').attr("onclick", "CrearEditar(false)")
+            }
+            $('#ModalSave').modal('show');
+        }
+    </script>
+}

@@ -1,0 +1,1098 @@
+﻿@model LotificacionViewModel;
+@using LiberacionProductoWeb.Models.Lotificacion
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@using Microsoft.Extensions.Configuration;
+@inject IConfiguration Configuration;
+
+
+<script src="~/lib/sweetalert/sweetalert2.min.js"></script>
+@* 
+<script src="~/lib/notify/notify.min.js"></script>
+ *@
+
+
+
+@{
+    ViewData["Title"] = "Lotificacion";
+    Layout = "~/Views/Shared/_LayoutCatalogs.cshtml";
+}
+
+<!-- Navigation -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="active">
+                    <a asp-controller="LotificacionTanques" asp-action="Lotificacion">
+                        @* <i class="fa fa-file-alt"></i> *@
+                        <span>Lotificación de Tanques</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="LotificacionTanques" asp-action="ListadoLotes">
+                        @* <i class="fa fa-file-alt"></i> *@
+                        <span>Listado de Lotes</span>
+                    </a>
+                </li>
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="@Url.Action("Access", "Access")">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Catalogs", "CertCatalogos")">Lotificacion de Tanques</a></li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    @* <h1 class="page-header tituloProducto"></h1> *@
+    <!-- end page-header -->
+
+    <div class="section-container section-with-top-border p-b-5">
+        <div class="row" style="display: inline;">
+            <div class="panel panel-primary">
+
+                <div class="panel-heading">
+                    <h1 class="page-header tituloProducto" style="text-align: center;">
+                    </h1>
+                </div>
+
+                <div class="container_lotificacion">
+
+                    <div id="notifyButton"></div>
+
+                    <div class="row  mb-3">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="dynamicSelectPlant" class="form-label">Planta:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <select class="selectpicker" data-live-search="true" id="dynamicSelectPlant" name="SelectedOption">
+                                        @foreach (var planta in Model.CatPlanta)
+                                        {
+                                            <option value="@planta.idPlanta">@planta.DescPlanta</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row  mb-3">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <label for="dynamicSelectProduct" class="form-label">Producto:</label>
+                                </div>
+                                <div class="col-md-9">
+                                    <select class="selectpicker" data-live-search="true" id="dynamicSelectProduct" name="SelectedOption">
+                                        <option value="">Seleccione una opción</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row  mb-3">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="row mb-3">
+                                <div class="col-md-6" style="text-align: right;">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label for="dynamicSelectTank" class="form-label">Tanque:</label>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <select class="selectpicker" data-live-search="true" id="dynamicSelectTank" name="SelectedOption">
+                                                <option value="">Seleccione una opción</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 ">
+                                    <div class="row">
+                                        <div class="col-md-4" style="text-align: left;">
+                                            <label class="form-label">Fecha: @Model.FechaActual.ToString("dd-MM-yyyy")</label>
+                                        </div>
+                                        <div class="col-md-3" style="text-align: right;">
+                                            <label class="form-label">Lote Origen:</label>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <input class='form-control' id='LoteOrigen' type='text'>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ul class="nav nav-tabs" id="mytab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pestaña1-tab" data-bs-toggle="tab" data-bs-target="#pestaña1" type="button" role="tab" aria-controls="pestaña1" aria-selected="true" style="cursor: default;pointer-events: none;">
+                                Análisis Realizado
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mt3" id="myTabContent">
+                        <div class="tab-pane fade show active" id="pestaña1" role="tabpanel" aria-labelledby="pestaña1-tab">
+                            <table id="dynamicTable">
+                                <thead>
+                                    <tr>
+                                        <th class="hiddenLotificacion_UM">ID Parametro</th>
+                                        <th>Parámetro</th>
+                                        <th>Valor Límite Mínimo</th>
+                                        <th>Valor Límite Máximo</th>
+                                        <th>Valor Análisis</th>
+                                        <th class="hiddenLotificacion_UM">ID Unidad Medida</th>
+                                        <th>Unidad de Medida</th>
+                                        <th>Analizador</th>
+                                        <th class="hiddenLotificacion_MA">IdMetodoAnalizador</th>
+                                        <th class="hiddenLotificacion_UM">ID Unidad Medida </th>
+                                        <th>.</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                            <div class="row mb-3 align-items-center">
+                                <div class="col-md-1">
+                                    <label for="commentarios" class="form-label">Comentarios:</label>
+                                </div>
+                                <div class="col-md-11">
+                                    <textarea class="form-control" id="commentarios" placeholder="Escribe tus comentarios aquí..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6" style="text-align: right;">
+                                            <label for="initial-level">Nivel Inicial del tanque:</label>
+                                            <input type="text" id="initial-level">
+                                        </div>
+                                        <div class="col-md-6 ">
+                                            <div class="form-group" id="pesoInicialGroup">
+                                                <div class="col-md-6 m-3 bg-light border p-3" style="text-align: center;">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="initial-unit" id="pesoInicial" value="25">
+                                                        <label class="form-check-label" for="pesoInicial">Peso (kg)</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="initial-unit" id="psigInicial" value="26">
+                                                        <label class="form-check-label" for="psigInicial">PSIG</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6 offset-md-3">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6" style="text-align: right;">
+                                            <label for="final-level">Nivel Final del tanque:</label>
+                                            <input type="text" id="final-level">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group" id="pesoFinalGroup">
+                                                <div class="col-md-6 m-3 bg-light border p-3" style="text-align: center;">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="final-unit" id="pesoFinal" value="25">
+                                                        <label class="form-check-label" for="pesoFinal">Peso (kg)</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="final-unit" id="psigFinal" value="26">
+                                                        <label class="form-check-label" for="psigFinal">PSIG</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="btn-container">
+                                <button id="btnGenerateLoteTanque">Generar Lote de Tanque</button>
+                            </div>
+                            <div id="validationMessage" class="mt-3"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Styles {
+
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />    
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+
+        <script src="~/lib/notify/notify.min.js"></script>
+        @* <script src="https://cdn.jsdelivr.net/npm/notifyjs-browser/dist/notify.js"></script> *@
+    </environment>
+
+    <script>
+        var commonUrl = @Json.Serialize(@Configuration.GetSection("publishUrl").GetSection("commonUrl").Value)
+
+        console.log(commonUrl);
+
+        var pb = {
+            base: commonUrl
+        };
+
+        $(function () {
+
+            if ('@Model.MensajeError'.length > 1) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+            }
+        });
+
+        $(function () {
+
+            if ('@Model.MensajeInfo'.length > 1) {
+                $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+            }
+        });
+
+
+        $(document).ready(function () {
+
+            App.init();
+            Demo.init();
+
+            // si funciona solo lo oculto para tomar como muestra
+            // $.notify("¡Esta es una notificación simple!", "success");
+            // $.notify("¡Esta es una notificación simplesdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfds!", 
+            // { 
+            //     className: "success", //info, warn, error
+            //     position: "top right" ,
+            //         autoHide: false
+            // });
+
+            // si funciona solo lo oculto para tomar como muestra
+            // $.notify.addStyle('custom', {                    
+            //     html: "<div class='custom-notifyjs-container'><div class='custom-notifyjs-title'><img src='/img/NewFolder/success.png' alt='icon'> <div data-notify-html='title'></div></div><div data-notify-html='message'></div></div>"
+            // }); 
+                    
+            // $.notify({ 
+            //     title: '¡Notificación!', 
+            //     message: 'Esta es una notificación con opciones avanzadas.' 
+            // }, 
+            // { 
+            //     style: 'custom', className: "success", position: "top right", autoHide: false, autoHideDelay: 3000, showAnimation: 'slideDown', hideAnimation: 'slideUp', clickToHide: true 
+            // }); 
+           
+
+            var notifyInstanceTank = null;
+
+            // Deshabilitar el botón
+            $('#btnGenerateLoteTanque').prop('disabled', true);
+
+            // Deshabilitar los inputs de nivel inicial y final
+            $('#initial-level').prop('disabled', true);
+            $('#final-level').prop('disabled', true);
+
+            // Deshabilitar los grupos de form pesoInicial/psigInicial y pesoFinal/psigFinal
+            $('#pesoInicialGroup input').prop('disabled', true);
+            $('#pesoFinalGroup input').prop('disabled', true);
+           
+            var idPlantaSeleccionado = $('#dynamicSelectPlant').val();
+            
+            // Si es un número, no necesita comillas
+            // var idProductoSeleccionado = '@Model.Product.Id';
+
+            var idProductoValueSeleccionado = null;
+            var idUsuarioAlta = @Model.ExternalId;
+
+            // console.log(idUsuarioAlta);
+
+            function cargarProductosPorPlanta(plantaId) {
+                if (plantaId) {
+                    $.ajax({
+                        type: "GET",
+                        url: pb.base + "/LotificacionTanques/ObtenerProductosPorPlanta",
+                        data:
+                        {
+                            plantaId: plantaId
+                        },
+                        success: function (response) {
+                            console.log("Respuesta del servidor: ", response);
+                            $("#dynamicSelectProduct").empty()
+                                .append($('<option>',
+                                    {
+                                        value: '',
+                                        text: 'Seleccione un producto'
+                                    }));
+                            $("#dynamicSelectProduct").prop("disabled", false);
+                            if (Array.isArray(response.data)) {
+                                response.data.forEach(function (item) {
+                                    $("#dynamicSelectProduct").append($('<option>',
+                                        {
+                                            value: item.idProducto,
+                                            text: item.descProducto
+                                        }));
+                                });
+                            }
+                            else {
+                                console.error("La respuesta no es un array. Estructura inesperada.");
+                            }
+
+
+                            $('#dynamicSelectProduct').selectpicker('refresh');
+                            // Actualizar la etiqueta
+                            $('#productoLabel').text("");
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error("Error en la solicitud AJAX: ", textStatus, errorThrown);
+                        }
+                    });
+                }
+            }
+
+            cargarProductosPorPlanta(idPlantaSeleccionado);
+
+
+            $('.selectpicker').selectpicker({ noneSelectedText: 'Seleccione una opción' });
+
+            $('#dynamicSelectPlant').change(function () {
+                var plantaId = $(this).val();
+
+                //**********/
+                //Limpia Valores a Default
+                $('.tituloProducto').text("");
+
+                //Limpia la tabla dinamica
+                var $tbody = $('#dynamicTable tbody');
+                $tbody.empty();
+
+                // Deshabilitar los inputs de nivel inicial y final
+                $('#initial-level').prop('disabled', true);
+                $('#final-level').prop('disabled', true);
+
+                // Deshabilitar los grupos de form pesoInicial/psigInicial y pesoFinal/psigFinal
+                $('#pesoInicialGroup input').prop('disabled', true);
+                $('#pesoFinalGroup input').prop('disabled', true);
+
+                // Deshabilitar el botón
+                $('#btnGenerateLoteTanque').prop('disabled', true);
+
+                //Combo de Tanque
+                $("#dynamicSelectTank").empty();
+                $("#dynamicSelectTank").prop("disabled", false);
+                $('#dynamicSelectTank').append($('<option>',
+                    {
+                        value: '',
+                        text: 'Seleccione un Tanque'
+                    }));
+                //**********/
+
+
+                $('#dynamicSelectTank').selectpicker('refresh');                
+                if (plantaId) {
+                    $.ajax({
+                        type: "GET",
+                        url: pb.base + "/LotificacionTanques/ObtenerProductosPorPlanta?plantaId=" + plantaId,
+                        success: function (response) {
+                            // console.log(response);
+                            $("#dynamicSelectProduct").empty();
+                            $("#dynamicSelectProduct").prop("disabled", false);
+                            $('#dynamicSelectProduct').append($('<option>',
+                                {
+                                    value: '',
+                                    text: 'Seleccione un producto'
+                                }));
+
+                            response.data.forEach(function (item) {
+                                $("#dynamicSelectProduct").append($('<option>', {
+                                    value: item.idProducto,
+                                    text: item.descProducto
+                                }));
+                            });
+
+                            $('#dynamicSelectProduct').selectpicker('refresh');
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error("Error en la solicitud AJAX: ", textStatus, errorThrown);
+                        }
+                    });
+                }
+                else {
+                    $('#dynamicSelectProduct').empty().append($('<option>',
+                        {
+                            value: '',
+                            text: 'Seleccione un producto'
+                        }));
+                }
+            });
+
+            $('#dynamicSelectProduct').change(function () {
+                var productoId = $(this).val();
+                idPlantaSeleccionado = $('#dynamicSelectPlant').val();
+
+                //Limpia parametros
+                $('#initial-level').val('');
+                $('#final-level').val('');
+                $('#pesoInicialGroup input').prop('checked', false);
+                $('#pesoFinalGroup input').prop('checked', false);
+                $('#commentarios').val('');
+
+                var selectedText = $("#dynamicSelectProduct option:selected").text();
+                // console.log(selectedText);
+                if (selectedText === "Seleccione un producto" || selectedText === "") {
+                    $('.tituloProducto').text("");
+                }
+                else {
+                    $('.tituloProducto').text(selectedText);
+
+                    $.ajax({
+                        type: 'GET',
+                        url: pb.base + '/LotificacionTanques/ObtenerEspecificacionProducto',
+                        contentType: 'application/json',
+                        data: ({
+                            plantaId: idPlantaSeleccionado,
+                            productoId: productoId
+                        }),
+                        success: function (response) {
+                            // console.log('Obtiene AnalisisParametros correctamente');
+                            // console.log(response);
+                            // Aquí puedes agregar la funcionalidad que debe ocurrir después de guardar los datos
+                            if (Array.isArray(response.data)) {
+                                // Limpia la tabla dinamica
+                                var $tbody = $('#dynamicTable tbody');
+                                $tbody.empty();
+
+                                if (response.data.length > 0) {
+                                    // Habilitar el botón
+                                    $('#btnGenerateLoteTanque').prop('disabled', false);
+
+                                    // Habilitar los inputs de nivel inicial y final
+                                    $('#initial-level').prop('disabled', false);
+                                    $('#final-level').prop('disabled', false);
+
+                                    // Habilitar los grupos de form pesoInicial/psigInicial y pesoFinal/psigFinal
+                                    $('#pesoInicialGroup input').prop('disabled', false);
+                                    $('#pesoFinalGroup input').prop('disabled', false);
+
+                                    // Recupera el valor de "Observaciones" del primer registro
+                                    var observacionesResponse = response.data.length > 0 ? response.data[0].observaciones : '';
+                                    $('#commentarios').val(observacionesResponse);
+
+                                    response.data.forEach(function (item) {
+                                        console.log("Elemento: ", item);
+                                        var row = `<tr>
+                                                        <td class="hiddenLotificacion_UM idParametro">${item.idParametro}</td>
+                                                        <td class="descParametroRow">${item.descripcionParametro}</td>
+                                                        <td class="valorLimiteInf">${item.valorLimiteInf}</td>
+                                                        <td class="valorLimiteSup">${item.valorLimiteSup}</td>
+                                                        <td class="editable">0.0000</td>
+                                                        <td class="hiddenLotificacion_UM idUnidadMedida">${item.idUnidadMedida}</td>
+                                                        <td>${item.descripcionUnidadMedida}</td>
+                                                        <td class="editable-dropdown">&nbsp;</td>
+                                                        <td class="hiddenLotificacion_UM idAnalizador">&nbsp;</td>
+                                                        <td class="hiddenLotificacion_MA idMetodo">&nbsp;</td>
+                                                        <td> <button class="edit-btn">✏️</button></td>
+                                                    </tr>`;
+                                        $tbody.append(row);
+                                    });
+                                }
+                                else {
+                                    // Deshabilitar el botón
+                                    $('#btnGenerateLoteTanque').prop('disabled', true);
+
+                                    // Deshabilitar los inputs de nivel inicial y final
+                                    $('#initial-level').prop('disabled', true);
+                                    $('#final-level').prop('disabled', true);
+
+                                    // Deshabilitar los grupos de form pesoInicial/psigInicial y pesoFinal/psigFinal
+                                    $('#pesoInicialGroup input').prop('disabled', true);
+                                    $('#pesoFinalGroup input').prop('disabled', true);
+                                }
+
+                            }
+                            else {
+                                console.error("La respuesta no es un array. Estructura inesperada.");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('Error al obtner los datos: ' + error);
+                        }
+                    });
+                }
+
+                if (idPlantaSeleccionado) {
+                    $.ajax({
+                        type: 'GET',
+                        url: pb.base + '/LotificacionTanques/ObtenerTanquesPorPlantaProducto',
+                        contentType: 'application/json',
+                        data: ({
+                            plantaId: idPlantaSeleccionado,
+                            productoId: productoId
+                        }),
+                        success: function (response) {
+                            console.log('Obtiene valores correctamente');
+                            console.log(response);
+                            // Aquí puedes agregar la funcionalidad que debe ocurrir después de guardar los datos
+                            $("#dynamicSelectTank").empty();
+                            $("#dynamicSelectTank").prop("disabled", false);
+                            $('#dynamicSelectTank').append($('<option>',
+                                {
+                                    value: '',
+                                    text: 'Seleccione un Tanque'
+                                }));
+
+                            if (Array.isArray(response.data)) {
+                                response.data.forEach(function (item) {
+                                    $("#dynamicSelectTank").append($('<option>',
+                                        {
+                                            value: item.idTanque,
+                                            text: item.descTanque
+                                        }));
+                                });
+                            }
+                            else {
+                                console.error("La respuesta no es un array. Estructura inesperada.");
+                            }
+                            $('#dynamicSelectTank').selectpicker('refresh');
+
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('Error al obtner los datos: ' + error);
+                        }
+                    });
+                }
+                else {
+                    $('#dynamicSelectTank').empty().append($('<option>',
+                        {
+                            value: '',
+                            text: 'Seleccione un tanque'
+                        }));
+                }
+            });
+
+            function validateInput(event) {
+                this.value = this.value.replace(/[^0-9.]/g, '');
+                if ((this.value.match(/\./g) || []).length > 1) {
+                    this.value = this.value.replace(/\.+$/, "");
+                }
+                // Permitir hasta 4 dígitos después del punto decimal
+                if (this.value.includes('.')) {
+                    var parts = this.value.split('.');
+                    parts[1] = parts[1].substring(0, 5);
+                    this.value = parts.join('.');
+                }
+            }
+
+            $('#initial-level, #final-level').on('input', validateInput);
+
+            $("#dynamicSelectTank").change(function () 
+            {
+                if (notifyInstanceTank) 
+                {                   
+                    //$(".custom-notifyTanque").remove();
+                    // Ocultar la notificación al cambiar la selección del elemento
+                    if ($(".custom-notifyTanque").length) 
+                    { 
+                        $(".custom-notifyTanque").closest(".notifyjs-wrapper").remove(); 
+                    }   
+                }
+            
+            });
+
+            function bindEditButton() {
+                //delegacion de eventos
+                $(document).off('click', '.edit-btn').on('click', '.edit-btn', function () {
+                    //$(document).on('click', '.edit-btn', function () {
+                    var currentRow = $(this).closest('tr');
+                    var editableCells = currentRow.find('.editable');
+                    var dropdownCell = currentRow.find('.editable-dropdown');
+                    var idMetodoCell = currentRow.find('.idMetodo');
+                    var idParametroCell = currentRow.find('.idParametro').text();
+
+                    idPlantaSeleccionado = $('#dynamicSelectPlant').val();
+
+                    editableCells.each(function () {
+                        var cell = $(this);
+                        var cellText = cell.text();
+                        cell.html('<input type="text" class="form-control" value="' + cellText + '">');
+                    });
+
+                    // Agregar evento keypress a los inputs dentro de las celdas editables
+                    currentRow.find('.editable input').on('keypress', function (event) {
+                        var charCode = (event.which) ? event.which : event.keyCode;
+                        if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                            return false;
+                        }
+                        // Permitir solo un punto decimal
+                        if (charCode === 46 && $(this).val().indexOf('.') !== -1) {
+                            return false;
+                        }
+                        // // Permitir hasta 4 dígitos después del punto decimal
+                        // var inputValue = $(this).val();
+                        // if (inputValue.includes('.') && inputValue.split('.')[1].length >= 4)
+                        // {
+                        //     return false;
+                        // }
+                        return true;
+                    });
+
+                    var currentText = dropdownCell.text();
+
+                    // console.log("planta: ", idPlantaSeleccionado);
+                    // console.log("parametro: ", idParametroCell);
+
+                    $.ajax({
+                        type: 'GET',
+                        url: pb.base + "/LotificacionTanques/ObtenerAnalizadores",
+                        data: ({
+                            idPlanta: idPlantaSeleccionado,
+                            idParametro: idParametroCell
+                        }),
+                        success: function (response) {                            
+                            // Crear el elemento select
+                            var select = $('<select class="form-control"></select>');
+                            // Iterar sobre la respuesta y agregar opciones al select
+                            //console.log(response);
+                            response.forEach(function (analizador, index) {
+                                var option = $('<option></option>')
+                                    .val(analizador.idAnalizador)
+                                    .text(analizador.descAnalizador)
+                                    .data('idMetodo', analizador.idMetodo);
+
+                                //Seleccionar por defecto el primer registro
+                                if (index === 0) {
+                                    option.attr('selected', 'selected');
+                                }
+
+                                select.append(option);
+                            });
+                            // Agregar el select al dropdownCell
+                            dropdownCell.html(select);
+
+                            function actualizarIdMetodo() {
+                                // var editableCells = currentRow.find('.editable');
+
+                                var selectedOption = currentRow.find('.editable-dropdown select option:selected');
+                                var idMetodo = selectedOption.data('idMetodo');
+                                idMetodoCell.text(idMetodo);
+                            }
+
+                            // Ejecutar al cargar la página para el primer elemento
+                            actualizarIdMetodo();
+                            // Evento para actualizar el idMetodo al cambiar la selección
+                            $('.editable-dropdown select').on('change', actualizarIdMetodo);
+
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('Error al obtener los analizadores: ' + error);
+                        }
+                    });
+
+
+                    var actionsCell = currentRow.find('td:last');
+
+                    actionsCell.html('<button class="btn btn-success save-btn">Guardar</button> ' +
+                        '<button class="btn btn-danger cancel-btn">Cancelar</button>');
+
+                    bindSaveCancelButtons();
+                });
+            }
+
+            function bindSaveCancelButtons() {
+                $('.cancel-btn').on('click', function () {
+                    var row = $(this).closest('tr');
+
+                    row.find('.editable').each(function () {
+                        var cell = $(this);
+                        var cellInput = cell.find('input');
+                        // var originalValue = cellInput.attr('value');
+                        // cell.html(originalValue);
+                        // Restaurar el valor de la celda a 0.0000
+                        cell.html('0.0000');
+                    });
+
+                    var dropdownCell = row.find('.editable-dropdown');
+                    dropdownCell.html('');
+                    var idMetodoCell = row.find('.idMetodo');
+                    idMetodoCell.html('');
+                    row.find('td:last').html('<button class="edit-btn">✏️</button>');
+
+                    bindEditButton();
+                });
+
+              
+
+                $(document).off('click', '.save-btn').on('click', '.save-btn', function () {
+                    var currentRow = $(this).closest('tr');
+                    var valid = true;
+
+                    // Procesar celdas editables
+                    currentRow.find('.editable').each(function () {
+                        var cell = $(this);
+                        var input = cell.find('input');
+                        if (input.length) {
+                            // Obtener el valor del input
+                            var inputValue = input.val();
+
+                            // Validar si es un número válido
+                            if (!/^\d+(\.\d{1,4})?$/.test(inputValue)) {
+                                alert('Valor no válido: ' + inputValue);
+                                valid = false;
+                                return false;
+                            }
+                            // Reemplazar el input por el valor en la celda
+                            cell.html(inputValue);
+                        }
+                    });
+
+                    if (!valid)
+                        return false;
+
+                    var valorAnalisis = parseFloat(currentRow.find('.editable').text());
+                    var valorLimiteInf = parseFloat(currentRow.find('.valorLimiteInf').text());
+                    var valorLimiteSup = parseFloat(currentRow.find('.valorLimiteSup').text());
+                    var dropdownCellThis = currentRow.find('.editable-dropdown');
+
+                    if (isNaN(valorAnalisis) || valorAnalisis < valorLimiteInf || valorAnalisis > valorLimiteSup) {
+                        alert(`El valor ${valorAnalisis} está fuera del rango permitido (${valorLimiteInf} - ${valorLimiteSup}) en el parámetro ${currentRow.find('.descParametroRow').text()}.`);
+                        //currentRow.find('.editable').html('<input type="text" class="form-control" value="' + valorAnalisis + '">').find('input').focus();
+                        //BanderaProductoConforme = false;
+                       // return false;
+                    }
+                   
+
+                    // Procesar celda del dropdown
+                    var dropdownCell = currentRow.find('.editable-dropdown');
+                    var select = dropdownCell.find('select');
+                    if (select.length) {
+                        // Obtener el valor seleccionado
+                        var selectedValue = select.find('option:selected').val();
+                        var selectedText = select.find('option:selected').text();
+
+                        // Reemplazar el select por el texto seleccionado
+                        dropdownCell.html(selectedText);
+
+                        // Guardar el valor en una celda oculta
+                        currentRow.find('.idAnalizador').html(selectedValue);
+                    }
+
+                    // Restaurar los botones
+                    var actionsCell = currentRow.find('td:last');
+                    actionsCell.html('<button class="edit-btn">✏️</button>');
+
+                    bindEditButton();
+                });
+            }
+
+            function validateLotificacionBtn() {
+                $('#btnGenerateLoteTanque').click(function () {
+                    var tanqueSeleccionado = $('#dynamicSelectTank').val();
+                    var tanqueSeleccionadoText = $("#dynamicSelectTank option:selected").text();
+
+                    idPlantaSeleccionado = $('#dynamicSelectPlant').val();
+                    // console.log("tanque seleccionada Val:", tanqueSeleccionado);
+                    // console.log("tanque seleccionada Text:", tanqueSeleccionadoText);
+
+                    // Obtener el valor del select de productos
+                    idProductoValueSeleccionado = $('#dynamicSelectProduct').val();
+                    // Validación para asegurarse de que se selecciona un producto
+                    if (!idProductoValueSeleccionado) {
+                        alert("Por favor, seleccione un producto.");
+                        return;
+                        // Salir del evento si no hay producto seleccionado
+                    }
+
+                    if (!tanqueSeleccionado) {
+                        //alert("Por favor, seleccione un tanque.");
+
+                       $.notify("¡Por favor, seleccione un tanque!",
+                            {
+                                className: "info", 
+                                position: "top right",
+                                autoHide: true
+                            });
+
+                         notifyInstanceTank = $("#dynamicSelectTank").notify(
+                            "Seleccione un tanque",
+                            {
+                                className: "info custom-notifyTanque",
+                                position: "bottom left",
+                                        autoHide: false
+                            }
+                        );
+
+                        return;
+                    }
+
+                    var isGroup1Selected = $('input[name="initial-unit"]:checked').length > 0;
+                    var isGroup2Selected = $('input[name="final-unit"]:checked').length > 0;
+                    var validationMessage = $('#validationMessage');
+
+                    if (!isGroup1Selected || !isGroup2Selected) {
+                        validationMessage.html('<div class="alert alert-danger">Por favor, selecciona una opción en ambos grupos.</div>');
+                        return;
+                    }
+                    else {
+                        //validationMessage.html('<div class="alert alert-success">Generación exitosa.</div>');
+                        // Aquí puedes añadir la lógica adicional para la generación
+                    }
+
+                    var BanderaProductoConforme = true;
+                    var allValid = true;
+                    var invalidRows = []; // Array para almacenar las descripciones de filas inválidas
+                    var tableData = []; // Array para almacenar los datos de la tabla
+
+                    // Validar inputs initial-level y final-level
+                    var initialLevel = $('#initial-level').val().trim();
+                    var finalLevel = $('#final-level').val().trim();
+
+                    if (initialLevel === '' || parseFloat(initialLevel) < 0) {
+                        allValid = false;
+                        $('#initial-level').addClass('invalid');
+                        // Resaltar input inválido (opcional)
+                        alert('El nivel inicial debe ser mayor a 0 y no estar vacío.');
+                        return;
+                        // Salir de la función si el valor es inválido
+                    }
+                    else {
+                        $('#initial-level').removeClass('invalid');
+                        // Remover resaltado si es válido (opcional)
+                    }
+
+                    if (finalLevel === '' || parseFloat(finalLevel) <= 0) {
+                        allValid = false;
+                        $('#final-level').addClass('invalid');
+                        // Resaltar input inválido (opcional)
+                        alert('El nivel final debe ser mayor a 0 y no estar vacío.');
+                        return;
+                        // Salir de la función si el valor es inválido
+                    }
+                    else {
+                        $('#final-level').removeClass('invalid');
+                        // Remover resaltado si es válido (opcional)
+                    }
+
+                    if (initialLevel > finalLevel) {
+                        allValid = false;
+                        $('#final-level').addClass('invalid');
+                        // Resaltar input inválido (opcional)
+                        alert('El nivel inicial no debe ser mayor a nivel final.');
+                        return;
+                    }
+
+                    if (initialLevel === finalLevel) {
+                        allValid = false;
+                        $('#final-level').addClass('invalid');
+                        // Resaltar input inválido (opcional)
+                        alert('El nivel inicial no debe ser igual a nivel final.');
+                        return;
+                    }
+
+                    $('#myTabContent tbody tr').each(function () {
+                        var currentRow = $(this);
+                        var descripcionParametro = currentRow.find('td').eq(1).text(); // Valor de la primera celda
+                        var descripcioAnalizador = "";
+                        var descripcioValorAnalisis = "";
+                        var rowValid = true;
+
+                        var rowData = {
+
+                            IdParametro: currentRow.find('.idParametro').text().trim(),
+                            ValorLimiteInf: currentRow.find('.valorLimiteInf').text().trim(),
+                            ValorLimiteSup: currentRow.find('.valorLimiteSup').text().trim(),
+                            ValorAnalisis: currentRow.find('.editable').text().trim(),
+                            IdUnidadMedida: currentRow.find('.idUnidadMedida').text().trim(),
+                            IdAnalizador: currentRow.find('.idAnalizador').text().trim(),
+                            IdMetodo: currentRow.find('.idMetodo').text().trim(),
+                            UsrAlta: idUsuarioAlta
+                        };
+
+                        var cvalorLimiteInf = currentRow.find('.valorLimiteInf').text().trim(); 
+                        var cvalorLimiteSup = currentRow.find('.valorLimiteSup').text().trim(); 
+                        var cvalorAnalisis = currentRow.find('.editable').text().trim();
+
+                        if (isNaN(cvalorAnalisis) || cvalorAnalisis < cvalorLimiteInf || cvalorAnalisis > cvalorLimiteSup) {
+                            BanderaProductoConforme = false;
+                        }
+
+                        //console.log("Datos a enviar detalle:", rowData);
+
+                        currentRow.find('.editable').each(function () {
+                            var cell = $(this);
+                            var cellText = cell.text().trim();
+                            if (cellText === '' || cellText === '0.0000' || !/^\d+(\.\d{1,4})?$/.test(cellText)) {
+                                rowValid = false;
+                                if (cellText === '' || cellText === '0.0000') {
+                                    descripcioValorAnalisis = "No se tiene valor de Analisis para el parametro " + descripcionParametro;
+                                }
+
+                                cell.addClass('invalid');
+                                // Agrega una clase para resaltar la celda inválida (opcional)
+                            }
+                            else {
+                                cell.removeClass('invalid');
+                                // Remueve la clase si es válida (opcional)
+                            }
+                        });
+
+
+
+                        currentRow.find('.editable-dropdown').each(function () {
+                            var cellDropdown = $(this);
+                            var cellDropdownText = cellDropdown.text().trim();
+                            if (cellDropdownText === '') {
+                                rowValid = false;
+                                descripcioAnalizador = "No se tiene seleccionado un Analizador para el parametro " + descripcionParametro;
+                                cellDropdown.addClass('invalid');
+                                // Agrega una clase para resaltar la celda inválida (opcional)
+                            }
+                            else {
+                                cellDropdown.removeClass('invalid');
+                                // Remueve la clase si es válida (opcional)
+                            }
+
+                            if (!rowValid) {
+                                allValid = false;
+                                invalidRows.push(descripcioValorAnalisis + ' - ' + descripcioAnalizador);
+                                // Añadir descripción de filas inválidas al array
+                            }
+                            else {
+                                tableData.push(rowData); // Agregar datos válidos de la fila al array
+                            }
+                        });
+
+                    });
+
+                    if (allValid) {
+                        // Todas las celdas son válidas, proceder con la acción del botón
+                        //console.log('Todas las celdas son válidas, procediendo...');
+                        
+                        // Datos de la tabla maestra
+                        var masterData =
+                        {
+                            IdLote: "",
+                            IdPlanta: idPlantaSeleccionado,
+                            IdTanqueDesc: tanqueSeleccionadoText,
+                            IdTanque: tanqueSeleccionado,
+                            IdProducto: idProductoValueSeleccionado,
+                            NivelIni: initialLevel,
+                            IdUMedidaIni: $('input[name="initial-unit"]:checked').val(),
+                            NivelFin: finalLevel,
+                            IdUMedidaFin: $('input[name="final-unit"]:checked').val(),
+                            Comentarios: $('#commentarios').val(),
+                            LoteOrigen: $('#LoteOrigen').val(),
+                            UsrAlta: idUsuarioAlta,
+                            Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6
+                        };
+
+                        //console.log("Datos a enviar:", masterData);
+
+                        // Todas las celdas son válidas, enviar datos al controlador
+                        $.ajax({
+                            type: 'POST',
+                            url: pb.base + '/LotificacionTanques/GenerarLote',
+                            //contentType: 'application/json',
+                            data: ({
+                                masterData: masterData,
+                                detailData: tableData
+                            }),
+                            success: function (response) {
+                                // console.log(response);
+                                Swal.fire({
+                                    title: "Lote Generado:",
+                                    text: response,
+                                    icon: "success",
+                                    button: "Aceptar",
+                                    allowOutsideClick: false, // Bloquear clics fuera del modal
+                                    allowEscapeKey: false, // Bloquear la tecla ESC
+                                    allowEnterKey: false // Bloquear la tecla Enter
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        // Este código se ejecuta después de que el usuario haga clic en "Aceptar"
+                                        // console.log("El usuario hizo clic en Aceptar");
+                                        
+                                        // // Por ejemplo, puedes recargar la página o resetear el formulario:
+                                        location.reload(); // Para recargar la página // o // $('form')[0].reset(); // Para resetear el primer formulario encontrado
+                                    }
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.log('Error al guardar los datos: ' + error);
+                            }
+                        });
+                    }
+                    else {
+                        // Hay celdas inválidas, muestra un mensaje de error o toma alguna acción
+                        alert('Las siguientes filas tienen valores inválidos en las celdas editables:\n\n' + invalidRows.join('\n\n'));
+                    }
+                });
+            }
+
+            bindEditButton();
+            validateLotificacionBtn();
+        });
+    </script>
+}

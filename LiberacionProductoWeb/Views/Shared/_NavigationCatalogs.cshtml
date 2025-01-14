@@ -1,0 +1,36 @@
+﻿@using LiberacionProductoWeb.Helpers;
+
+<!-- begin #sidebar -->
+<div id="top-menu" class="top-menu">
+    <!-- begin sidebar scrollbar -->
+    <div class="container-fluid">
+        <!-- begin sidebar nav -->
+        <ul class="nav">
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li>
+                    <a asp-controller="LotificacionTanques" asp-action="Lotificacion">
+                        @* <i class="fa fa-file-alt"></i> *@
+                        <span>Lotificación de Tanques</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="LotificacionTanques" asp-action="ListadoLotes">
+                        @* <i class="fa fa-file-alt"></i> *@
+                        <span>Listado de Lotes</span>
+                    </a>
+                </li>
+            }
+        </ul>
+        <!-- end sidebar nav -->
+    </div>
+    <!-- end sidebar scrollbar -->
+</div>
+
+<!-- end #sidebar -->
+<!-- ================== BEGIN BASE JS ================== -->
+<script src="~/plugins/jquery/jquery-3.3.1.min.js"></script>
+<script src="~/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+<!-- ================== END BASE JS ================== -->

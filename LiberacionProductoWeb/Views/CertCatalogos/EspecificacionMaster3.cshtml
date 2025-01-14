@@ -1,0 +1,1249 @@
+﻿@model LiberacionProductoWeb.Models.CertCatalogosViewModels.EspecificacionMasterViewModel;
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using LiberacionProductoWeb.Helpers;
+@using System.Globalization;
+@using Microsoft.Extensions.Configuration;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IStringLocalizer<Resource> resource;
+@inject IConfiguration Configuration
+
+@{
+    ViewData["Title"] = "Especificación Producto Grado";
+    Layout = "~/Views/Shared/_LayoutCatalogs.cshtml";
+
+    var btnFind = resource.GetString("BtnFind");
+    var btnFilter = resource.GetString("BtnFilter");
+    var lengthMenu = resource.GetString("LengthMenu");
+    var searchPlaceholder = resource.GetString("SearchPlaceholder");
+    var info = resource.GetString("Info");
+    var emptyTable = resource.GetString("EmptyTable");
+    var paginatefirst = resource.GetString("Paginatefirst");
+    var paginatelast = resource.GetString("Paginatelast");
+    var pageNext = resource.GetString("PageNext");
+    var pagePreviuos = resource.GetString("PagePreviuos");
+    var loadingRecords = resource.GetString("LoadingRecords");
+    var processing = resource.GetString("Processing");
+    var zeroRecords = resource.GetString("ZeroRecords");
+    var infoEmpty = resource.GetString("InfoEmpty");
+    var infoFiltered = resource.GetString("InfoFiltered");
+}
+
+@* @await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml") *@
+
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div id="content" class="content">
+
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="@Url.Action("Access", "Access")">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Catalogs", "CertCatalogos")">Especificación Producto Grado</a></li>
+        <li class="breadcrumb-item active">Especificación Producto Grado</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Catálogo Especificación Producto Grado</h1>
+    <!-- end page-header -->
+    @* <div class="section-container section-with-top-border p-b-10">
+    <div class="row">
+    <div class="col-lg-20">
+    <form>
+    <div class="row">
+    <div class="col-lg-6 m-b-15">
+    <div class="m-b-5"><b>Producto:</b></div>
+    <select multiple asp-for="SelectedEspecificacionMasterFilter" asp-items="Model.EspecificacionMasterFilter"
+    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
+    data-live-search="true" title="Selecciona">
+    </select>
+    </div>
+    <div class="col-lg-6 m-b-15">
+    <div class="m-b-5"> &nbsp; </div>
+    <div class="input-group">
+    <button type="submit" class="btn btn-inverse">Buscar</button>
+    <a href="@Url.Action("ClearFiltersEspecificacionMaster", "CertCatalogos" )" class="btn btn-white m-r-5">
+    <i class="fa fa-eraser"></i> Limpiar filtros
+    </a>
+    </div>
+    </div>
+    </div>
+    </form>
+    </div>
+    </div>
+    </div>
+    *@
+
+    <div class="section-container section-with-top-border p-b-5">
+        <div class="row">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="btn-group pull-left">
+                        <a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
+                            <i class="fa fa-plus"></i> Agregar Registro
+                        </a>
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
+                            <i class="fa fa-file-excel"></i> Exportar a excel
+                        </a>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <a href="javascript:;" class="btn btn-white m-r-5" id="ClearFilters">
+                            <i class="fa fa-eraser"></i>Limpiar filtros
+                        </a>
+                    </div>
+                    <h4 class="panel-title">
+                        &nbsp;
+                    </h4>
+                </div>
+
+                <!-- Mensaje de error -->
+                <div class="col-md-12" id="message"></div>
+
+                <div class="panel-body">
+                    <div>
+                        <table id="data-table" class="display compact table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="no-sort" style="width:1%"></th>
+                                    <th style="white-space: nowrap; display: none;">IdEspecificacion</th>
+                                    <th style="white-space: nowrap; display: none;">Planta</th>
+                                    <th style="white-space: nowrap; display: none;">Cliente</th>
+                                    <th style="white-space: nowrap; display: none;">tanque_PX</th>
+                                    <th style="white-space: nowrap;">Producto</th>
+                                    <th style="white-space: nowrap;">Grado</th>
+                                    <th style="white-space: nowrap; display: none;">Tipo Especificación</th>
+                                    <th style="white-space: nowrap;">Observaciones</th>
+                                    <th style="white-space: nowrap;">Estatus</th>
+                                    <th style="white-space: nowrap; width:1%"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var entry in Model.EspecificacionMasterList)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td style="display: none;">
+                                            @entry.iD_ESPECIFICACION
+                                        </td>
+                                        <td style="display: none;">
+                                            @{
+                                                foreach (var item in Model.PlantasList)
+                                                {
+                                                    if (item.iD_PLANTA == entry.iD_PLANTA)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td style="display: none;">
+                                            @{
+                                                foreach (var item in Model.ClientesList)
+                                                {
+                                                    if (item.iD_CLIENTE == entry.iD_CLIENTE)
+                                                    {
+                                                        @item.nombre
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td style="display: none;">
+                                            @entry.tanquE_PX
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.ProductosList)
+                                                {
+                                                    if (item.iD_PRODUCTO == entry.iD_PRODUCTO)
+                                                    {
+                                                        @item.nombrE_ESP
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.GradosList)
+                                                {
+                                                    if (item.iD_GRADO == entry.iD_GRADO)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td style="display: none;">
+                                            @{
+                                                foreach (var item in Model.TipoEspecificacionList)
+                                                {
+                                                    if (item.iD_TIPO_ESPECIFICACION == entry.iD_TIPO_ESPECIFICACION)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @entry.observaciones
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (Convert.ToBoolean(entry.iD_STATUS))
+                                                {
+                                                    @: Activo
+                                                }
+                                                else
+                                                {
+                                                    @: Inactivo
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_ESPECIFICACION" class="btn btn-default btn-xs">
+                                                <i class="fa fa-trash-alt"></i>
+                                            </a>
+                                            <a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_ESPECIFICACION'>
+                                                <i class='fa fa-edit'></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel-body" style="display:none;">
+                    <div>
+                        <table id="data-table-export-to-excel" class="display compact table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="white-space: nowrap;">Producto</th>
+                                    <th style="white-space: nowrap;">Grado</th>
+                                    <th style="white-space: nowrap">Observaciones</th>
+                                    <th style="white-space: nowrap">Estatus</th>
+                                    <th style="white-space: nowrap">Parámetro</th>
+                                    <th style="white-space: nowrap">Unidad de Medida</th>
+                                    <th style="white-space: nowrap">Valor Límite Superior</th>
+                                    <th style="white-space: nowrap">Valor Límite Inferior</th>
+                                    <th style="white-space: nowrap">Observaciones</th>
+                                    <th style="white-space: nowrap">Orden</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var entry in Model.EspecificacionMasterExportExcelList)
+                                {
+                                    <tr>                                        
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.ProductosList)
+                                                {
+                                                    if (item.iD_PRODUCTO == entry.iD_PRODUCTO)
+                                                    {
+                                                        @item.nombrE_ESP
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.GradosList)
+                                                {
+                                                    if (item.iD_GRADO == entry.iD_GRADO)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @entry.observaciones
+                                        </td>
+                                        <td>
+                                            @{
+                                                if (Convert.ToBoolean(entry.iD_STATUS))
+                                                {
+                                                    @: Activo
+                                                }
+                                                else
+                                                {
+                                                    @: Inactivo
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.ParametroList)
+                                                {
+                                                    if (item.iD_PARAMETRO == entry.iD_PARAMETRO)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.UnidadMedidasList)
+                                                {
+                                                    if (item.iD_UNIDAD_MEDIDA == entry.iD_UNIDAD_MEDIDA)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @entry.valoR_LIMITE_SUP
+                                        </td>
+                                        <td>
+                                            @entry.valoR_LIMITE_INF
+                                        </td>
+                                        <td>
+                                            @entry.observaciones2
+                                        </td>
+                                        <td>
+                                            @entry.orden
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+
+
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+
+
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+}
+
+@section scripts {
+
+    <environment names="Development,Staging,Production">
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/js/catalogs.js"></script>
+    </environment>
+
+    <script>
+        var commonUrl = @Json.Serialize(@Configuration.GetSection("publishUrl").GetSection("commonUrl").Value)
+
+        console.log(commonUrl);
+
+        var pb = {
+            base: commonUrl
+        };
+
+        $(function () {
+            if ('@Model.MensajeError'.length > 1) {
+                $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
+            }
+        });
+
+        $(function () {
+            if ('@Model.MensajeInfo'.length > 1) {
+                $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
+            }
+        });
+
+        var refresh = function () {
+            window.location.href = '@Url.Action("EspecificacionMaster3", "CertCatalogos")';
+        }
+
+        var deleteOnClick = function (event) {
+            bootbox.confirm({
+                message: "¿Deseas eliminar el registro?",
+                buttons: {
+                    confirm: {
+                        label: 'Si',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        deleteConfirm(event);
+                    }
+                }
+            });
+        };
+
+        var deleteOnClickEspecificacionDetalle = function (event) {
+            bootbox.confirm({
+                message: "¿Deseas eliminar el registro?",
+                buttons: {
+                    confirm: {
+                        label: 'Si',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        deleteConfirmEspecificacionDetalle(event);
+                    }
+                }
+            });
+        };
+
+        var deleteConfirm = function (event) {
+            var id = $(event).data("id");
+
+            if (id === -1) {
+                id = "";
+            }
+
+            $.ajax({
+                type: "POST",
+                url: pb.base + "/CertCatalogos/DeleteEspecificacionMaster3/" + id,
+                dataType: "json",
+                success: function (response) {
+                    if (response.message) {
+                        $.gritter.add({
+                            title: "Error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    } else {
+                        //sucess add, needs to refresh and show message
+                        window.location.href = '@Url.Action("EspecificacionMaster3", "CertCatalogos")';
+                    }
+                },
+                failure: function (response) {
+                    $.gritter.add({
+                        title: "Error",
+                        text: "Ocurrio un error, por favor comunicate con el Administrador",
+                        class_name: "gritter-light"
+                    })
+                }
+            });
+        }
+
+        var deleteConfirmEspecificacionDetalle = function (event) {
+            var id = $(event).data("id");
+
+            if (id === -1) {
+                id = "";
+            }
+
+            $.ajax({
+                type: "POST",
+                url: pb.base + "/CertCatalogos/DeleteEspecificacionDetalle/" + id,
+                dataType: "json",
+                success: function (response) {
+                    if (response.message) {
+                        $.gritter.add({
+                            title: "Error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    } else {
+                        //sucess add, needs to refresh and show message
+                        window.location.href = '@Url.Action("EspecificacionMaster3", "CertCatalogos")';
+                    }
+                },
+                failure: function (response) {
+                    $.gritter.add({
+                        title: "Error",
+                        text: "Ocurrio un error, por favor comunicate con el Administrador",
+                        class_name: "gritter-light"
+                    })
+                }
+            });
+        }
+
+        @{
+            var idTag = "<select id='iD_ESPECIFICACION' class='form-control' data-style='btn-white'  title='Selecciona'>";
+
+            if (Model.EspecificacionMasterFilter != null)
+            {
+                foreach (var item in Model.EspecificacionMasterFilter)
+                {
+                    idTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                }
+
+                idTag += "</select>";
+            }
+
+            var productoTag = "<select id='iD_PRODUCTO' class='form-control' data-style='btn-white'  title='Selecciona'>";
+
+            if (Model.ProductosFilter != null)
+            {
+                foreach (var item in Model.ProductosFilter)
+                {
+                    productoTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                }
+
+                productoTag += "</select>";
+            }
+
+            var gradoTag = "<select id='iD_GRADO' class='form-control' data-style='btn-white'  title='Selecciona'>";
+
+            if (Model.GradosFilter != null)
+            {
+                foreach (var item in Model.GradosFilter)
+                {
+                    gradoTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                }
+
+                gradoTag += "</select>";
+            }
+
+            var parametroTag = "<select id='iD_PARAMETRO' class='form-control' data-style='btn-white'  title='Selecciona'>";
+
+            if (Model.ParametroFilter != null)
+            {
+                foreach (var item in Model.ParametroFilter)
+                {
+                    parametroTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                }
+
+                parametroTag += "</select>";
+            }
+
+            var unidadMedidaTag = "<select id='iD_UNIDAD_MEDIDA' class='form-control' data-style='btn-white'  title='Selecciona'>";
+
+            if (Model.UnidadMedidasFilter != null)
+            {
+                foreach (var item in Model.UnidadMedidasFilter)
+                {
+                    unidadMedidaTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                }
+
+                unidadMedidaTag += "</select>";
+            }
+        }
+
+        var getEditRow = function (Id) {
+            var ret = null;
+            $.ajax({
+                async: false,
+                url: pb.base + "/CertCatalogos/GetEspecificacionMaster3HTMLTagsById/" + Id,
+                dataType: "json",
+                success: function (data) {
+                    ret = data.html;
+                }
+            });
+
+            return ret;
+        };
+
+        var getEditRowEspecificacionDetalle = function (Id) {
+            var ret = null;
+            $.ajax({
+                async: false,
+                url: pb.base + "/CertCatalogos/GetEspecificacionDetalleHTMLTagsById/" + Id,
+                dataType: "json",
+                success: function (data) {
+                    ret = data.html;
+                }
+            });
+
+            return ret;
+        };
+
+        var getNewRow = function () {
+            var result = "<tr>" +
+                "<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
+                "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
+                "<td style='display: none'><input class='form-control' id='iD_ESPECIFICACION' type='text'></td>" +
+                "<td>@Html.Raw(productoTag)</td>" +
+                "<td>@Html.Raw(gradoTag)</td>" +
+                "<td><input class='form-control' id='observaciones' type='text'></td>" +
+                "<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
+                "</tr>"
+            return result;
+        };
+
+        var getNewRowEspecificacionDetalle = function (Id) {
+            var result = "<tr>" +
+                "<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
+                "<a href='javascript:void(0)' onclick='saveOnClickEspecificacionDetalle(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
+                "<td style='display: none;'><input class='form-control' id='iD_ESPECIFICACION' value='" + Id + "' type='text'></td>" +
+                "<td>@Html.Raw(parametroTag)</td>" +
+                "<td>@Html.Raw(unidadMedidaTag)</td>" +
+                "<td><input class='form-control' id='valoR_LIMITE_SUP' type='text'></td>" +
+                "<td><input class='form-control' id='valoR_LIMITE_INF' type='text'></td>" +
+                "<td><input class='form-control' id='observaciones' type='text'></td>" +
+                "<td><input class='form-control' id='orden' type='text'></td>" +
+                "<td><select id='iD_STATUS' class='form-control'><option value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
+                "</tr>"
+            return result;
+        };
+
+        var removeOnClick = function (event) {
+            $(event).closest("tr").remove();
+            $("#ExporttoExcel").removeClass("disabled");
+            $("#add-entry").removeClass("disabled")
+        };
+
+        var isEdit = false;
+        var isCreate = false;
+
+        var editOnClick = function (event) {
+            var Id = $(event).data("id");
+
+            if (isCreate) {
+                return false;
+            }
+
+            if (!isEdit) {
+                //remueve y pinta los controles
+                isEdit = true;
+                $("#add-entry").addClass("disabled");
+                $("#ExporttoExcel").addClass("disabled");
+                $(event).closest("tr").replaceWith(getEditRow(Id));
+            }
+        };
+
+        var editOnClickEspecificacionDetalle = function (event) {
+            var Id = $(event).data("id");
+
+            if (isCreate) {
+                return false;
+            }
+
+            if (!isEdit) {
+                //remueve y pinta los controles
+                isEdit = true;
+                $("#add-entry").addClass("disabled");
+                $("#ExporttoExcel").addClass("disabled");
+                $(event).closest("tr").replaceWith(getEditRowEspecificacionDetalle(Id));
+            }
+        };
+
+        var saveConfirm = function (event) {
+
+            if (isEdit) {
+                $("#add-entry").removeClass("disabled");
+                $("#ExporttoExcel").removeClass("disabled");
+            }
+
+            isEdit = false;
+            isCreate = false;
+
+            var id = $(event).data("id");
+
+            if (id === -1) {
+                id = "";
+            }
+
+            var iD_ESPECIFICACION = "";
+            var iD_PRODUCTO = "";
+            var iD_GRADO = "";
+            var observaciones = "";
+            var iD_STATUS = "";
+
+            $(event).closest("tr").each(function () {
+                $.each(this.cells, function () {
+                    //gets values for each cell
+
+                    if ($(this).find("#iD_ESPECIFICACION").length) {
+                        iD_ESPECIFICACION = $(this).find("#iD_ESPECIFICACION").val();
+                    }
+
+                    if ($(this).find("#iD_PRODUCTO").length) {
+                        iD_PRODUCTO = $(this).find("#iD_PRODUCTO").val();
+                    }
+
+                    if ($(this).find("#iD_GRADO").length) {
+                        iD_GRADO = $(this).find("#iD_GRADO").val();
+                    }
+
+                    if ($(this).find("#observaciones").length) {
+                        observaciones = $(this).find("#observaciones").val();
+                    }
+
+                    if ($(this).find("#iD_STATUS").length) {
+                        iD_STATUS = $(this).find("#iD_STATUS").val();
+                    }
+
+                    // var selectElementStatus = document.getElementById("status");
+                    // var selectedIndexStatus = selectElementStatus.selectedIndex;
+                    // var selectedValueStatus = selectElementStatus.options[selectedIndexStatus].value;
+
+                    // iD_STATUS = selectedValueStatus;
+
+                    // if ($(this).find("#status").length) {
+                    //     estado = $(this).find("#status").val();
+                    // }
+                });
+            });
+
+            $.ajax({
+                type: "POST",
+                url: pb.base + "/CertCatalogos/SaveOrEditEspecificacionMaster3",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: JSON.stringify({
+                    iD_ESPECIFICACION: String(id),
+                    iD_PRODUCTO: iD_PRODUCTO,
+                    iD_GRADO: iD_GRADO,
+                    observaciones: observaciones,
+                    iD_STATUS: iD_STATUS
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    if (response.message) {
+                        $.gritter.add({
+                            title: "Error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    } else {
+                        //sucess add, needs to refresh and show message
+                        window.location.href = '@Url.Action("EspecificacionMaster3", "CertCatalogos")';
+                    }
+                },
+                failure: function (response) {
+                    //failure, shgow messahe with error
+                    alert("Fail");
+                }
+            });
+        }
+
+        var saveConfirmEspecificacionDetalle = function (event) {
+
+            if (isEdit) {
+                $("#add-entry").removeClass("disabled");
+                $("#ExporttoExcel").removeClass("disabled");
+            }
+
+            isEdit = false;
+            isCreate = false;
+
+            var id = $(event).data("id");
+
+            if (id === -1) {
+                id = "";
+            }
+
+            var iD_ESPECIFICACION = "";
+            var iD_PARAMETRO = "";
+            var iD_UNIDAD_MEDIDA = "";
+            var valoR_LIMITE_SUP = "";
+            var valoR_LIMITE_INF = "";
+            var observaciones = "";
+            var orden = "";
+            var iD_STATUS = "";
+
+            $(event).closest("tr").each(function () {
+                $.each(this.cells, function () {
+                    //gets values for each cell
+
+                    if ($(this).find("#id").length) {
+                        id = $(this).find("#id").val();
+                    }
+
+                    if ($(this).find("#iD_ESPECIFICACION").length) {
+                        iD_ESPECIFICACION = $(this).find("#iD_ESPECIFICACION").val();
+                    }
+
+                    if ($(this).find("#iD_PARAMETRO").length) {
+                        iD_PARAMETRO = $(this).find("#iD_PARAMETRO").val();
+                    }
+
+                    if ($(this).find("#iD_UNIDAD_MEDIDA").length) {
+                        iD_UNIDAD_MEDIDA = $(this).find("#iD_UNIDAD_MEDIDA").val();
+                    }
+
+                    if ($(this).find("#valoR_LIMITE_SUP").length) {
+                        valoR_LIMITE_SUP = $(this).find("#valoR_LIMITE_SUP").val();
+                    }
+
+                    if ($(this).find("#valoR_LIMITE_INF").length) {
+                        valoR_LIMITE_INF = $(this).find("#valoR_LIMITE_INF").val();
+                    }
+
+                    if ($(this).find("#observaciones").length) {
+                        observaciones = $(this).find("#observaciones").val();
+                    }
+
+                    if ($(this).find("#orden").length) {
+                        orden = $(this).find("#orden").val();
+                    }
+
+                    if ($(this).find("#iD_STATUS").length) {
+                        iD_STATUS = $(this).find("#iD_STATUS").val();
+                    }
+
+                    // var selectElementStatus = document.getElementById("status");
+                    // var selectedIndexStatus = selectElementStatus.selectedIndex;
+                    // var selectedValueStatus = selectElementStatus.options[selectedIndexStatus].value;
+
+                    // iD_STATUS = selectedValueStatus;
+
+                    // if ($(this).find("#status").length) {
+                    //     estado = $(this).find("#status").val();
+                    // }
+                });
+            });
+
+            $.ajax({
+                type: "POST",
+                url: pb.base + "/CertCatalogos/SaveOrEditEspecificacionDetalle",
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader("XSRF-TOKEN",
+                        $('input:hidden[name="__RequestVerificationToken"]').val());
+                },
+                data: JSON.stringify({
+                    id: String(id),
+                    iD_ESPECIFICACION: iD_ESPECIFICACION,
+                    iD_PARAMETRO: iD_PARAMETRO,
+                    iD_UNIDAD_MEDIDA: iD_UNIDAD_MEDIDA,
+                    valoR_LIMITE_SUP: valoR_LIMITE_SUP,
+                    valoR_LIMITE_INF: valoR_LIMITE_INF,
+                    observaciones: observaciones,
+                    orden: orden,
+                    iD_STATUS: iD_STATUS
+                }),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    if (response.message) {
+                        $.gritter.add({
+                            title: "Error",
+                            text: response.message,
+                            class_name: "gritter-light"
+                        })
+                    } else {
+                        //sucess add, needs to refresh and show message
+                        window.location.href = '@Url.Action("EspecificacionMaster3", "CertCatalogos")';
+                    }
+                },
+                failure: function (response) {
+                    //failure, shgow messahe with error
+                    alert("Fail");
+                }
+            });
+        }
+
+        var saveOnClick = function (event) {
+            bootbox.confirm({
+                message: "¿Deseas guardar los cambios?",
+                buttons: {
+                    confirm: {
+                        label: 'Si',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        saveConfirm(event);
+                    }
+                }
+            });
+        };
+
+        var saveOnClickEspecificacionDetalle = function (event) {
+            bootbox.confirm({
+                message: "¿Deseas guardar los cambios?",
+                buttons: {
+                    confirm: {
+                        label: 'Si',
+                        className: 'btn-success'
+                    },
+                    cancel: {
+                        label: 'No',
+                        className: 'btn-danger'
+                    }
+                },
+                callback: function (result) {
+                    if (result) {
+                        saveConfirmEspecificacionDetalle(event);
+                    }
+                }
+            });
+        };
+
+        var tableIdentificator = "";
+        var tableDetail = "";
+
+        var addEntryEspecificacionDetalle = function (event, Id) {
+                //console.log('Entro');
+                //event.preventDefault();
+                //$('#addGeneralCatalog').modal('show');
+                $(tableIdentificator + ' tr:eq(1)').after(getNewRowEspecificacionDetalle(Id));
+                $("#ExporttoExcel").addClass("disabled");
+                $("#add-entry").addClass("disabled")
+                if (!isCreate) {
+                    isCreate = true;
+                    $("#ExporttoExcel").addClass("disabled");
+                    // $('#data-table tr:eq(1)').after(getNewRow());
+                }
+                else {
+                    $("#add-entry").addClass("disabled")
+                }
+                $('.selectpicker').selectpicker();
+        };
+
+        $(document).ready(function () {
+            App.init();
+            Demo.init();
+
+            //radioswitch.init()
+
+            //$("#form").validate();
+
+            $('#data-table thead tr').clone(true).appendTo('#data-table thead');
+            $('#data-table thead tr:eq(1) th').each(function (i) {
+                if (i === 0)
+                    return;
+
+                var title = $(this).text();
+
+                $(this).html('<input type="text" placeholder="Buscar" />');
+
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+            var table = $("#data-table").DataTable(
+                {
+                    pageLength: 10,
+                    orderCellsTop: true,
+                    fixedHeader: true,
+                    bLengthChange: false,
+                    bFilter: true,
+                    bAutoWidth: false,
+                    searching: true,
+                    sDom: 'lrtip',
+                    "bInfo": false,
+                    buttons: [
+                        {
+                            extend: 'csv',
+                            charset: 'utf-8',
+                            bom: true
+                        }
+                    ],
+                    "dom": 'rtp',
+                    "language": {
+                        "search": '<a href="@Url.Action("Index", "home")" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                        "searchPlaceholder": '@searchPlaceholder',
+                        "emptyTable": "@emptyTable",
+                        "lengthMenu": "@lengthMenu",
+                        "info": "@info",
+                        "paginate": {
+                            "first": "@paginatefirst",
+                            "last": "@paginatelast",
+                            "next": "@pageNext",
+                            "previous": "@pagePreviuos"
+                        },
+                        "loadingRecords": "@loadingRecords",
+                        "processing": "@processing",
+                        "zeroRecords": "@zeroRecords",
+                        "infoEmpty": "@infoEmpty",
+                        "infoFiltered": "@infoFiltered",
+                    },
+                    "order": [],
+                    "columnDefs": [{
+                        "pageLength": 10,
+                        "targets": 'no-sort',
+                        "orderable": false,
+                        "className": 'dt-control',
+                        "data": null,
+                        "defaultContent": '',
+                        "language": {
+                            "search": '<a href="@Url.Action("Index", "home")" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                            "searchPlaceholder": '@searchPlaceholder',
+                            "emptyTable": "@emptyTable",
+                            "lengthMenu": "@lengthMenu",
+                            "info": "@info",
+                            "paginate": {
+                                "first": "@paginatefirst",
+                                "last": "@paginatelast",
+                                "next": "@pageNext",
+                                "previous": "@pagePreviuos"
+                            },
+                            "loadingRecords": "@loadingRecords",
+                            "processing": "@processing",
+                            "zeroRecords": "@zeroRecords",
+                            "infoEmpty": "@infoEmpty",
+                            "infoFiltered": "@infoFiltered",
+                        },
+                    }]
+                });
+
+            // Formatting function for row details - modify as you need
+            function format(event) {
+
+                var id = event[1];
+
+                if (id === -1) {
+                    id = "";
+                }
+
+                var ret = null;
+
+                $.ajax({
+                    async: false,
+                    url: pb.base + "/CertCatalogos/GetSpecificationMasterById/" + id,
+                    dataType: "json",
+                    success: function (data) {
+                        ret = data.html;
+                    }
+                });
+
+                let tabla = ret;
+
+                return $(tabla).toArray();
+            }
+
+            function getId(event) {
+
+                var id = event[1];
+
+                if (id === -1) {
+                    id = "";
+                }
+
+                return id;
+            }
+
+            // Add event listener for opening and closing details
+            table.on('click', 'td.dt-control', function (event) {
+                let tr = event.target.closest('tr');
+                let row = table.row(tr);
+                let tableId = '#data-table-especificacion-master-' + getId(row.data()) + '';
+
+                console.log(row.data());
+
+                if (row.child.isShown()) {
+                    // This row is already open - close it
+                    row.child.hide();
+                    //tr.removeClass('shown');
+                    // Destroy table child
+                    $(tableId).DataTable().destroy();
+                }
+                else {
+                    // Open this row
+                    row.child(format(row.data())).show();
+                    // You're going to need the row data
+                    let rowData = format(row.data());
+
+                    console.log(rowData);
+
+                    // Activate the child table as a DataTable
+                    tableDetail = $(tableId).DataTable({
+                        data: rowData.id,
+                        pageLength: 10,
+                        orderCellsTop: true,
+                        fixedHeader: true,
+                        bLengthChange: false,
+                        bFilter: true,
+                        bAutoWidth: false,
+                        searching: true,
+                        sDom: 'lrtip',
+                        "bInfo": false,
+                        buttons: [
+                            {
+                                extend: 'csv',
+                                charset: 'utf-8',
+                                bom: true
+                            }
+                        ],
+                        "dom": 'rtp',
+                        "language": {
+                            "search": '<a href="@Url.Action("Index", "home")" class="btn btn-white m-r-5"><i class="fa fa-eraser"></i> @btnFilter</a> <br><div><i class="fa fa-filter" aria-hidden="true"></i>Buscar',
+                            "searchPlaceholder": '@searchPlaceholder',
+                            "emptyTable": "@emptyTable",
+                            "lengthMenu": "@lengthMenu",
+                            "info": "@info",
+                            "paginate": {
+                                "first": "@paginatefirst",
+                                "last": "@paginatelast",
+                                "next": "@pageNext",
+                                "previous": "@pagePreviuos"
+                            },
+                            "loadingRecords": "@loadingRecords",
+                            "processing": "@processing",
+                            "zeroRecords": "@zeroRecords",
+                            "infoEmpty": "@infoEmpty",
+                            "infoFiltered": "@infoFiltered",
+                        },
+                        "order": [],
+                        "columnDefs": [{
+                            "targets": 'no-sort',
+                            "orderable": false,
+                        }]
+                    });
+                    //tr.addClass('shown');
+
+                    tableIdentificator = tableId;
+
+                    if (tableIdentificator && tableDetail)
+                    {
+                        $(tableIdentificator + ' thead tr').clone(true).appendTo(tableIdentificator + ' thead');
+                        $(tableIdentificator + ' thead tr:eq(1) th').each(function (i) {
+                            if (i === 0)
+                                return;
+
+                            var title = $(this).text();
+
+                            $(this).html('<input type="text" placeholder="Buscar" />');
+
+                            $('input', this).on('keyup change', function () {
+                                if (tableDetail.column(i).search() !== this.value) {
+                                    tableDetail
+                                        .column(i)
+                                        .search(this.value)
+                                        .draw();
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+
+            // $("#ExporttoExcel").on("click", function () {
+            //     table.button('.buttons-csv').trigger();
+            // });
+
+            // Exportacion Excel
+
+            var tableExportToExcel = $("#data-table-export-to-excel").DataTable(
+                {
+                    buttons: [
+                        {
+                            extend: 'csv',
+                            charset: 'utf-8',
+                            bom: true
+                        }
+                    ]
+                });
+
+            $("#ExporttoExcel").on("click", function () {
+                tableExportToExcel.button('.buttons-csv').trigger();
+            });
+
+            $("#ClearFilters").on("click", function () {
+                $('#data-table thead tr:eq(1) th').each(function (i) {
+                    if (i === 0)
+                        return;
+
+                    $('input', this).val("").change();
+                });
+            });
+
+            $('#add-entry').on('click', function (event) {
+                event.preventDefault();
+                //$('#addGeneralCatalog').modal('show');
+                $('#data-table tr:eq(1)').after(getNewRow());
+                $("#ExporttoExcel").addClass("disabled");
+                $("#add-entry").addClass("disabled")
+                if (!isCreate) {
+                    isCreate = true;
+                    $("#ExporttoExcel").addClass("disabled");
+                    // $('#data-table tr:eq(1)').after(getNewRow());
+                }
+                else {
+                    $("#add-entry").addClass("disabled")
+                }
+                $('.selectpicker').selectpicker();
+            });
+
+            //Data Table manipulation
+            //$.fn.dataTable.render.moment("M/D/YYYY");
+
+            $('.selectpicker').selectpicker();
+        });
+    </script>
+}

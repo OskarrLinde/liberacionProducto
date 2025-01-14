@@ -1,0 +1,823 @@
+﻿@model LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsVM
+@using Microsoft.Extensions.Localization;
+@using LiberacionProductoWeb.Localize;
+@using Microsoft.AspNetCore.Identity;
+@using LiberacionProductoWeb.Helpers;
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<LiberacionProductoWeb.Models.IndentityModels.ApplicationUser> UserManager
+@inject IStringLocalizer<Resource> resource;
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cambios a los textos de Orden de acondicionamiento";
+    var url = Context.Request.Host.Value;
+    var claimsIdentity = User.Identity as System.Security.Claims.ClaimsIdentity;
+    var userId = "";
+    if (claimsIdentity != null)
+    {
+        var name = claimsIdentity.Name;
+        if (name != null)
+        {
+            var FullUserInfo = await UserManager.FindByNameAsync(name);
+            userId = FullUserInfo.Id;
+        }
+    }
+}
+@await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml")
+<!-- begin #content -->
+<div id="content" class="content">
+    <!-- begin breadcrumb -->
+    <ol class="breadcrumb pull-right">
+        <li class="breadcrumb-item"><a href="javascript:;">Inicio</a></li>
+        <li class="breadcrumb-item"><a href="javascript:;">Catálogos</a></li>
+        <li class="breadcrumb-item active">Cambios a los textos de Orden de acondicionamiento</li>
+    </ol>
+    <!-- end breadcrumb -->
+    <!-- begin page-header -->
+    <h1 class="page-header">Cambios a los textos de Orden de acondicionamiento</h1>
+    <!-- end page-header -->
+    <div class="section-container section-with-top-border p-b-5">
+        <br />
+        <form method="post" asp-action="CrearEditar" id="CheckListForm">
+            @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_LAYOUT_ORDEN_PRODUCCION_CONDITIONING))
+            {
+                <button name="Guardar" hidden class='btn btn' id="Guardar" onclick="ShowModal(false)" type="button" style="background-color:transparent">
+                    <i class="fa fa-save"></i> Guardar
+                </button>
+                <button class='btn btn' name="Editar" id="Editar" type="button" style="background-color:transparent">
+                    <i class="fa fa-edit"></i> Editar
+                </button>
+                <button class='btn btn' hidden name="Cancelar" id="Cancelar" type="button" style="background-color:transparent">
+                    <i class="fa fa-trash"></i> Cancelar
+                </button>
+                <button name="view" hidden class='btn btn' id="view" onclick="VistaPrevia()" type="button" style="background-color:transparent">
+                    <i class="fa fa-binoculars"></i> Vista previa
+                </button>
+                <button name="Publicar" hidden class='btn btn' id="Publicar" onclick="ShowModal(true)" type="button" style="background-color:transparent">
+                    <i class="fa fa-save"></i> Publicar
+                </button>
+            }
+
+            <br />
+            <div class="container" id="pdfEdit" style="pointer-events: none; color:silver">
+                {CaseTag:ProductName} = "Nombre del producto"
+                <br />
+                {CaseTag:Location} = "Nombre de planta"
+                <br />
+                {CaseTag:ProductCode} = "Código del producto (OX,NI,CD)"
+                <br />
+                {CaseTag:SelectedTankFilter} = "Número de tanque"
+                <br />
+                <br />
+                @Html.DropDownListFor(m => m.SelectedProduct, Model.ListProducts, "-Por favor seleccione un producto", new { @class = "form-control col-sm", @Id = "SelectedProduct", @onchange = "ReloadForProduct(this)" })
+                <div id="editcontent" style="pointer-events: none; color:silver">
+                    @if (Model != null)
+                    {
+                        <div id="step0">
+                            <div class="panel-group" id="step-0-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion" data-toggle="collapse" data-parent="#step-0-accordion"
+                                           href="#step-0-collapse-three" aria-expanded="true">
+                                                <i id="icon-1" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleZero" placeholder="Información del lote de acondicionamiento">
+                                            <label id="TitleZero-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-0-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepZero" id="StepZero"></textarea>
+                                            <label id="StepZero-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step1">
+                            <div class="panel-group" id="step-1-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion" data-toggle="collapse" data-parent="#step-1-accordion"
+                                           href="#step-1-collapse-three" aria-expanded="true">
+                                                <i id="icon-1" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleOne" placeholder="Equipos analíticos">
+                                            <label id="TitleOne-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-1-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepOne" id="StepOne"></textarea>
+                                            <label id="StepOne-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step2">
+                            <div class="panel-group" id="step-2-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-2-accordion" href="#step-2-collapse-three" aria-expanded="true">
+                                                <i id="icon-2" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleTwo" placeholder="Equipos (accesorios) empleados en el proceso de acondicionamiento.">
+                                            <label id="TitleTwo-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-2-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepTwo" id="StepTwo"></textarea>
+                                            <label id="StepTwo-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step3">
+                            <div class="panel-group" id="step-3-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-3-accordion" href="#step-3-collapse-three" aria-expanded="true">
+                                                <i id="icon-3" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleThree" placeholder="Acondicionamiento del producto - llenado de pipas (envase primario)">
+                                            <label id="TitleThree-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-3-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepThree" id="StepThree"></textarea>
+                                            <label id="StepThree-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step4">
+                            <div class="panel-group" id="step-4-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-4-accordion" href="#step-4-collapse-three" aria-expanded="true">
+                                                <i id="icon-4" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleFor" placeholder="Control de llenado de pipas">
+                                            <label id="TitleFor-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-4-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepFor" id="StepFor"></textarea>
+                                            <label id="StepFor-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step5">
+                            <div class="panel-group" id="step-5-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-5-accordion" href="#step-5-collapse-three" aria-expanded="true">
+                                                <i id="icon-5" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleFive" placeholder="Certificado de análisis">
+                                            <label id="TitleFive-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-5-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepFive" id="StepFive"></textarea>
+                                            <label id="StepFive-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step6">
+                            <div class="panel-group" id="step-6-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-6-accordion" href="#step-6-collapse-three" aria-expanded="true">
+                                                <i id="icon-6" class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleSix" placeholder="Conciliación de materiales">
+                                            <label id="TitleSix-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-6-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepSix" id="StepSix"></textarea>
+                                            <label id="StepSix-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step7">
+                            <div class="panel-group" id="step-7-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-7-accordion" href="#step-7-collapse-three" aria-expanded="true">
+                                                <i class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleSeven" placeholder="Rendimiento del proceso de acondicionamiento.">
+                                            <label id="TitleSeven-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-7-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepSeven" id="StepSeven"></textarea>
+                                            <label id="StepSeven-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div id="step8">
+                            <div class="panel-group" id="step-8-accordion">
+                                <div class="panel panel-primary overflow-hidden">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse"
+                                           data-parent="#step-8-accordion" href="#step-8-collapse-three" aria-expanded="true">
+                                                <i class="fa fa-plus-circle pull-right"></i>
+                                            </a>
+                                            <input type="text" class="form-control" asp-for="TitleEight" placeholder="Liberación del producto terminado">
+                                            <label id="TitleEight-error" class="text-danger"></label>
+                                        </h3>
+                                    </div>
+                                    <div id="step-8-collapse-three" class="" style="">
+                                        <div class="panel-body">
+                                            <textarea class="form-control col-md-12" asp-for="StepEight" id="StepEight"></textarea>
+                                            <label id="StepEight-error" class="text-danger"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            @*///modals*@
+            <div class="modal fade" id="ModalSave" tabindex="-1" role="dialog" aria-labelledby="ModalSaveLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="ModalSaveLabel">
+                                @*¿Deseas publicar la información?*@
+                                <div style="font-size:20px" class="modal-title" id="mheader"></div>
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-success" data-dismiss="modal" name="GuardarOA" id="GuardarOA">Si</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+@section Styles {
+    <style>
+        .colorWhite {
+            background-color: white
+        }
+    </style>
+    <link href="~/plugins/bootstrap-combobox/css/bootstrap-combobox.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-select/bootstrap-select.css" rel="stylesheet" />
+    <link href="~/plugins/select2/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="~/plugins/bootstrap-calendar/css/bootstrap_calendar.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/Buttons/css/buttons.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/DataTables/extensions/FixedHeader/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/plugins/tinymce/skins/ui/tinymce-5/skin.min.css" rel="stylesheet" />
+    <link href="~/css/production-order.css" rel="stylesheet" />
+}
+    <!-- end #content -->
+    @section Scripts {
+    <environment names="Development,Staging,Production">
+        <script src="~/js/demo.min.js"></script>
+        <script src="~/js/apps.min.js"></script>
+        <script src="~/plugins/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
+
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootstrap-combobox/js/bootstrap-combobox.js"></script>
+        <script src="~/plugins/bootstrap-select/bootstrap-select.js"></script>
+        <script src="~/plugins/select2/dist/js/select2.min.js"></script>
+        <script src="~/plugins/bootstrap-calendar/js/bootstrap_calendar.min.js"></script>
+        <script src="~/plugins/DataTables/media/js/jquery.dataTables.js"></script>
+        <script src="~/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.html5.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/buttons.print.min.js"></script>
+        <script src="~/plugins/DataTables/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+        <script src="~/plugins/gritter/js/jquery.gritter.js"></script>
+        <script src="~/plugins/bootbox/js/bootbox.all.min.js"></script>
+        <script src="~/js/linde.js"></script>
+        <script src="~/js/production-order/production-order-index.js"></script>
+    </environment>
+    <script>
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        $(".accordion-toggle").click(function () {
+            if ($(this).find("i").hasClass("fa-minus-circle")) {
+                $(this).find("i").removeClass("fa-minus-circle").addClass("fa-plus-circle");
+            } else {
+                $(this).find("i").removeClass("fa-plus-circle").addClass("fa-minus-circle");
+
+            }
+
+        });
+        $(document).ready(function () {
+            App.init();
+            Demo.init();
+            //getProducts();
+            $('#step-1-collapse-three').addClass('show');
+            $('#step-2-collapse-three').addClass('show');
+            $('#step-3-collapse-three').addClass('show');
+            $('#step-4-collapse-three').addClass('show');
+            $('#step-5-collapse-three').addClass('show');
+            $('#step-6-collapse-three').addClass('show');
+            $('#step-7-collapse-three').addClass('show');
+            $('#step-8-collapse-three').addClass('show');
+            $('#icon-1').removeClass('fa-plus-circle');
+            $('#icon-1').addClass('fa-minus-circle');
+            $('#icon-2').removeClass('fa-plus-circle');
+            $('#icon-2').addClass('fa-minus-circle');
+            $('#icon-3').removeClass('fa-plus-circle');
+            $('#icon-3').addClass('fa-minus-circle');
+            $('#icon-4').removeClass('fa-plus-circle');
+            $('#icon-4').addClass('fa-minus-circle');
+            $('#icon-5').removeClass('fa-plus-circle');
+            $('#icon-5').addClass('fa-minus-circle');
+            $('#icon-6').removeClass('fa-plus-circle');
+            $('#icon-6').addClass('fa-minus-circle');
+            $('#icon-7').addClass('fa-minus-circle');
+            $('#icon-8').addClass('fa-minus-circle');
+            $("#Editar").on("click", function () {
+                $("#Editar").attr('hidden', true);
+                $("#pdfEdit").removeAttr("style");
+                $("#Cancelar").attr('hidden', false);
+                $("#Guardar").attr('hidden', false);
+                $("#Publicar").attr('hidden', false);
+                $("#view").attr('hidden', false);
+            });
+            $("#Cancelar").on("click", function () {
+                $("#Guardar").attr('hidden', false);
+                window.location.reload();
+            });
+            tinymce.init({
+                selector: '#StepZero',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepOne',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepTwo',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepThree',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepFor',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepFive',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepSix',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepSeven',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            tinymce.init({
+                selector: '#StepEight',
+                height: "300",
+                menubar: false,
+                resize: false,
+                elementpath: false,
+                language: 'es_MX',
+                paste_merge_formats: false,
+                plugins: 'powerpaste',
+                paste_as_text: true,
+                toolbar: 'undo redo | styles | bold italic | link image | alignleft aligncenter alignright alignjustify'
+            });
+            let info = '@User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_LAYOUT_ORDEN_PRODUCCION_CONDITIONING)'
+            if (!isNullOrEmpty(params['productId']) && info == 'True') {
+                console.log(info);
+                console.log(params['productId'].toString())
+                $('#SelectedProduct').val(params['productId'].toString())
+                $("#Editar").attr('hidden', true);
+                $("#pdfEdit").removeAttr("style");
+                $("#Cancelar").attr('hidden', false);
+                $("#Guardar").attr('hidden', false);
+                $("#Publicar").attr('hidden', false);
+                $("#view").attr('hidden', false);
+                $("#editcontent").removeAttr("style");
+            }
+        });
+        async function CrearEditar(active) {
+            if (Validate()) {
+                $.ajax({
+                    type: "POST",
+                    url: "/LayoutLeyends/CrearEditar?option=1&active=" + active,
+                    data: serializeCondinioningOrder(),
+                    dataType: "json",
+                    success: function (response) {
+                        valorAccion = response.message;
+                        if (response.result == "Ok") {
+                            $.gritter.add({
+                                title: "Mensaje",
+                                text: "Se guardó con éxito",
+                                class_name: "gritter-light"
+                            })
+                            //window.location.reload();
+                        }
+                        else {
+                            $.gritter.add({
+                                title: "Ocurrió un error",
+                                text: response.message,
+                                class_name: "gritter-light"
+                            })
+
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+        var getProducts = function () {
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetProduts",
+                success: function (response) {
+                    $("#SelectedProduct").empty()
+                    response.data.forEach(function (item) {
+                        $("#SelectedProduct").append($('<option>', {
+                            value: item.value,
+                            text: item.text
+                        }))
+                    });
+
+                    $('#SelectedProduct').selectpicker('refresh');
+
+                    if (!isNullOrEmpty(params['SelectedProduct'])) {
+                        $('#SelectedProduct').val(params['SelectedProduct'].split(','))
+                        getProducts("#SelectedProduct")
+                        $('#SelectedProduct').selectpicker('refresh');
+                    }
+                }
+            });
+        }
+        async function Save(event) {
+            CrearEditar(true);
+        }
+        function serializeCondinioningOrder() {
+            var style = "font-family: 'Arial'; font-size: 9pt;";
+            let StepZero = tinymce.get("StepZero").getContent().includes("div");
+            let StepOne = tinymce.get("StepOne").getContent().includes("div");
+            let StepTwo = tinymce.get("StepTwo").getContent().includes("div");
+            let StepThree = tinymce.get("StepThree").getContent().includes("div");
+            let StepFor = tinymce.get("StepFor").getContent().includes("div");
+            let StepFive = tinymce.get("StepFive").getContent().includes("div");
+            let StepSix = tinymce.get("StepSix").getContent().includes("div");
+            let StepSeven = tinymce.get("StepSeven").getContent().includes("div");
+            let StepEight = tinymce.get("StepEight").getContent().includes("div");
+            let LayoutLeyendsConditioningOrders = [];
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleZero").val(),
+                "Text": StepZero ? tinymce.get("StepZero").getContent() : `<div style="${style}">` + tinymce.get("StepZero").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepZero.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleOne").val(),
+                "Text": StepOne ? tinymce.get("StepOne").getContent() : `<div style="${style}">` + tinymce.get("StepOne").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepOne.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleTwo").val(),
+                "Text": StepTwo ? tinymce.get("StepTwo").getContent() : `<div style="${style}">` + tinymce.get("StepTwo").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepTwo.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleThree").val(),
+                "Text": StepThree ? tinymce.get("StepThree").getContent() : `<div style="${style}">` + tinymce.get("StepThree").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepThree.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleFor").val(),
+                "Text": StepFor ? tinymce.get("StepFor").getContent() : `<div style="${style}">` + tinymce.get("StepFor").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepFor.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleFive").val(),
+                "Text": StepFive ? tinymce.get("StepFive").getContent() : `<div style="${style}">` + tinymce.get("StepFive").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepFive.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleSix").val(),
+                "Text": StepSix ? tinymce.get("StepSix").getContent() : `<div style="${style}">` + tinymce.get("StepSix").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepSix.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleSeven").val(),
+                "Text": StepSeven ? tinymce.get("StepSeven").getContent() : `<div style="${style}">` + tinymce.get("StepSeven").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepSeven.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            LayoutLeyendsConditioningOrders.push({
+                "Title": $("#TitleEight").val(),
+                "Text": StepEight ? tinymce.get("StepEight").getContent() : `<div style="${style}">` + tinymce.get("StepEight").getContent() + `</div>`,
+                "Step": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsConditioningOrderSteps.StepEight.Value',
+                "Type": '@LiberacionProductoWeb.Models.LayoutLeyendsViewModels.LayoutLeyendsType.ConditioningOrder.Value',
+                "CreatedBy": '@userId',
+                "ModifyBy": '@userId',
+                "ProductId": $("#SelectedProduct").val()
+            });
+            return {
+
+                "LayoutLeyendsConditioningOrders": LayoutLeyendsConditioningOrders,
+                "ProductId": $("#SelectedProduct").val(),
+            }
+        }
+        async function VistaPrevia(event) {
+            if (Validate()) {
+                $.ajax({
+                    type: "POST",
+                    url: "/LayoutLeyends/CrearEditarPreview?option=1",
+                    data: serializeCondinioningOrder(),
+                    dataType: "json",
+                    success: function (response) {
+                        valorAccion = response.message;
+                        if (response.result == "Ok") {
+                            $.gritter.add({
+                                title: "Mensaje",
+                                text: "Se mostrará vista previa",
+                                class_name: "gritter-light"
+                            })
+                            window.open('@Url.Action("PreviewCondinioningOrder", "LayoutLeyends")?productionId=' + $("#SelectedProduct").val(), "_blank");
+                        }
+                        else {
+                            $.gritter.add({
+                                title: "Ocurrió un error",
+                                text: response.message,
+                                class_name: "gritter-light"
+                            })
+
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+        function Validate() {
+            let validate = true;
+            if ($('#SelectedProduct').val().length == 0) {
+                $.gritter.add({
+                    title: "Mensaje",
+                    text: "Selecciona un producto",
+                    class_name: "gritter-light"
+                })
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty($('#TitleZero').val())) {
+                $("#TitleZero-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepZero").getContent())) {
+                $("#StepZero-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty($('#TitleOne').val())) {
+                $("#TitleOne-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepOne").getContent())) {
+                $("#StepOne-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty($('#TitleTwo').val())) {
+                $("#TitleTwo-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepTwo").getContent())) {
+                $("#StepTwo-error").text("Requerido")
+                validate = false;
+            }
+            if (isNullOrEmpty($('#TitleThree').val())) {
+                $("#TitleThree-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepThree").getContent())) {
+                $("#StepThree-error").text("Requerido")
+                validate = false;
+            }
+            if (isNullOrEmpty($('#TitleFor').val())) {
+                $("#TitleFor-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepFor").getContent())) {
+                $("#StepFor-error").text("Requerido")
+                validate = false;
+            }
+            if (isNullOrEmpty($('#TitleFive').val())) {
+                $("#TitleFive-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepFive").getContent())) {
+                $("#StepFive-error").text("Requerido")
+                validate = false;
+            }
+            if (isNullOrEmpty($('#TitleSix').val())) {
+                $("#TitleSix-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepSix").getContent())) {
+                $("#StepSix-error").text("Requerido")
+                validate = false;
+            }
+            if (isNullOrEmpty($('#TitleSeven').val())) {
+                $("#TitleSeven-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepSeven").getContent())) {
+                $("#StepSeven-error").text("Requerido")
+                validate = false;
+            }
+            if (isNullOrEmpty($('#TitleEight').val())) {
+                $("#TitleEight-error").text("Requerido")
+                validate = false;
+                return false;
+            }
+            if (isNullOrEmpty(tinymce.get("StepEight").getContent())) {
+                $("#StepEight-error").text("Requerido")
+                validate = false;
+            }
+            return validate;
+        }
+        var ReloadForProduct = function (selectObject) {
+            $("#editcontent").removeAttr("style");
+            console.log(selectObject.id);
+            console.log(selectObject.value);
+            window.location.href = '@Url.Action("IndexConditioningOrder", "LayoutLeyends")?productId=' + selectObject.value;
+        }
+        async function ShowModal(active) {
+            if (active) {
+                $('#mheader').text("¿Deseas publicar la información?");
+                $('#GuardarOA').attr("onclick", "CrearEditar(true)")
+
+            } else {
+                $('#mheader').text("¿Deseas guardar la información?");
+                $('#GuardarOA').attr("onclick", "CrearEditar(false)")
+            }
+            $('#ModalSave').modal('show');
+        }
+    </script>
+}
