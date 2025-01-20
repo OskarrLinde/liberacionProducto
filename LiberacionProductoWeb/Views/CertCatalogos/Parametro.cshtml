@@ -357,9 +357,9 @@
                 "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
                 "<td>@Html.Raw(unidadMedidaTag)</td>" +
                 "<td><input class='form-control' id='decimaleS_CERTIFICADO' type='text'></td>" +
-                "<td><input class='form-control' id='clavE_PALS' type='text'></td>" +
-                "<td><input class='form-control' id='leyenda' type='text'></td>" +
-                "<td><input class='form-control' id='descripcion' type='text'></td>" +
+                "<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'></td>" +
+                "<td><input class='form-control' maxlength='50' id='leyenda' type='text'></td>" +
+                "<td><input class='form-control' maxlength='150' id='descripcion' type='text'></td>" +
                 "<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
                 "</tr>"
             return result;
@@ -506,26 +506,67 @@
             });
         }
 
+        var validateForm = function () {
+            let decimaleS_CERTIFICADO = $("#decimaleS_CERTIFICADO").val();
+            let clavE_PALS = $("#clavE_PALS").val();
+            let leyenda = $("#leyenda").val();
+            let descripcion = $("#descripcion").val();
+
+            let isValid = true;
+            let errors = [];
+
+            if (!decimaleS_CERTIFICADO) {
+                errors.push('El campo Decimales Certificado cre es requerido');
+                isValid = false;
+            }
+
+            if (!clavE_PALS) {
+                errors.push('El campo Clave Pals es requerido');
+                isValid = false;
+            }
+
+            if (!leyenda) {
+                errors.push('El campo Leyenda es requerido');
+                isValid = false;
+            }
+
+            if (!descripcion) {
+                errors.push('El campo Descripción es requerido');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                errors.forEach(error => {
+                    $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>' + error + '</div>');
+                });
+            }
+
+            return isValid;
+        }
+
         var saveOnClick = function (event) {
-            bootbox.confirm({
-                message: "¿Deseas guardar los cambios?",
-                buttons: {
-                    confirm: {
-                        label: 'Si',
-                        className: 'btn-success'
+            if (validateForm()) {
+                bootbox.confirm({
+                    message: "¿Deseas guardar los cambios?",
+                    buttons: {
+                        confirm: {
+                            label: 'Si',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
                     },
-                    cancel: {
-                        label: 'No',
-                        className: 'btn-danger'
+                    callback: function (result) {
+                        if (result) {
+                            saveConfirm(event);
+                        }
                     }
-                },
-                callback: function (result) {
-                    if (result) {
-                        saveConfirm(event);
-                    }
-                }
-            });
+                });
+            }
         };
+
 
         $(document).ready(function () {
             App.init();

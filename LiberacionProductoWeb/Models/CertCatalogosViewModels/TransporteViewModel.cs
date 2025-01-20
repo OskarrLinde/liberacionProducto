@@ -45,6 +45,7 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         public int iD_STATUS { get; set; }
         public int usR_ALTA { get; set; }
         public int usR_MODIFICA { get; set; }
+        public string iD_GRADO { get; set; }
     }
 
     public class DtoTransporte

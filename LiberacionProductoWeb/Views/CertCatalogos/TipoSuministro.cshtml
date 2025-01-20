@@ -330,7 +330,7 @@
                 "<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                 "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
                 // "<td>@Html.Raw(idTag)</td>" +
-                "<td><input class='form-control' id='descripcion' type='text'></td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'></td>" +
                 "<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
                 "</tr>"
             return result;
@@ -438,25 +438,47 @@
             });
         }
 
+        var validateForm = function () {
+            let inptDescripcion = $("#descripcion").val();
+
+            let isValid = true;
+            let errors = [];
+
+            if (!inptDescripcion) {
+                errors.push('El campo tipo suministro es requerido');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                errors.forEach(error => {
+                    $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>' + error + '</div>');
+                });
+            }
+
+            return isValid;
+        }
+
         var saveOnClick = function (event) {
-            bootbox.confirm({
-                message: "¿Deseas guardar los cambios?",
-                buttons: {
-                    confirm: {
-                        label: 'Si',
-                        className: 'btn-success'
+            if (validateForm()) {
+                bootbox.confirm({
+                    message: "¿Deseas guardar los cambios?",
+                    buttons: {
+                        confirm: {
+                            label: 'Si',
+                            className: 'btn-success'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
                     },
-                    cancel: {
-                        label: 'No',
-                        className: 'btn-danger'
+                    callback: function (result) {
+                        if (result) {
+                            saveConfirm(event);
+                        }
                     }
-                },
-                callback: function (result) {
-                    if (result) {
-                        saveConfirm(event);
-                    }
-                }
-            });
+                });
+            }
         };
 
         $(document).ready(function () {

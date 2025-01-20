@@ -37,6 +37,7 @@ namespace LiberacionProductoWeb.Controllers
         private readonly ILogger<AccessController> _logger;
         IStringLocalizer<Localize.Resource> _resource;
         private AppDbContext _context;
+        private Transporte iD_GRADO;
         private readonly int[] plantsByUser;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPrincipalService _principalService;
@@ -923,7 +924,7 @@ namespace LiberacionProductoWeb.Controllers
                             _analizadorParametros.iD_PARAMETRO = int.Parse(iD_PARAMETRO);
                             _analizadorParametros.iD_METODO = int.Parse(iD_METODO);
                             _analizadorParametros.descripcion = descripcion;
-                            _analizadorParametros.limitE_INFERIOR = limitE_INFERIOR;
+                            _analizadorParametros.limitE_INFERIOR = limitE_INFERIOR == string.Empty ? 0.ToString() : limitE_INFERIOR;
                             _analizadorParametros.leyendA_REPORTE = leyendA_REPORTE;
                             _analizadorParametros.usR_ALTA = 1;
 
@@ -3736,8 +3737,8 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_GRADO + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
-                "<td><input class='form-control' id='gradO_ESPECIAL' type='text'  value='" + entity.gradO_ESPECIAL + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' id='gradO_ESPECIAL' type='number'  value='" + entity.gradO_ESPECIAL + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -3970,7 +3971,7 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_METODO + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -4213,8 +4214,8 @@ namespace LiberacionProductoWeb.Controllers
                         "<a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_PAIS + "' ><i class='fa fa-save'></i></a>" +
                     "</td>" +
-                    "<td><input class='form-control' id='iD_PAIS' type='text' value='" + entity.iD_PAIS + "' readonly></td>" +
-                    "<td><input class='form-control' id='nombre' type='text' value='" + entity.nombre + "'></td>" +
+                    "<td><input class='form-control' maxlength='3' id='iD_PAIS' type='text' value='" + entity.iD_PAIS + "' readonly></td>" +
+                    "<td><input class='form-control' maxlength='50' id='nombre' type='text' value='" + entity.nombre + "'></td>" +
                     "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -4485,10 +4486,10 @@ namespace LiberacionProductoWeb.Controllers
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_PARAMETRO + "' ><i class='fa fa-save'></i></a> </td>" +
                 "<td>" + unidadMedida + "</td>" +
-                "<td><input class='form-control' id='decimaleS_CERTIFICADO' type='text'  value='" + entity.decimaleS_CERTIFICADO + "'></td>" +
-                "<td><input class='form-control' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
-                "<td><input class='form-control' id='leyenda' type='text'  value='" + entity.leyenda + "'></td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' id='decimaleS_CERTIFICADO' type='number'  value='" + entity.decimaleS_CERTIFICADO + "'></td>" +
+                "<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='leyenda' type='text'  value='" + entity.leyenda + "'></td>" +
+                "<td><input class='form-control' maxlength='150' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -4611,7 +4612,7 @@ namespace LiberacionProductoWeb.Controllers
                 planta.clavE_CERTIFICADO = data.clavE_CERTIFICADO ?? throw new ArgumentNullException(nameof(data.clavE_CERTIFICADO), "La clave de certificado es obligatoria");
                 planta.ID_FUENTE_SUMINISTRO = idFuenteSuministro;
                 planta.ID_PLANTA_APROBADA = idPlantaAprobada;
-                // planta.identificador = data.identi
+                planta.identificador = ""; //data.identi
 
                 if (idPlanta == null)
                 {
@@ -5511,9 +5512,9 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_PRODUCTO + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
-                "<td><input class='form-control' id='nombre' type='text'  value='" + entity.nombre + "'></td>" +
-                "<td><input class='form-control' id='nombrE_ESP' type='text'  value='" + entity.nombrE_ESP + "'></td>" +
+                "<td><input class='form-control' maxlength='30' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='nombre' type='text'  value='" + entity.nombre + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='nombrE_ESP' type='text'  value='" + entity.nombrE_ESP + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -6786,7 +6787,7 @@ namespace LiberacionProductoWeb.Controllers
                             "<a href='javascript:void(0)' onclick='saveOnClickRolAlias(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_ROL_ALIAS + "' ><i class='fa fa-save'></i></a> </td>" +
                     "<td style='display: none;'>" + rolTag + "</td>" +
                     "<td>" + paisTag + "</td>" +
-                    "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+					"<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
                     "<td>" + estatusTag + "</td>" +
                     "</tr>";
                 }
@@ -7158,7 +7159,7 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_STATUS_PIPA + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -7443,8 +7444,8 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TANQUE + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
-                "<td><input class='form-control' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
+                "<td><input class='form-control' id='descripcion' maxlength='20' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' id='clavE_PALS' maxlength='100' type='text'  value='" + entity.clavE_PALS + "'></td>" +
                 "<td>" + plantasTag + "</td>" +
                 "<td>" + productosTag + "</td>" +
                 "<td>" + estatusTag + "</td>" +
@@ -7892,7 +7893,7 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TIPO_SUMINISTRO + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -8120,8 +8121,8 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TIPO_TRANSPORTE + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
-                "<td><input class='form-control' id='analizar' type='text'  value='" + entity.analizar + "'></td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' maxlength='1' id='analizar' type='text'  value='" + entity.analizar + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -8240,6 +8241,7 @@ namespace LiberacionProductoWeb.Controllers
                             _transporte.descripcion = descripcion;
                             _transporte.clavE_PALS = clavE_PALS;
                             _transporte.usR_ALTA = 1;
+                            _transporte.iD_GRADO = "1";
 
                             var _url = _catalogCertificate.urlCatalogs + "Transporte";
 
@@ -8469,8 +8471,8 @@ namespace LiberacionProductoWeb.Controllers
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TRANSPORTE + "' ><i class='fa fa-save'></i></a> </td>" +
                 "<td>" + tipoTransporteTag + "</td>" +
                 "<td>" + paisesTag + "</td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
-                "<td><input class='form-control' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
+                "<td><input class='form-control' maxlength='20' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' maxlength='30' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
                 "<td>" + productoTag + "</td>" +
                 "<td style='display: none;'>" + statusPipaTag + "</td>" +
                 "<td>" + estatusTag + "</td>" +
@@ -8738,8 +8740,8 @@ namespace LiberacionProductoWeb.Controllers
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_UNIDAD_MEDIDA + "' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
-                "<td><input class='form-control' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
+                "<td><input class='form-control' maxlength='20' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+                "<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
                  "<td>" + binarioTag + "</td>" +
                 "<td><input class='form-control' id='tipo' type='text'  value='" + entity.tipo + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
