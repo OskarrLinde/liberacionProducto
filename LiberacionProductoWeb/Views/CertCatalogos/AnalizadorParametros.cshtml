@@ -134,11 +134,11 @@
 												{
 													if (item.iD_PRODUCTO == entry.iD_PRODUCTO)
 													{
-														@item.nombrE_ESP
+															@item.nombrE_ESP
 													}
 													else
 													{
-														@:
+															@:
 													}
 												}
 											}
@@ -147,11 +147,11 @@
 											@{
 												if (Convert.ToBoolean(entry.iD_STATUS))
 												{
-													@: Activo
+														@: Activo
 												}
 												else
 												{
-													@: Inactivo
+														@: Inactivo
 												}
 											}
 										</td>
@@ -195,11 +195,11 @@
 												{
 													if (item.iD_PLANTA == entry.iD_PLANTA)
 													{
-														@item.descripcion
+															@item.descripcion
 													}
 													else
 													{
-														@:
+															@:
 													}
 												}
 											}
@@ -210,11 +210,11 @@
 												{
 													if (item.iD_PARAMETRO == entry.iD_PARAMETRO)
 													{
-														@item.descripcion
+															@item.descripcion
 													}
 													else
 													{
-														@:
+															@:
 													}
 												}
 											}
@@ -225,11 +225,11 @@
 												{
 													if (item.iD_METODO == entry.iD_METODO)
 													{
-														@item.descripcion
+															@item.descripcion
 													}
 													else
 													{
-														@:
+															@:
 													}
 												}
 											}
@@ -244,11 +244,11 @@
 											@{
 												if (Convert.ToBoolean(entry.iD_STATUS))
 												{
-													@: Activo
+														@: Activo
 												}
 												else
 												{
-													@: Inactivo
+														@: Inactivo
 												}
 											}
 										</td>
@@ -540,8 +540,8 @@
 			var result = "<tr>" +
 				"<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
 				"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
-				"<td><input class='form-control' id='descripcion' type='text'></td>" +
-				"<td><input class='form-control' id='clavE_PALS' type='text'></td>" +
+				"<td><input class='form-control' maxlength='50' id='descripcion' type='text'></td>" +
+				"<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'></td>" +
 				"<td>@Html.Raw(productoTag)</td>" +
 				"<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
 				"</tr>"
@@ -556,8 +556,8 @@
 				"<td>@Html.Raw(plantaTag)</td>" +
 				"<td>@Html.Raw(parametroTag)</td>" +
 				"<td>@Html.Raw(metodoTag)</td>" +
-				"<td><input class='form-control' id='limitE_INFERIOR' type='text'></td>" +
-				"<td><input class='form-control' id='leyendA_REPORTE' type='text'></td>" +
+				"<td><input class='form-control' id='limitE_INFERIOR' type='number'></td>" +
+				"<td><input class='form-control' maxlength='25' id='leyendA_REPORTE' type='text'></td>" +
 				"<td><select id='iD_STATUS' class='form-control'><option value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
 				"</tr>"
 			return result;
@@ -794,46 +794,102 @@
 			});
 		}
 
+		var validateForm = function () {
+			let clavE_PALS = $("#clavE_PALS").val();
+			let descripcion = $("#descripcion").val();
+
+			let isValid = true;
+			let errors = [];
+
+			if (!clavE_PALS) {
+				errors.push('El campo Clave Pals es requerido');
+				isValid = false;
+			}
+
+			if (!descripcion) {
+				errors.push('El campo Descripción es requerido');
+				isValid = false;
+			}
+
+			if (!isValid) {
+				errors.forEach(error => {
+					$('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>' + error + '</div>');
+				});
+			}
+
+			return isValid;
+		}
+
 		var saveOnClick = function (event) {
-			bootbox.confirm({
-				message: "¿Deseas guardar los cambios?",
-				buttons: {
-					confirm: {
-						label: 'Si',
-						className: 'btn-success'
+			if (validateForm()) {
+				bootbox.confirm({
+					message: "¿Deseas guardar los cambios?",
+					buttons: {
+						confirm: {
+							label: 'Si',
+							className: 'btn-success'
+						},
+						cancel: {
+							label: 'No',
+							className: 'btn-danger'
+						}
 					},
-					cancel: {
-						label: 'No',
-						className: 'btn-danger'
+					callback: function (result) {
+						if (result) {
+							saveConfirm(event);
+						}
 					}
-				},
-				callback: function (result) {
-					if (result) {
-						saveConfirm(event);
-					}
-				}
-			});
+				});
+			}
 		};
 
+		var validateFormAnalizadorParametros = function () {
+			let limitE_INFERIOR = $("#limitE_INFERIOR").val();
+			let leyendA_REPORTE = $("#leyendA_REPORTE").val();
+
+			let isValid = true;
+			let errors = [];
+
+			if (!limitE_INFERIOR) {
+				errors.push('El campo limite inferior es requerido');
+				isValid = false;
+			}
+
+			if (!leyendA_REPORTE) {
+				errors.push('El campo Leyenda Reporte es requerido');
+				isValid = false;
+			}
+
+			if (!isValid) {
+				errors.forEach(error => {
+					$('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>' + error + '</div>');
+				});
+			}
+
+			return isValid;
+		}
+
 		var saveOnClickAnalizadorParametros = function (event) {
-			bootbox.confirm({
-				message: "¿Deseas guardar los cambios?",
-				buttons: {
-					confirm: {
-						label: 'Si',
-						className: 'btn-success'
+			if (validateFormAnalizadorParametros()) {
+				bootbox.confirm({
+					message: "¿Deseas guardar los cambios?",
+					buttons: {
+						confirm: {
+							label: 'Si',
+							className: 'btn-success'
+						},
+						cancel: {
+							label: 'No',
+							className: 'btn-danger'
+						}
 					},
-					cancel: {
-						label: 'No',
-						className: 'btn-danger'
+					callback: function (result) {
+						if (result) {
+							saveConfirmAnalizadorParametros(event);
+						}
 					}
-				},
-				callback: function (result) {
-					if (result) {
-						saveConfirmAnalizadorParametros(event);
-					}
-				}
-			});
+				});
+			}
 		};
 
 		var tableIdentificator = "";
