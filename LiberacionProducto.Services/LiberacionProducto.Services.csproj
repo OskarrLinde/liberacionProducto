@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\LiberacionProducto.Bus\LiberacionProducto.Bus.csproj" />
     <ProjectReference Include="..\LiberacionProducto.CommonLibrary\LiberacionProducto.CommonLibrary.csproj" />
     <ProjectReference Include="..\LiberacionProducto.Data\LiberacionProducto.Data.csproj" />
