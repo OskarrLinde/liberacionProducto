@@ -1,4 +1,5 @@
-﻿using LiberacionProductoWeb.Data;
+﻿using LiberacionProducto.Services.Interfaces;
+using LiberacionProductoWeb.Data;
 using LiberacionProductoWeb.Data.Repository;
 using LiberacionProductoWeb.Helpers;
 using LiberacionProductoWeb.Models.CertCatalogosViewModels;
@@ -43,14 +44,16 @@ namespace LiberacionProductoWeb.Controllers
 		private readonly IPrincipalService _principalService;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly CatalogCertificate _catalogCertificate;
+		private readonly ICertCatalogosService _certCatalogosService;
 
-		public CertCatalogosController(ILogger<AccessController> logger, UserManager<ApplicationUser> userManager, IStringLocalizer<Localize.Resource> resource, IConfiguration config, CatalogCertificate catalogCertificate)
+		public CertCatalogosController(ILogger<AccessController> logger, UserManager<ApplicationUser> userManager, IStringLocalizer<Localize.Resource> resource, IConfiguration config, CatalogCertificate catalogCertificate, ICertCatalogosService certCatalogosService)
 		{
 			_logger = logger;
 			_userManager = userManager;
 			_resource = resource;
 			_config = config;
 			_catalogCertificate = catalogCertificate;
+			_certCatalogosService = certCatalogosService;
 		}
 
 		public IConfiguration _config { get; }
@@ -493,42 +496,40 @@ namespace LiberacionProductoWeb.Controllers
 			return _model;
 		}
 
-		public List<FuenteSuministro> getFuenteSuministro()
+		public async Task<List<FuenteSuministro>> getFuenteSuministro()
 		{
-			var _model = new List<FuenteSuministro>();
-			var _url = _catalogCertificate.urlCatalogs + "FuenteSuministro";
+			var result = await _certCatalogosService.GetFuenteSuministro();
 
-			var client = new RestClient(_url);
-			client.Timeout = -1;
-			var request = new RestRequest(Method.GET);
-			IRestResponse response = client.Execute(request);
+			List<FuenteSuministro> lstFuenteSuministros = new List<FuenteSuministro>();
+			foreach (var item in result)
+			{
+				lstFuenteSuministros.Add(new FuenteSuministro
+				{
+					ID_FUENTE_SUMINISTRO = item.IdFuenteSuministro,
+					descripcion = item.Descripcion,
+					iD_STATUS = item.IdStatus
+				});
+			}
 
-			JsonDeserializer deserial = new JsonDeserializer();
-			var JSONObj = deserial.Deserialize<Dictionary<string, string>>(response);
-
-			_model = JsonConvert.DeserializeObject<List<FuenteSuministro>>(JSONObj["data"]);
-
-
-			return _model;
+			return lstFuenteSuministros;
 		}
 
-		public List<PlantaAprobada> getPlantaAprobada()
+		public async Task<List<PlantaAprobada>> getPlantaAprobada()
 		{
-			var _model = new List<PlantaAprobada>();
-			var _url = _catalogCertificate.urlCatalogs + "PlantaAprobada";
+			var result = await _certCatalogosService.GetPlantaAprobada();
 
-			var client = new RestClient(_url);
-			client.Timeout = -1;
-			var request = new RestRequest(Method.GET);
-			IRestResponse response = client.Execute(request);
+			List<PlantaAprobada> lstPlantaAprobada = new List<PlantaAprobada>();
+			foreach (var item in result)
+			{
+				lstPlantaAprobada.Add(new PlantaAprobada
+				{
+					ID_PLANTA_APROBADA = item.IdPlantaAprobada,
+					descripcion = item.Descripcion,
+					iD_STATUS = item.IdStatus
+				});
+			}
 
-			JsonDeserializer deserial = new JsonDeserializer();
-			var JSONObj = deserial.Deserialize<Dictionary<string, string>>(response);
-
-			_model = JsonConvert.DeserializeObject<List<PlantaAprobada>>(JSONObj["data"]);
-
-
-			return _model;
+			return lstPlantaAprobada;
 		}
 
 		public List<TipoCertificado> getTipoCertificado()
@@ -4501,13 +4502,13 @@ namespace LiberacionProductoWeb.Controllers
 
 		#region Plantas
 
-		public IActionResult Planta()
+		public async Task<IActionResult> Planta()
 		{
 			var plants = getPlantas();
 			var country = getPaises();
 			var supplyType = getTipoSuministro();
-			//var sourceSupply = getFuenteSuministro();
-			//var approvedPlant = getPlantaAprobada();
+			var sourceSupply = await getFuenteSuministro();
+			var approvedPlant = await getPlantaAprobada();
 
 			PlantaViewModel _plantaVM = new PlantaViewModel();
 
@@ -4550,31 +4551,31 @@ namespace LiberacionProductoWeb.Controllers
 				});
 			}
 
-			//if (sourceSupply != null)
-			//{
-			//    _plantaVM.FuenteSuministroList = sourceSupply;
-			//    _plantaVM.FuenteSuministroFilter = sourceSupply.ConvertAll(a =>
-			//    {
-			//        return new SelectListItem()
-			//        {
-			//            Text = a.descripcion,
-			//            Value = a.ID_FUENTE_SUMINISTRO.ToString()
-			//        };
-			//    });
-			//}
+			if (sourceSupply != null)
+			{
+				_plantaVM.FuenteSuministroList = sourceSupply;
+				_plantaVM.FuenteSuministroFilter = sourceSupply.ConvertAll(a =>
+				{
+					return new SelectListItem()
+					{
+						Text = a.descripcion,
+						Value = a.ID_FUENTE_SUMINISTRO.ToString()
+					};
+				});
+			}
 
-			//if (approvedPlant != null)
-			//{
-			//    _plantaVM.PlantaAprobadaList = approvedPlant;
-			//    _plantaVM.PlantaAprobadFilter = approvedPlant.ConvertAll(a =>
-			//    {
-			//        return new SelectListItem()
-			//        {
-			//            Text = a.descripcion,
-			//            Value = a.ID_PLANTA_APROBADA.ToString()
-			//        };
-			//    });
-			//}
+			if (approvedPlant != null)
+			{
+				_plantaVM.PlantaAprobadaList = approvedPlant;
+				_plantaVM.PlantaAprobadFilter = approvedPlant.ConvertAll(a =>
+				{
+					return new SelectListItem()
+					{
+						Text = a.descripcion,
+						Value = a.ID_PLANTA_APROBADA.ToString()
+					};
+				});
+			}
 
 			return View(_plantaVM);
 		}
@@ -4612,7 +4613,7 @@ namespace LiberacionProductoWeb.Controllers
 				planta.clavE_CERTIFICADO = data.clavE_CERTIFICADO ?? throw new ArgumentNullException(nameof(data.clavE_CERTIFICADO), "La clave de certificado es obligatoria");
 				planta.ID_FUENTE_SUMINISTRO = idFuenteSuministro;
 				planta.ID_PLANTA_APROBADA = idPlantaAprobada;
-				planta.identificador = ""; //data.identi
+				planta.identificador = data.identificador;
 
 				if (idPlanta == null)
 				{
@@ -4664,86 +4665,50 @@ namespace LiberacionProductoWeb.Controllers
 
 		public JsonResult DeletePlanta(String Id)
 		{
-			try
-			{
-				var _url = _catalogCertificate.urlCatalogs + "Planta?statusId=1";
-				Plantas model2 = new Plantas();
-				RestGenerico _rest = new RestGenerico();
-				var _result = _rest.getApi<Plantas, Plantas>(_url);
-				JsonDeserializer deserial = new JsonDeserializer();
-				var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-				var lstPlantas = JsonConvert.DeserializeObject<List<Plantas>>(JSONObj["data"]);
-				var result = lstPlantas.FirstOrDefault(x => x.iD_PLANTA == Int32.Parse(Id));
-
-				if (result != null)
-				{
-					model2.iD_PLANTA = result.iD_PLANTA;
-					model2.iD_PAIS = result.iD_PAIS;
-					model2.iD_TIPO_SUMINISTRO = result.iD_TIPO_SUMINISTRO;
-					model2.identificador = result.identificador;
-					model2.descripcion = result.descripcion;
-					model2.clavE_CERTIFICADO = result.clavE_CERTIFICADO;
-					model2.iD_STATUS = 0;
-					model2.usR_MODIFICA = 1;
-					model2.ID_FUENTE_SUMINISTRO = result.ID_FUENTE_SUMINISTRO;
-					model2.ID_PLANTA_APROBADA = result.ID_PLANTA_APROBADA;
-
-					_result = _rest.postApi<Plantas, Plantas>(_url + "/" + Id, model2);
-					JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-					var _error = JSONObj["error"];
-					if (_error.Trim() == "False")
-					{
-						ViewBag.Error = "false";
-						_result = _rest.getApi<Plantas, Plantas>(_url);
-						JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-						//model = JsonConvert.DeserializeObject<List<Plantas>>(JSONObj["data"]);
-					}
-					else
-					{
-						throw new Exception("El registro no existe");
-					}
-				}
-				else
-				{
-					throw new Exception("El registro no existe");
-				}
-			}
-			catch (Exception ex)
-			{
-				return Json(new { Result = "Fail", Message = ex.Message });
-			}
+			var result = _certCatalogosService.DeletePlanta(Convert.ToInt32(Id));
 
 			return Json(new { Result = "Ok" });
 		}
 
-		public JsonResult GetPlantaHTMLTagsById(string Id)
+		public async Task<JsonResult> GetPlantaHTMLTagsById(string Id)
 		{
 			String response = String.Empty;
-			var plants = getPlantas();
+			//var plants = getPlantas();
 			var country = getPaises();
 			var supplyType = getTipoSuministro();
-			//var sourceSupply = getFuenteSuministro();
-			//var approvedPlant = getPlantaAprobada();
-			var _url = _catalogCertificate.urlCatalogs + "Planta";
+			var sourceSupply = await getFuenteSuministro();
+			var approvedPlant = await getPlantaAprobada();
+
 			RestGenerico _rest = new RestGenerico();
-			var _result = _rest.getApi<Plantas, Plantas>(_url + "/" + Id);
-			JsonDeserializer deserial = new JsonDeserializer();
-			var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-			var entity = JsonConvert.DeserializeObject<Plantas>(JSONObj["data"]);
+			var _resultActive = _rest.getApi<Plantas, Plantas>(_catalogCertificate.urlCatalogs + "Planta?statusId=1");
+            var _resultInactive = _rest.getApi<Plantas, Plantas>(_catalogCertificate.urlCatalogs + "Planta?statusId=0");
+
+            JsonDeserializer deserial = new JsonDeserializer();
+			var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_resultActive);
+
+            var lstPlantas = JsonConvert.DeserializeObject<List<Plantas>>(JSONObj["data"]);
+			var entity = lstPlantas.FirstOrDefault(x => x.iD_PLANTA == Int32.Parse(Id));
+
+			if (entity == null)
+			{
+                JSONObj = deserial.Deserialize<Dictionary<string, string>>(_resultInactive);
+                lstPlantas = JsonConvert.DeserializeObject<List<Plantas>>(JSONObj["data"]);
+                entity = lstPlantas.FirstOrDefault(x => x.iD_PLANTA == Int32.Parse(Id));
+            }
 
 			if (entity != null)
 			{
-				var plantasTag = "<select  id='iD_PLANTA' class='form-control' >";
+				//var plantasTag = "<select  id='iD_PLANTA' class='form-control' >";
 
-				foreach (var item in plants)
-				{
-					if (entity.iD_PLANTA == item.iD_PLANTA)
-						plantasTag += "<option value='" + item.iD_PLANTA + "' selected >" + item.descripcion + " </option>";
-					else
-						plantasTag += "<option value='" + item.iD_PLANTA + "'>" + item.descripcion + " </option>";
-				}
+				//foreach (var item in plants)
+				//{
+				//	if (entity.iD_PLANTA == item.iD_PLANTA)
+				//		plantasTag += "<option value='" + item.iD_PLANTA + "' selected >" + item.descripcion + " </option>";
+				//	else
+				//		plantasTag += "<option value='" + item.iD_PLANTA + "'>" + item.descripcion + " </option>";
+				//}
 
-				plantasTag += "</select>";
+				//plantasTag += "</select>";
 
 				var estatusTag = "<select  id='iD_STATUS' class='form-control'>";
 
@@ -4784,29 +4749,29 @@ namespace LiberacionProductoWeb.Controllers
 
 				tipoSuministroTag += "</select>";
 
-				//var fuenteSuministroTag = "<select  id='ID_FUENTE_SUMINISTRO' class='form-control' >";
+				var fuenteSuministroTag = "<select  id='ID_FUENTE_SUMINISTRO' class='form-control' >";
 
-				//foreach (var item in sourceSupply)
-				//{
-				//    if (entity.ID_FUENTE_SUMINISTRO == item.ID_FUENTE_SUMINISTRO)
-				//        fuenteSuministroTag += "<option value='" + item.ID_FUENTE_SUMINISTRO + "' selected >" + item.descripcion + " </option>";
-				//    else
-				//        fuenteSuministroTag += "<option value='" + item.ID_FUENTE_SUMINISTRO + "'>" + item.descripcion + " </option>";
-				//}
+				foreach (var item in sourceSupply)
+				{
+					if (entity.ID_FUENTE_SUMINISTRO == item.ID_FUENTE_SUMINISTRO)
+						fuenteSuministroTag += "<option value='" + item.ID_FUENTE_SUMINISTRO + "' selected >" + item.descripcion + " </option>";
+					else
+						fuenteSuministroTag += "<option value='" + item.ID_FUENTE_SUMINISTRO + "'>" + item.descripcion + " </option>";
+				}
 
-				//fuenteSuministroTag += "</select>";
+				fuenteSuministroTag += "</select>";
 
-				//var plantaAprobadaTag = "<select  id='ID_PLANTA_APROBADA' class='form-control' >";
+				var plantaAprobadaTag = "<select  id='ID_PLANTA_APROBADA' class='form-control' >";
 
-				//foreach (var item in approvedPlant)
-				//{
-				//    if (entity.ID_PLANTA_APROBADA == item.ID_PLANTA_APROBADA)
-				//        plantaAprobadaTag += "<option value='" + item.ID_PLANTA_APROBADA + "' selected >" + item.descripcion + " </option>";
-				//    else
-				//        plantaAprobadaTag += "<option value='" + item.ID_PLANTA_APROBADA + "'>" + item.descripcion + " </option>";
-				//}
+				foreach (var item in approvedPlant)
+				{
+					if (entity.ID_PLANTA_APROBADA == item.ID_PLANTA_APROBADA)
+						plantaAprobadaTag += "<option value='" + item.ID_PLANTA_APROBADA + "' selected >" + item.descripcion + " </option>";
+					else
+						plantaAprobadaTag += "<option value='" + item.ID_PLANTA_APROBADA + "'>" + item.descripcion + " </option>";
+				}
 
-				//plantaAprobadaTag += "</select>";
+				plantaAprobadaTag += "</select>";
 
 				response +=
 				"<tr>" +
@@ -4814,13 +4779,13 @@ namespace LiberacionProductoWeb.Controllers
 						"<a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
 						"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_PLANTA + "' ><i class='fa fa-save'></i></a> " +
 					"</td>" +
-					//"<td>" + plantasTag + "</td>" +
 					"<td>" + paisTag + "</td>" +
 					"<td>" + tipoSuministroTag + "</td>" +
 					"<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+					"<td><input class='form-control' maxlength='10' id='identificador' type='text' value='" + entity.identificador + "'></td>" +
 					"<td><input class='form-control' maxlength='3' id='clavE_CERTIFICADO' type='text'  value='" + entity.clavE_CERTIFICADO + "'></td>" +
-					//"<td>" + fuenteSuministroTag + "</td>" +
-					//"<td>" + plantaAprobadaTag + "</td>" +
+					"<td>" + fuenteSuministroTag + "</td>" +
+					"<td>" + plantaAprobadaTag + "</td>" +
 					"<td>" + estatusTag + "</td>" +
 				"</tr>";
 			}

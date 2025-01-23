@@ -1,8 +1,12 @@
 using DevExpress.AspNetCore;
 using DevExpress.AspNetCore.Reporting;
 using LiberacionProducto.Bus.Services.Lotificacion;
+using LiberacionProducto.Data.Implementation;
+using LiberacionProducto.Data.Interfaces;
 using LiberacionProducto.Data.Repositories.Lotificacion;
+using LiberacionProducto.Services.Implementation;
 using LiberacionProducto.Services.Implementation.Lotificacion;
+using LiberacionProducto.Services.Interfaces;
 using LiberacionProductoWeb.Controllers;
 using LiberacionProductoWeb.Data;
 using LiberacionProductoWeb.Data.Repository;
@@ -105,7 +109,8 @@ namespace LiberacionProductoWeb
             services.AddSingleton(Configuration.GetSection("AccessOptions").Get<AccessOptions>());
             services.AddSingleton(Configuration.GetSection("CatalogCertificate").Get<CatalogCertificate>());
 
-            services.AddSingleton(new LotificacionRepository(cadenadeconexionEnc));
+			services.AddSingleton<IConfiguration>(Configuration);
+			services.AddSingleton(new LotificacionRepository(cadenadeconexionEnc));
             services.AddScoped<LotificacionService>();
             services.AddScoped<LoteService>();            
 
@@ -237,8 +242,13 @@ namespace LiberacionProductoWeb
             services.AddScoped<ILeyendsTextHistoryGroupRepository, LeyendsTextHistoryGroupRepository>();
             services.AddScoped<ICheckListService, CheckListService>();
             services.AddScoped<IProductionOrderCustomersFilesRepository, ProductionOrderCustomersFilesRepository>();
-            //Add Authorization Policy
-            ConfigureAuthorizationPolicies(services);
+
+			//CertCatalogos
+			services.AddScoped<ICertCatalogosRepository, CertCatalogosRepository>();
+			services.AddScoped<ICertCatalogosService, CertCatalogosService>();
+
+			//Add Authorization Policy
+			ConfigureAuthorizationPolicies(services);
 
             services.AddLocalization(options =>
             {

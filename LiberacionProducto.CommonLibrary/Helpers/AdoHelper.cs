@@ -51,7 +51,10 @@ namespace LiberacionProducto.CommonLibrary.Helpers
 
             SqlCommand command = new SqlCommand(procedure.StoredProcedureIdentifier, connection);
             command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddRange(procedure.Parameters.ToArray());
+
+			if (procedure.Parameters != null)
+			    command.Parameters.AddRange(procedure.Parameters.ToArray());
+
             command.CommandTimeout = 120;
             return await command.ExecuteReaderAsync(CommandBehavior.CloseConnection);
         }

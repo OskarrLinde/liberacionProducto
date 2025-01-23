@@ -54,7 +54,8 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         public string iD_PAIS { get; set; }
         public string iD_TIPO_SUMINISTRO { get; set; }
         public string descripcion { get; set; }
-        public string clavE_CERTIFICADO { get; set; }
+		public string identificador { get; set; }
+		public string clavE_CERTIFICADO { get; set; }
         public string iD_STATUS { get; set; }
         public string ID_FUENTE_SUMINISTRO { get; set; }
         public string ID_PLANTA_APROBADA { get; set; }
