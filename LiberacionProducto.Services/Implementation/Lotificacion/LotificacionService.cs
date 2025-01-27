@@ -75,6 +75,11 @@ namespace LiberacionProducto.Services.Implementation.Lotificacion
             return _lotificacionRepository.GuardarDatos(data);
         }
 
+        public string EditarDatosLote(LotificacionData data)
+        {
+            return _lotificacionRepository.EditarDatosLote(data);
+        }
+
         public async Task<List<AnalisisTanque>> ObtenerAnalisisTanque(ListadoLotificacionData dataBusqueda)
         {
             return await _lotificacionRepository.ObtenerAnalisisTanque(dataBusqueda);

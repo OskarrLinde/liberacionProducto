@@ -148,6 +148,31 @@ namespace LiberacionProductoWeb.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> EditarLote(LotificacionData data)
+        {
+            try
+            {
+                //var descPlanta = _lotificacionService.GetDescripcionPlanta(data.MasterData.IdPlanta);
+                //var descProducto = _lotificacionService.GetDescripcionProducto(Convert.ToInt32(data.MasterData.IdProducto));
+
+                //string IdLoteNuevo = _lotificacionService.GeneraIdLote(
+                //    data.MasterData.IdProducto, descProducto.Result.DescProducto.Trim(), data.MasterData.IdPlanta, descPlanta.Result.DescPlanta.Trim(), data.MasterData.IdTanqueDesc);
+                //data.MasterData.IdLote = IdLoteNuevo;
+
+                var retVal = _lotificacionService.EditarDatosLote(data);
+                if (string.IsNullOrEmpty(retVal) || retVal.Contains("Error"))
+                {
+                    return BadRequest(retVal);
+                }
+                return Ok(retVal);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error al guardar los datos: " + ex.Message);
+            }
+        }
+
+        [HttpPost]
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> CancelarLote(CancelarLoteData data)
         {

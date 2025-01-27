@@ -539,6 +539,97 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
             }
         }
 
+        public string EditarDatosLote(LotificacionData data)
+        {
+            var _connectionString2 = "Data Source=MLGMTY00DBTST01;Database=CertAnaliticosBulkDB;User Id=syscer_a; Password=Test394mx;";
+            CultureInfo culture = new CultureInfo("es-ES");
+
+            using (var connection = new SqlConnection(_connectionString2))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Declarar el parámetro de salida para validar que se realizo correctamente commit
+                        var CommitIdAnalisis = new SqlParameter("@Resultado", SqlDbType.Int)
+                        {
+                            Direction = ParameterDirection.Output
+                        };
+
+                        // Guardar datos en la tabla maestra y obtener el nuevo IdAnalisis
+                        using (var command = new SqlCommand("sp_EditarLotificacionMaestro", connection, transaction))
+                        {
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.Add(new SqlParameter("@IdAnalisis", data.MasterData.IdAnalisis));
+                            command.Parameters.Add(new SqlParameter("@IdPlanta", data.MasterData.IdPlanta));
+                            command.Parameters.Add(new SqlParameter("@IdProducto", Convert.ToInt32(data.MasterData.IdProducto)));
+                            command.Parameters.Add(new SqlParameter("@NivelIni", Convert.ToDecimal(data.MasterData.NivelIni, culture)));
+                            command.Parameters.Add(new SqlParameter("@IdUMedidaIni", Convert.ToInt32(data.MasterData.IdUMedidaIni)));
+                            command.Parameters.Add(new SqlParameter("@NivelFin", Convert.ToDecimal(data.MasterData.NivelFin, culture)));
+                            command.Parameters.Add(new SqlParameter("@IdUMedidaFin", Convert.ToInt32(data.MasterData.IdUMedidaFin)));
+                            command.Parameters.Add(new SqlParameter("@EstatusAnalisis", Convert.ToInt32(data.MasterData.Estatus_Analisis)));
+
+                            command.Parameters.Add(CommitIdAnalisis);
+
+                            command.ExecuteNonQuery();
+                        }
+
+                        // Obtener el el resultado de commit del IdAnalisis Maestra
+                        //int nuevoIdAnalisis = (int)nuevoIdAnalisisParam.Value;
+
+                        // Guardar datos en la tabla detalle utilizando el nuevo IdAnalisis
+                        foreach (var item in data.DetailData)
+                        {
+                            // Declarar el parámetro de salida para validar que se realizo correctamente commit
+                            var CommitIdAnalisisDetalle = new SqlParameter("@Resultado", SqlDbType.Int)
+                            {
+                                Direction = ParameterDirection.Output
+                            };
+
+                            using (var command = new SqlCommand("sp_EditarLotificacionDetalle", connection, transaction))
+                            {
+                                command.CommandType = CommandType.StoredProcedure;
+                                command.Parameters.Add(new SqlParameter("@IdAnalisis", Convert.ToInt32(item.IdAnalisis)));
+                                command.Parameters.Add(new SqlParameter("@IdParametro", Convert.ToInt32(item.IdParametro)));
+                                command.Parameters.Add(new SqlParameter("@ValorAnalisis", Convert.ToDecimal(item.ValorAnalisis, culture)));
+                                command.Parameters.Add(new SqlParameter("@IdAnalizador", Convert.ToInt32(item.IdAnalizador)));
+                                command.Parameters.Add(new SqlParameter("@IdMetodo", Convert.ToInt32(item.IdMetodo)));
+                                command.Parameters.Add(new SqlParameter("@UsrEdit", Convert.ToInt32(item.UsrAlta)));
+                                command.Parameters.Add(new SqlParameter("@EstatusAnalisis", Convert.ToInt32(data.MasterData.Estatus_Analisis)));
+                                command.Parameters.Add(new SqlParameter("@IdUnidadMedida", Convert.ToInt32(item.IdUnidadMedida)));
+
+                                command.Parameters.Add(CommitIdAnalisisDetalle);
+
+                                //foreach (SqlParameter param in command.Parameters)
+                                //{
+                                //    if (param.Value == null)
+                                //    {
+                                //        throw new ArgumentNullException(param.ParameterName, "El valor del parámetro no puede ser nulo.");
+                                //    }
+                                //    Console.WriteLine($"Parámetro: {param.ParameterName}, Valor: {param.Value}");
+                                //}
+
+                                command.ExecuteNonQuery();
+
+                                // Obtener el el resultado de commit del IdAnalisis detalle
+                                //int nuevoIdAnalisis = (int)nuevoIdAnalisisParam.Value;
+                            }
+                        }
+
+                        transaction.Commit();
+
+                        return data.MasterData.IdLote;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return ("Error al guardar los datos: " + ex.Message);
+                    }
+                }
+            }
+        }
+
 
         public async Task<List<AnalisisTanque>> ObtenerAnalisisTanque(ListadoLotificacionData dataBusqueda)
         {
