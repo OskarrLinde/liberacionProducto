@@ -102,6 +102,7 @@
     <None Remove="Views\RAPPipas\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LiberacionProducto.Entities\LiberacionProducto.Entities.csproj" />
     <ProjectReference Include="..\LiberacionProducto.Services\LiberacionProducto.Services.csproj" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/aiproj.json" /></VisualStudio></ProjectExtensions>
