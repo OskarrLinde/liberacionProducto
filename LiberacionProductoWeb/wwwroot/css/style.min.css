@@ -14876,3 +14876,39 @@ td.difuminado .no-difuminar {
     font-weight: bold;
 }
 
+.hiddenListadoLotes_detail {
+    display: none;
+}
+
+.hiddenListadoLotes_analizador {
+    display: none;
+}
+
+.hiddenListadoLotes_Maestra {
+    display: none;
+}
+
+.hiddenListadoLotes_NIValue {
+    display: none;
+}
+
+.hiddenListadoLotes_UMNIValue {
+    display: none;
+}
+
+
+.hiddenListadoLotes_NFValue {
+    display: none;
+}
+
+.hiddenListadoLotes_UMNFValue {
+    display: none;
+}
+
+@media (min-width: 576px) {
+    .form-inline .form-check {
+        justify-content: left;
+        /*align-items: flex-start !important;*/
+    }
+}
+

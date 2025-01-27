@@ -84,7 +84,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                     using (var command = new SqlCommand("sp_ConsultarPlantas", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.Add(new SqlParameter("@PlantasStr", plantasArray));                      
+                        command.Parameters.Add(new SqlParameter("@PlantasStr", plantasArray));
                         await connection.OpenAsync();
 
                         using (var reader = await command.ExecuteReaderAsync())
@@ -141,8 +141,8 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             {
                                 var producto = new CatProducto
                                 {
-                                     idProducto = reader.GetInt32(0),
-                                     DescProducto = reader.GetString(1)
+                                    idProducto = reader.GetInt32(0),
+                                    DescProducto = reader.GetString(1)
                                 };
                                 lstProductos.Add(producto);
                             }
@@ -237,11 +237,11 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                 {
                     using (var command = new SqlCommand("sp_ConsultarAnalizadores", connection))
                     {
-                        command.CommandType = CommandType.StoredProcedure; 
+                        command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add(new SqlParameter("@IdPlanta", idPlanta));
                         command.Parameters.Add(new SqlParameter("@IdParametro", idParametro));
-                        await connection.OpenAsync(); 
-                        
+                        await connection.OpenAsync();
+
                         using (var reader = await command.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())
@@ -252,7 +252,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                 //}
 
                                 var analizador = new CAB_TC_Analizadores
-                                {    
+                                {
                                     IdAnalizador = reader.GetInt32(0),
                                     DescAnalizador = reader.GetString(1),
                                     IdMetodo = reader.GetInt32(2),
@@ -306,11 +306,11 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             }
                             else
                             {
-                                return catplanta; 
+                                return catplanta;
                             }
                         }
                     }
-                }               
+                }
             }
             catch (SqlException sqlEx)
             {
@@ -533,11 +533,12 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                     catch (Exception ex)
                     {
                         transaction.Rollback();
-                        return ("Error al guardar los datos: " + ex.Message);                   
+                        return ("Error al guardar los datos: " + ex.Message);
                     }
                 }
             }
         }
+
 
         public string EditarDatosLote(LotificacionData data)
         {
@@ -633,7 +634,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
 
         public async Task<List<AnalisisTanque>> ObtenerAnalisisTanque(ListadoLotificacionData dataBusqueda)
         {
-            var resultados = new List<AnalisisTanque>(); 
+            var resultados = new List<AnalisisTanque>();
             var analisisDict = new Dictionary<int, AnalisisTanque>();
             var _connectionString2 = "Data Source=MLGMTY00DBTST01;Database=CertAnaliticosBulkDB;User Id=syscer_a; Password=Test394mx;";
 
@@ -642,9 +643,9 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                 using (var connection = new SqlConnection(_connectionString2))
                 {
                     using (var command = new SqlCommand("sp_ObtenerListadoLotes", connection))
-                    {                        
+                    {
                         DateTime fechaInicialFormatted = DateTime.ParseExact(dataBusqueda.FechaInicial.ToString("yyyy-MM-dd"), "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                        DateTime fechaFinalFormatted = DateTime.ParseExact(dataBusqueda.FechaFinal.ToString("yyyy-MM-dd"), "yyyy-MM-dd", CultureInfo.InvariantCulture);                        
+                        DateTime fechaFinalFormatted = DateTime.ParseExact(dataBusqueda.FechaFinal.ToString("yyyy-MM-dd"), "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.Add(new SqlParameter("@idPlanta", dataBusqueda.IdPlanta));
@@ -659,52 +660,64 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             {
                                 int idAnalisis = reader.GetInt32(0);
 
-                                if (!analisisDict.ContainsKey(idAnalisis)) 
+                                if (!analisisDict.ContainsKey(idAnalisis))
                                 {
-                                    var analisis = new AnalisisTanque 
-                                    { 
-                                        IdAnalisis = idAnalisis, 
-                                        IdLote = reader.GetString("id_lote"), 
+                                    var analisis = new AnalisisTanque
+                                    {
+                                        IdAnalisis = idAnalisis,
+                                        IdLote = reader.GetString("id_lote"),
                                         LoteOrigen = reader.IsDBNull(reader.GetOrdinal("Lote_Origen")) ? null : reader.GetString(reader.GetOrdinal("Lote_Origen")),
                                         IdTanque = reader.IsDBNull(reader.GetOrdinal("descTanque")) ? null : reader.GetString(reader.GetOrdinal("descTanque")),
 
                                         //IdTanque = reader.GetString("descTanque"),
                                         //IdTanque = reader.GetInt32(3), 
                                         NivelIni = reader.GetString("nivel_iniDesc"),
+
+                                        NivelIniVal = reader.IsDBNull(reader.GetOrdinal("NivelInicialVal")) ? null : reader.GetDecimal(reader.GetOrdinal("NivelInicialVal")),
+                                        UMInicial = reader.IsDBNull(reader.GetOrdinal("UnidadMedidaIni")) ? null : reader.GetInt32(reader.GetOrdinal("UnidadMedidaIni")),
+
                                         NivelFin = reader.GetString("nivel_finDesc"),
-                                        Comentarios = reader.IsDBNull(reader.GetOrdinal("comentarios")) ? null : reader.GetString(reader.GetOrdinal("comentarios")) , 
-                                        FechaAlta = reader.GetDateTime(7), 
+
+                                        NivelFinVal = reader.IsDBNull(reader.GetOrdinal("NivelFinalVal")) ? null : reader.GetDecimal(reader.GetOrdinal("NivelFinalVal")),
+                                        UMFinal = reader.IsDBNull(reader.GetOrdinal("UnidadMedidaFin")) ? null : reader.GetInt32(reader.GetOrdinal("UnidadMedidaFin")),
+
+                                        Comentarios = reader.IsDBNull(reader.GetOrdinal("comentarios")) ? null : reader.GetString(reader.GetOrdinal("comentarios")),
+                                        FechaAlta = reader.IsDBNull(reader.GetOrdinal("FEC_ALTA")) ? null : reader.GetDateTime(reader.GetOrdinal("FEC_ALTA")),
                                         Estatus = reader.IsDBNull(reader.GetOrdinal("DESCRIPCION_ESTATUS")) ? null : reader.GetString(reader.GetOrdinal("DESCRIPCION_ESTATUS")),
 
                                         UsrAlta = reader.IsDBNull(reader.GetOrdinal("nomUsuarioAlta")) ? null : reader.GetString(reader.GetOrdinal("nomUsuarioAlta")),
                                         GetUseralta = reader.GetInt32("Usr_Alta"),
                                         //UsrAlta = reader.GetInt32(9), 
                                         //IdProducto = reader.GetInt32(10), 
-                                        Detalles = new List<DetalleAnalisisTanque>() 
-                                    }; 
+                                        Detalles = new List<DetalleAnalisisTanque>()
+                                    };
 
-                                    analisisDict[idAnalisis] = analisis; 
+                                    analisisDict[idAnalisis] = analisis;
                                 }
 
                                 // Agregar el detalle solo si id_parametro no es nulo
-                                if (!reader.IsDBNull(11)) 
-                                { 
-                                    var detalle = new DetalleAnalisisTanque { 
-                                        IdParametro = reader.IsDBNull(reader.GetOrdinal("descParametro")) ? null : reader.GetString(reader.GetOrdinal("descParametro")),
-                                        
-                                        ValorLimiteInf = reader.GetDecimal("valor_limite_inf"), 
-                                        ValorLimiteSup = reader.GetDecimal("valor_limite_sup"), 
-                                        ValorAnalisis = reader.GetDecimal("valor_analisis"), 
+                                if (!reader.IsDBNull(15))
+                                {
+                                    var detalle = new DetalleAnalisisTanque
+                                    {
+                                        IdPlanta = reader.IsDBNull(reader.GetOrdinal("ID_PLANTA")) ? null : reader.GetInt32(reader.GetOrdinal("ID_PLANTA")),
+                                        IdParametro = reader.IsDBNull(reader.GetOrdinal("ID_PARAMETRO")) ? null : reader.GetInt32(reader.GetOrdinal("ID_PARAMETRO")),
+                                        descParametro = reader.IsDBNull(reader.GetOrdinal("descParametro")) ? null : reader.GetString(reader.GetOrdinal("descParametro")),
+                                        IdAnalisisDetail = idAnalisis,
+                                        ValorLimiteInf = reader.GetDecimal("valor_limite_inf"),
+                                        ValorLimiteSup = reader.GetDecimal("valor_limite_sup"),
+                                        ValorAnalisis = reader.GetDecimal("valor_analisis"),
                                         IdAnalizador = reader.IsDBNull(reader.GetOrdinal("descAnalizador")) ? null : reader.GetString(reader.GetOrdinal("descAnalizador")),
                                         IdMetodo = reader.IsDBNull(reader.GetOrdinal("descMetodo")) ? null : reader.GetString(reader.GetOrdinal("descMetodo")),
                                         DescUnidadMedida = reader.IsDBNull(reader.GetOrdinal("descUMedidaDetalle")) ? null : reader.GetString(reader.GetOrdinal("descUMedidaDetalle")),
                                         MotivoCancelBitacora = reader.IsDBNull(reader.GetOrdinal("motivo_bitacLotif")) ? null : reader.GetString(reader.GetOrdinal("motivo_bitacLotif")),
                                         FechaCancelBitacora = reader.IsDBNull(reader.GetOrdinal("Fec_bitaclotif")) ? null : reader.GetDateTime(reader.GetOrdinal("Fec_bitaclotif")),
                                         UserCancelBitacora = reader.IsDBNull(reader.GetOrdinal("usr_bitaclotif")) ? null : reader.GetInt32(reader.GetOrdinal("usr_bitaclotif")),
-                                        UserNameCancelBitacora = reader.IsDBNull(reader.GetOrdinal("descUsr_bitaclotif")) ? null : reader.GetString(reader.GetOrdinal("descUsr_bitaclotif"))
-                                    }; 
-                                    
-                                    analisisDict[idAnalisis].Detalles.Add(detalle); 
+                                        UserNameCancelBitacora = reader.IsDBNull(reader.GetOrdinal("descUsr_bitaclotif")) ? null : reader.GetString(reader.GetOrdinal("descUsr_bitaclotif")),
+                                        IdAnalizadorVal = reader.IsDBNull(reader.GetOrdinal("ID_ANALIZADOR")) ? null : reader.GetInt32(reader.GetOrdinal("ID_ANALIZADOR"))
+                                    };
+
+                                    analisisDict[idAnalisis].Detalles.Add(detalle);
                                 }
                             }
                         }
@@ -719,7 +732,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                 return resultados;
             }
             catch (Exception ex)
-            { 
+            {
                 // Manejo de excepciones generales
                 Console.WriteLine($"Error: {ex.Message}");
                 // Aquí podrías registrar el error o tomar alguna acción específica
@@ -755,7 +768,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             command.CommandType = CommandType.StoredProcedure;
                             command.Parameters.Add(new SqlParameter("@IdAnalisis", data.IdAnalisis));
                             command.Parameters.Add(new SqlParameter("@MotivoCancelacion", data.MotivoCancelacion));
-                            command.Parameters.Add(new SqlParameter("@UserCancel", data.UserCancel));                            
+                            command.Parameters.Add(new SqlParameter("@UserCancel", data.UserCancel));
                             command.Parameters.Add(ResultadoParam);
 
                             command.ExecuteNonQuery();
@@ -783,7 +796,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                         // Aquí podrías registrar el error o tomar alguna acción específica
                         transaction.Rollback();
                         return ex.Message;
-                    }                 
+                    }
                 }
             }
         }

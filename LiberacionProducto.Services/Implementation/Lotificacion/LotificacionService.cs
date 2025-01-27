@@ -47,7 +47,7 @@ namespace LiberacionProducto.Services.Implementation.Lotificacion
         public async Task<List<CAB_EspecificacionProducto>> GetEspecificacionProductsAsync(int IdPlanta, int IdProducto, int IdTipoEspecificacion/*int IdEspecificacionProducto*/)
         //public async Task<List<CAB_EspecificacionProducto>> GetEspecificacionProductsAsync(int IdEspecificacionProducto)
         {
-            
+
             return await _lotificacionRepository.GetEspecificacionProductsAsync(IdPlanta, IdProducto, IdTipoEspecificacion);
         }
 
@@ -67,7 +67,7 @@ namespace LiberacionProducto.Services.Implementation.Lotificacion
 
         public string GeneraIdLote(string idProducto, string descProducto, int idPlanta, string descPlanta, string idTanque)
         {
-            return _loteService.GeneraNuevoLote(idProducto, descProducto, idPlanta, descPlanta, idTanque);        
+            return _loteService.GeneraNuevoLote(idProducto, descProducto, idPlanta, descPlanta, idTanque);
         }
 
         public string GuardarDatos(LotificacionData data)

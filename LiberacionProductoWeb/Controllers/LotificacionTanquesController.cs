@@ -31,15 +31,15 @@ namespace LiberacionProductoWeb.Controllers
         IStringLocalizer<Localize.Resource> _resource;
         private readonly IPrincipalService _principalService;
         private readonly LotificacionService _lotificacionService;
-       
+
 
         public LotificacionTanquesController(
-            ILogger<AccessController> logger, 
-            UserManager<ApplicationUser> userManager, 
-            IStringLocalizer<Localize.Resource> resource, 
+            ILogger<AccessController> logger,
+            UserManager<ApplicationUser> userManager,
+            IStringLocalizer<Localize.Resource> resource,
             IConfiguration config,
             IPrincipalService principalService,
-            LotificacionService lotificacionService           
+            LotificacionService lotificacionService
             )
         {
             _logger = logger;
@@ -47,7 +47,7 @@ namespace LiberacionProductoWeb.Controllers
             _resource = resource;
             _config = config;
             _principalService = principalService;
-            _lotificacionService = lotificacionService;     
+            _lotificacionService = lotificacionService;
         }
 
         public IConfiguration _config { get; }
@@ -56,17 +56,17 @@ namespace LiberacionProductoWeb.Controllers
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Lotificacion()
         {
-            LotificacionViewModel model = new LotificacionViewModel();            
+            LotificacionViewModel model = new LotificacionViewModel();
             model.Plant = new Models.ConfigViewModels.Plant();
             model.Product = new Models.CatalogsViewModels.Product();
 
             try
-            {         
+            {
                 var userInfo = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
                 if (userInfo != null)
                 {
                     model.ExternalId = userInfo.ExternalId;
-                }    
+                }
 
                 model.FechaActual = DateTime.Now;
                 var plantaxUsuario = await _lotificacionService.GetPlantasUsuario(userInfo.MexeUsuario);
@@ -74,8 +74,8 @@ namespace LiberacionProductoWeb.Controllers
                 model.CatPlanta = plantas;
             }
             catch (Exception ex)
-            { 
-                Console.WriteLine($"Error: {ex.Message}");                
+            {
+                Console.WriteLine($"Error: {ex.Message}");
             }
             return View(model);
         }
@@ -143,9 +143,10 @@ namespace LiberacionProductoWeb.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("Error al guardar los datos: " + ex.Message);              
+                return BadRequest("Error al guardar los datos: " + ex.Message);
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> EditarLote(LotificacionData data)
@@ -172,6 +173,8 @@ namespace LiberacionProductoWeb.Controllers
             }
         }
 
+
+
         [HttpPost]
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> CancelarLote(CancelarLoteData data)
@@ -183,8 +186,8 @@ namespace LiberacionProductoWeb.Controllers
                 {
                     if (data.UserCancel == userInfo.ExternalId)
                     {
-                        var retVal = _lotificacionService.CancelarLote(data);                       
-                        return Ok(retVal);                       
+                        var retVal = _lotificacionService.CancelarLote(data);
+                        return Ok(retVal);
                     }
                     else
                     {
@@ -221,7 +224,7 @@ namespace LiberacionProductoWeb.Controllers
         public async Task<IActionResult> ObtenerProductosPorPlanta(int plantaId)
         {
             var productos = await _lotificacionService.GetProductosAsync(plantaId);
-          
+
             return Json(new { Result = "Ok", Data = productos });
         }
 
@@ -250,26 +253,41 @@ namespace LiberacionProductoWeb.Controllers
             {
                 var datos = await _lotificacionService.ObtenerAnalisisTanque(data);
 
-                if(datos!=null && datos.Count()> 0)
+                if (datos != null && datos.Count() > 0)
                 {
                     var userInfo = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
                     if (userInfo != null)
                     {
                         // Se tiene que ir a buscar el permiso para este usuario (api, consulta a base , etc)
                         //Obtener el permiso para este usuario , puede ser 1 = permiso concedido, 0 = No tiene permiso
-                        bool GetPermisoUser = true;
-                        if(GetPermisoUser)
+                        bool GetUserAdmin = true;
+                        if (GetUserAdmin)
                         {
-                            // Actualizar el campo PermisoUser a true donde GetUseralta coincida con el criterio
-                            datos.ForEach(item => 
-                            { 
-                                if (item.GetUseralta == userInfo.ExternalId) 
-                                { 
-                                    item.PermisoUser = true; 
-                                } 
+                            // Actualizar el campo PermisoUserAdmin a true donde GetUserAdmin 
+                            datos.ForEach(item =>
+                            {
+                                if (item.GetUseralta == userInfo.ExternalId)
+                                {
+                                    item.PermisoUserAdmin = true;
+                                }                                   
+
                             });
                         }
 
+                        // Se tiene que ir a buscar el permiso para este usuario (api, consulta a base , etc)
+                        //Obtener el permiso para este usuario , puede ser 1 = permiso concedido, 0 = No tiene permiso
+                        bool GetPermisoUser = false;
+                        if (GetPermisoUser)
+                        {
+                            // Actualizar el campo PermisoUser a true donde GetUseralta coincida con el criterio
+                            datos.ForEach(item =>
+                            {
+                                if (item.GetUseralta == userInfo.ExternalId)
+                                {
+                                    item.PermisoUser = true;
+                                }
+                            });
+                        }
                     }
                 }
 

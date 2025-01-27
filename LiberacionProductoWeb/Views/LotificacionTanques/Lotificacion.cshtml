@@ -259,7 +259,7 @@
 
     <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 
-    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />    
+    <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
 }
 
 @section scripts {
@@ -326,26 +326,26 @@
 
             // si funciona solo lo oculto para tomar como muestra
             // $.notify("¡Esta es una notificación simple!", "success");
-            // $.notify("¡Esta es una notificación simplesdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfds!", 
-            // { 
+            // $.notify("¡Esta es una notificación simplesdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfsdfds!",
+            // {
             //     className: "success", //info, warn, error
             //     position: "top right" ,
             //         autoHide: false
             // });
 
             // si funciona solo lo oculto para tomar como muestra
-            // $.notify.addStyle('custom', {                    
+            // $.notify.addStyle('custom', {
             //     html: "<div class='custom-notifyjs-container'><div class='custom-notifyjs-title'><img src='/img/NewFolder/success.png' alt='icon'> <div data-notify-html='title'></div></div><div data-notify-html='message'></div></div>"
-            // }); 
-                    
-            // $.notify({ 
-            //     title: '¡Notificación!', 
-            //     message: 'Esta es una notificación con opciones avanzadas.' 
-            // }, 
-            // { 
-            //     style: 'custom', className: "success", position: "top right", autoHide: false, autoHideDelay: 3000, showAnimation: 'slideDown', hideAnimation: 'slideUp', clickToHide: true 
-            // }); 
-           
+            // });
+
+            // $.notify({
+            //     title: '¡Notificación!',
+            //     message: 'Esta es una notificación con opciones avanzadas.'
+            // },
+            // {
+            //     style: 'custom', className: "success", position: "top right", autoHide: false, autoHideDelay: 3000, showAnimation: 'slideDown', hideAnimation: 'slideUp', clickToHide: true
+            // });
+
 
             var notifyInstanceTank = null;
 
@@ -359,9 +359,9 @@
             // Deshabilitar los grupos de form pesoInicial/psigInicial y pesoFinal/psigFinal
             $('#pesoInicialGroup input').prop('disabled', true);
             $('#pesoFinalGroup input').prop('disabled', true);
-           
+
             var idPlantaSeleccionado = $('#dynamicSelectPlant').val();
-            
+
             // Si es un número, no necesita comillas
             // var idProductoSeleccionado = '@Model.Product.Id';
 
@@ -451,7 +451,7 @@
                 //**********/
 
 
-                $('#dynamicSelectTank').selectpicker('refresh');                
+                $('#dynamicSelectTank').selectpicker('refresh');
                 if (plantaId) {
                     $.ajax({
                         type: "GET",
@@ -648,18 +648,18 @@
 
             $('#initial-level, #final-level').on('input', validateInput);
 
-            $("#dynamicSelectTank").change(function () 
+            $("#dynamicSelectTank").change(function ()
             {
-                if (notifyInstanceTank) 
-                {                   
+                if (notifyInstanceTank)
+                {
                     //$(".custom-notifyTanque").remove();
                     // Ocultar la notificación al cambiar la selección del elemento
-                    if ($(".custom-notifyTanque").length) 
-                    { 
-                        $(".custom-notifyTanque").closest(".notifyjs-wrapper").remove(); 
-                    }   
+                    if ($(".custom-notifyTanque").length)
+                    {
+                        $(".custom-notifyTanque").closest(".notifyjs-wrapper").remove();
+                    }
                 }
-            
+
             });
 
             function bindEditButton() {
@@ -711,7 +711,7 @@
                             idPlanta: idPlantaSeleccionado,
                             idParametro: idParametroCell
                         }),
-                        success: function (response) {                            
+                        success: function (response) {
                             // Crear el elemento select
                             var select = $('<select class="form-control"></select>');
                             // Iterar sobre la respuesta y agregar opciones al select
@@ -783,7 +783,7 @@
                     bindEditButton();
                 });
 
-              
+
 
                 $(document).off('click', '.save-btn').on('click', '.save-btn', function () {
                     var currentRow = $(this).closest('tr');
@@ -822,7 +822,7 @@
                         //BanderaProductoConforme = false;
                        // return false;
                     }
-                   
+
 
                     // Procesar celda del dropdown
                     var dropdownCell = currentRow.find('.editable-dropdown');
@@ -870,7 +870,7 @@
 
                        $.notify("¡Por favor, seleccione un tanque!",
                             {
-                                className: "info", 
+                                className: "info",
                                 position: "top right",
                                 autoHide: true
                             });
@@ -970,8 +970,8 @@
                             UsrAlta: idUsuarioAlta
                         };
 
-                        var cvalorLimiteInf = currentRow.find('.valorLimiteInf').text().trim(); 
-                        var cvalorLimiteSup = currentRow.find('.valorLimiteSup').text().trim(); 
+                        var cvalorLimiteInf = currentRow.find('.valorLimiteInf').text().trim();
+                        var cvalorLimiteSup = currentRow.find('.valorLimiteSup').text().trim();
                         var cvalorAnalisis = currentRow.find('.editable').text().trim();
 
                         if (isNaN(cvalorAnalisis) || cvalorAnalisis < cvalorLimiteInf || cvalorAnalisis > cvalorLimiteSup) {
@@ -1029,7 +1029,7 @@
                     if (allValid) {
                         // Todas las celdas son válidas, proceder con la acción del botón
                         //console.log('Todas las celdas son válidas, procediendo...');
-                        
+
                         // Datos de la tabla maestra
                         var masterData =
                         {
@@ -1073,7 +1073,7 @@
                                     if (result.isConfirmed) {
                                         // Este código se ejecuta después de que el usuario haga clic en "Aceptar"
                                         // console.log("El usuario hizo clic en Aceptar");
-                                        
+
                                         // // Por ejemplo, puedes recargar la página o resetear el formulario:
                                         location.reload(); // Para recargar la página // o // $('form')[0].reset(); // Para resetear el primer formulario encontrado
                                     }
