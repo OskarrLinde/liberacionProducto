@@ -260,8 +260,13 @@ namespace LiberacionProductoWeb.Controllers
                     {
                         // Se tiene que ir a buscar el permiso para este usuario (api, consulta a base , etc)
                         //Obtener el permiso para este usuario , puede ser 1 = permiso concedido, 0 = No tiene permiso
-                        bool GetUserAdmin = true;
-                        if (GetUserAdmin)
+                        var permisosUsuario = await _lotificacionService.GetPermisosUsuario(userInfo.ExternalId);
+
+                        bool tienePermisoGetUserAdmin = permisosUsuario.Any(p => p.nombrePermiso.Equals("GetUserAdmin") && p.tienePermiso);
+
+                        //bool GetUserAdmin = true;
+                        //if (GetUserAdmin)
+                        if (tienePermisoGetUserAdmin)
                         {
                             // Actualizar el campo PermisoUserAdmin a true donde GetUserAdmin 
                             datos.ForEach(item =>
@@ -276,8 +281,11 @@ namespace LiberacionProductoWeb.Controllers
 
                         // Se tiene que ir a buscar el permiso para este usuario (api, consulta a base , etc)
                         //Obtener el permiso para este usuario , puede ser 1 = permiso concedido, 0 = No tiene permiso
-                        bool GetPermisoUser = false;
-                        if (GetPermisoUser)
+                        bool tienePermisoGetPermisoUser = permisosUsuario.Any(p => p.nombrePermiso.Equals("GetPermisoUser") && p.tienePermiso);
+
+                        //bool GetPermisoUser = false;
+                        //if (GetPermisoUser)
+                        if (tienePermisoGetPermisoUser)
                         {
                             // Actualizar el campo PermisoUser a true donde GetUseralta coincida con el criterio
                             datos.ForEach(item =>

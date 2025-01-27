@@ -89,5 +89,9 @@ namespace LiberacionProducto.Services.Implementation.Lotificacion
         {
             return _lotificacionRepository.CancelarLote(data);
         }
+        public async Task<List<PermisosUsuarioData>> GetPermisosUsuario(int idUsuario)
+        {
+            return await _lotificacionRepository.GetPermisosUsuario(idUsuario);
+        }
     }
 }

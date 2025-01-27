@@ -801,5 +801,52 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
             }
         }
 
+        public async Task<List<PermisosUsuarioData>> GetPermisosUsuario(int idUsuario)
+        {
+            List<PermisosUsuarioData> lstPermisosUsuario = new List<PermisosUsuarioData>();
+            var _connectionString2 = "Data Source=MLGMTY00DBTST01;Database=CertAnaliticosBulkDB;User Id=syscer_a; Password=Test394mx;";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString2))
+                {
+                    using (var command = new SqlCommand("sp_ObtienePermisosUsuario", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add(new SqlParameter("@idUsuario", idUsuario));                       
+
+                        await connection.OpenAsync();
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                var permisosusuario = new PermisosUsuarioData
+                                {
+                                    IdUsuario = reader.GetInt32(reader.GetOrdinal("idUsuario")),
+                                    nombrePermiso = reader.GetString(reader.GetOrdinal("nombrePermiso")),                                    
+                                    tienePermiso = Convert.ToBoolean(reader.GetByte(reader.GetOrdinal("tienePermiso")))
+                                };
+                                lstPermisosUsuario.Add(permisosusuario);
+                            }
+                        }
+                        return lstPermisosUsuario;
+                    }
+                }
+            }
+            catch (SqlException sqlEx)
+            {
+                // Manejo de excepciones específicas de SQL
+                Console.WriteLine($"SQL Error: {sqlEx.Message}");
+                // Aquí podrías registrar el error o tomar alguna acción específica
+                return lstPermisosUsuario;
+            }
+            catch (Exception ex)
+            { // Manejo de excepciones generales
+                Console.WriteLine($"Error: {ex.Message}");
+                // Aquí podrías registrar el error o tomar alguna acción específica
+            }
+            return lstPermisosUsuario;
+        }
+
     }
 }
