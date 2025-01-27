@@ -1,6 +1,6 @@
-﻿namespace LiberacionProducto.Entities.Entities.CertCatalogos
+﻿namespace LiberacionProducto.Entities.CertCatalogos
 {
-	public class PlantaAprobada
+	public class PlantaAprobadaData
 	{
 		public int IdPlantaAprobada { get; set; }
 		public string Descripcion { get; set; }

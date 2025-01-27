@@ -1,6 +1,6 @@
-﻿namespace LiberacionProducto.Entities.Entities.CertCatalogos
+﻿namespace LiberacionProducto.Entities.CertCatalogos
 {
-	public class FuenteSuministro
+	public class FuenteSuministroData
 	{
         public int IdFuenteSuministro { get; set; }
         public string Descripcion { get; set; }

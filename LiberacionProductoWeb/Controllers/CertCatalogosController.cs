@@ -1,7 +1,9 @@
-﻿using LiberacionProducto.Services.Interfaces;
+﻿using LiberacionProducto.Entities.CertCatalogos;
+using LiberacionProducto.Services.Interfaces;
 using LiberacionProductoWeb.Data;
 using LiberacionProductoWeb.Data.Repository;
 using LiberacionProductoWeb.Helpers;
+using LiberacionProductoWeb.Mappers;
 using LiberacionProductoWeb.Models.CertCatalogosViewModels;
 using LiberacionProductoWeb.Models.IndentityModels;
 using LiberacionProductoWeb.Services;
@@ -386,24 +388,6 @@ namespace LiberacionProductoWeb.Controllers
             return _model;
         }
 
-        public List<Models.CertCatalogosViewModels.Tanque> getTanque()
-        {
-            var _model = new List<Models.CertCatalogosViewModels.Tanque>();
-            var _url = _catalogCertificate.urlCatalogs + "Tanque";
-
-            var client = new RestClient(_url);
-            client.Timeout = -1;
-            var request = new RestRequest(Method.GET);
-            IRestResponse response = client.Execute(request);
-
-            JsonDeserializer deserial = new JsonDeserializer();
-            var JSONObj = deserial.Deserialize<Dictionary<string, string>>(response);
-
-            _model = JsonConvert.DeserializeObject<List<Models.CertCatalogosViewModels.Tanque>>(JSONObj["data"]);
-
-            return _model;
-        }
-
         public List<TipoEspecificacion> getTipoEspecificacion()
         {
             var _model = new List<TipoEspecificacion>();
@@ -496,41 +480,14 @@ namespace LiberacionProductoWeb.Controllers
             return _model;
         }
 
-        public async Task<List<FuenteSuministro>> getFuenteSuministro()
-        {
-            var result = await _certCatalogosService.GetFuenteSuministro();
+        public async Task<List<FuenteSuministro>> getFuenteSuministro() => 
+            CerCatalogosMappers.MapFuenteSuministroDataToFuenteSuministro(await _certCatalogosService.GetFuenteSuministro());
 
-            List<FuenteSuministro> lstFuenteSuministros = new List<FuenteSuministro>();
-            foreach (var item in result)
-            {
-                lstFuenteSuministros.Add(new FuenteSuministro
-                {
-                    ID_FUENTE_SUMINISTRO = item.IdFuenteSuministro,
-                    descripcion = item.Descripcion,
-                    iD_STATUS = item.IdStatus
-                });
-            }
+        public async Task<List<PlantaAprobada>> getPlantaAprobada() =>
+            CerCatalogosMappers.MapPlantaAprobadaDataToPlantaAprobada(await _certCatalogosService.GetPlantaAprobada());
 
-            return lstFuenteSuministros;
-        }
-
-        public async Task<List<PlantaAprobada>> getPlantaAprobada()
-        {
-            var result = await _certCatalogosService.GetPlantaAprobada();
-
-            List<PlantaAprobada> lstPlantaAprobada = new List<PlantaAprobada>();
-            foreach (var item in result)
-            {
-                lstPlantaAprobada.Add(new PlantaAprobada
-                {
-                    ID_PLANTA_APROBADA = item.IdPlantaAprobada,
-                    descripcion = item.Descripcion,
-                    iD_STATUS = item.IdStatus
-                });
-            }
-
-            return lstPlantaAprobada;
-        }
+        public async Task<List<Tanque>> getTanque() => 
+            CerCatalogosMappers.MapTanqueDataToTanque(await _certCatalogosService.GetTanques());
 
         public List<TipoCertificado> getTipoCertificado()
         {
@@ -1337,10 +1294,10 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Clientes
 
-        public IActionResult Clientes()
+        public async Task<IActionResult> Clientes()
         {
             var clientes = getClientes();
-            var tanque = getTanque();
+            var tanque = await getTanque();
             var productos = getProductos();
             var grados = getGrado();
             var tipoCertificado = getTipoCertificado();
@@ -1627,11 +1584,11 @@ namespace LiberacionProductoWeb.Controllers
             return Json(new { Result = "Ok" });
         }
 
-        public JsonResult GetClientesHTMLTagsById(string Id)
+        public async Task<JsonResult> GetClientesHTMLTagsById(string Id)
         {
             String response = String.Empty;
             var clientes = getClientes();
-            var tanks = getTanque();
+            var tanks = await getTanque();
             var products = getProductos();
             var grade = getGrado();
             var typeCertificate = getTipoCertificado();
@@ -2634,14 +2591,14 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Especificacion Master 2
 
-        public IActionResult EspecificacionMaster2()
+        public async Task<IActionResult> EspecificacionMaster2()
         {
             var especificacionDetalleExportExcel = getEspecificacionDetalle();
             var especificacionMasterExportExcel = getEspecificacionMaster();
             var especificacionMaster = getEspecificacionMaster();
             var plantas = getPlantas();
             var clientes = getClientes();
-            var tanque = getTanque();
+            var tanque = await getTanque();
             var productos = getProductos();
             var grados = getGrado();
             var tipoEspecificacion = getTipoEspecificacion();
@@ -2986,12 +2943,12 @@ namespace LiberacionProductoWeb.Controllers
             return Json(new { Result = "Ok" });
         }
 
-        public JsonResult GetEspecificacionMaster2HTMLTagsById(string Id)
+        public async Task<JsonResult> GetEspecificacionMaster2HTMLTagsById(string Id)
         {
             String response = String.Empty;
             var especificacionMaster = getEspecificacionMaster();
             var clients = getClientes();
-            var tanks = getTanque();
+            var tanks = await getTanque();
             var products = getProductos();
             var grade = getGrado();
             var _url = _catalogCertificate.urlCatalogs + "EspecificacionMaster";
@@ -7144,13 +7101,14 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Tanque
 
-        public IActionResult Tanque()
+        public async Task<IActionResult> Tanque()
         {
-            var tanque = getTanque();
+            var tanque = await getTanque();
             var plantas = getPlantas();
             var producto = getProductos();
+            var grados = getGrado();
 
-            Models.CertCatalogosViewModels.TanqueViewModel _tanqueVM = new Models.CertCatalogosViewModels.TanqueViewModel();
+            TanqueViewModel _tanqueVM = new TanqueViewModel();
 
             _tanqueVM.TanqueList = tanque;
             _tanqueVM.TanqueFilter = tanque.ConvertAll(a =>
@@ -7182,6 +7140,16 @@ namespace LiberacionProductoWeb.Controllers
                 };
             });
 
+            _tanqueVM.GradosList = grados;
+            _tanqueVM.GradosFilter = grados.ConvertAll(a =>
+            {
+                return new SelectListItem()
+                {
+                    Text = a.descripcion,
+                    Value = a.iD_GRADO.ToString()
+                };
+            });
+
             return View(_tanqueVM);
         }
 
@@ -7190,170 +7158,82 @@ namespace LiberacionProductoWeb.Controllers
             return RedirectToAction("Tanque");
         }
 
-        public JsonResult SaveOrEditTanque([FromBody] DtoTanque data)
+        public async Task<JsonResult> SaveOrEditTanque([FromBody] DtoTanque data)
         {
+            // TODO: Falta agregar IdGrado 
             try
             {
-                if (data != null)
+                if (data == null)
                 {
-                    if (String.IsNullOrEmpty(data.iD_TANQUE))
-                    {
-                        var iD_STATUS = data.iD_STATUS; //?.Trim().Replace(" ", "").Split(",");
-                        var descripcion = data.descripcion; //?.Trim().Replace(" ", "").Split(",");
-                        var iD_PLANTA = data.iD_PLANTA; //?.Trim().Replace(" ", "").Split(",");
-                        var iD_PRODUCTO = data.iD_PRODUCTO; //?.Trim().Replace(" ", "").Split(",");
-                        var clavE_PALS = data.clavE_PALS; //?.Trim().Replace(" ", "").Split(",");
-
-                        if (iD_PLANTA != null && iD_PRODUCTO != null && descripcion != null)
-                        {
-                            Models.CertCatalogosViewModels.Tanque _tanque = new Models.CertCatalogosViewModels.Tanque();
-
-                            string _iDSTATUS = iD_STATUS;
-
-                            int _resultiDSTATUS;
-
-                            if (_iDSTATUS == "true")
-                                _resultiDSTATUS = 1;
-                            else
-                                _resultiDSTATUS = 0;
-
-                            _tanque.iD_STATUS = _resultiDSTATUS;
-                            _tanque.descripcion = descripcion;
-                            _tanque.iD_PLANTA = int.Parse(iD_PLANTA);
-                            _tanque.iD_PRODUCTO = int.Parse(iD_PRODUCTO);
-                            _tanque.clavE_PALS = clavE_PALS;
-                            _tanque.usR_ALTA = 1;
-
-                            var _url = _catalogCertificate.urlCatalogs + "Tanque";
-
-                            RestGenerico _rest = new RestGenerico();
-                            var _result = _rest.postApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url, _tanque);
-                            JsonDeserializer deserial = new JsonDeserializer();
-                            var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-                            var _error = JSONObj["error"];
-
-                            if (_error.Trim() == "False")
-                            {
-                                _result = _rest.getApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url);
-                                JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-                            }
-                            else
-                            {
-                                throw new Exception("Los datos ya existen, no es posible agregar el catálogo");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //edit selected row
-
-                        var iD_STATUS = data.iD_STATUS; //?.Trim().Replace(" ", "").Split(",");
-                        var iD_TANQUE = data.iD_TANQUE; //?.Trim().Replace(" ", "").Split(",");
-                        var descripcion = data.descripcion; //?.Trim().Replace(" ", "").Split(",");
-                        var iD_PLANTA = data.iD_PLANTA; //?.Trim().Replace(" ", "").Split(",");
-                        var iD_PRODUCTO = data.iD_PRODUCTO; //?.Trim().Replace(" ", "").Split(",");
-                        var clavE_PALS = data.clavE_PALS; //?.Trim().Replace(" ", "").Split(",");
-
-                        if (iD_TANQUE != null)
-                        {
-                            Models.CertCatalogosViewModels.Tanque _tanque = new Models.CertCatalogosViewModels.Tanque();
-
-                            string _iDSTATUS = iD_STATUS;
-
-                            int _resultiDSTATUS;
-
-                            if (_iDSTATUS == "true")
-                                _resultiDSTATUS = 1;
-                            else
-                                _resultiDSTATUS = 0;
-
-                            _tanque.iD_STATUS = _resultiDSTATUS;
-                            _tanque.iD_TANQUE = int.Parse(iD_TANQUE);
-                            _tanque.iD_PLANTA = int.Parse(iD_PLANTA);
-                            _tanque.iD_PRODUCTO = int.Parse(iD_PRODUCTO);
-                            _tanque.descripcion = descripcion;
-                            _tanque.clavE_PALS = clavE_PALS;
-                            _tanque.usR_MODIFICA = 1;
-
-                            var _url = _catalogCertificate.urlCatalogs + "Tanque";
-                            RestGenerico _rest = new RestGenerico();
-                            var _result = _rest.postApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url + "/" + _tanque.iD_TANQUE, _tanque);
-                            JsonDeserializer deserial = new JsonDeserializer();
-                            var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-                            var _error = JSONObj["error"];
-
-                            if (_error.Trim() == "False")
-                            {
-                                _result = _rest.getApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url);
-                                JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-                            }
-                            else
-                            {
-                                throw new Exception("Los datos ya existen, no es posible agregar el catálogo");
-                            }
-                        }
-                    }
+                    throw new ArgumentNullException(nameof(data), "La información proporcionada es nula.");
                 }
-            }
-            catch (Exception ex)
-            {
-                //TODO send to log
-                return Json(new { Result = "Fail", Message = ex.Message });
-            }
 
-            return Json(new { Result = "Ok" });
-        }
+                var tanqueData = CerCatalogosMappers.MapDtoTanqueToTanqueData(data);
 
-        public JsonResult DeleteTanque(String Id)
-        {
-            try
-            {
-                var _url = _catalogCertificate.urlCatalogs + "Tanque";
-                Models.CertCatalogosViewModels.Tanque model2 = new Models.CertCatalogosViewModels.Tanque();
-                RestGenerico _rest = new RestGenerico();
-                var _result = _rest.getApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url + "/" + Id);
-                JsonDeserializer deserial = new JsonDeserializer();
-                var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-                var result = JsonConvert.DeserializeObject<Models.CertCatalogosViewModels.Tanque>(JSONObj["data"]);
-
-                model2.iD_TANQUE = result.iD_TANQUE;
-                model2.descripcion = result.descripcion;
-                model2.iD_PLANTA = result.iD_PLANTA;
-                model2.iD_PRODUCTO = result.iD_PRODUCTO;
-                model2.clavE_PALS = result.clavE_PALS;
-                model2.iD_STATUS = 0;
-                model2.usR_MODIFICA = 1;
-
-                _result = _rest.postApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url + "/" + Id, model2);
-                JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-
-                var _error = JSONObj["error"];
-
-                if (_error.Trim() == "False")
+                if (string.IsNullOrWhiteSpace(data.iD_TANQUE))
                 {
-                    ViewBag.Error = "false";
-                    _result = _rest.getApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url);
-                    JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
+                    tanqueData.UsrAlta = 1;
+
+                    await _certCatalogosService.InsertTanque(tanqueData);
                 }
                 else
                 {
-                    throw new Exception("El registro no existe");
+                    tanqueData.IdTanque = ParseMandatoryInt(data.iD_TANQUE, "El ID del tanque es inválido.");
+                    tanqueData.UsrModifica = 1;
+
+                    await _certCatalogosService.UpdateTanque(tanqueData);
                 }
+
+                return Json(new { Result = "Ok" });
             }
             catch (Exception ex)
             {
                 return Json(new { Result = "Fail", Message = ex.Message });
             }
-
-            return Json(new { Result = "Ok" });
         }
 
-        public JsonResult GetTanqueHTMLTagsById(string Id)
+        public JsonResult DeleteTanque(String id)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    throw new ArgumentNullException(nameof(id), "El ID proporcionado es nulo o vacío.");
+                }
+
+                var url = _catalogCertificate.urlCatalogs + "Tanque/" + id;
+                var restClient = new RestGenerico();
+
+                var getResult = restClient.getApi<Tanque, Tanque>(url);
+                var tanque = DeserializeResponse<Tanque>(getResult, "data");
+
+                tanque.iD_STATUS = 0;
+                tanque.usR_MODIFICA = 1;
+                tanque.clavE_PALS = tanque.clavE_PALS ?? string.Empty;
+
+                var postResult = restClient.postApi<Tanque, Tanque>(url, tanque);
+                var postResponse = DeserializeResponse(postResult);
+
+                if (postResponse["error"].Trim() != "False")
+                {
+                    throw new Exception("El registro no existe o no se pudo actualizar.");
+                }
+
+                return Json(new { Result = "Ok" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Fail", Message = ex.Message });
+            }
+        }
+
+        public async Task<JsonResult> GetTanqueHTMLTagsById(string Id)
         {
             String response = String.Empty;
-            var tanque = getTanque();
+            var tanque = await getTanque();
             var plants = getPlantas();
             var product = getProductos();
+            var grados = getGrado();
             var _url = _catalogCertificate.urlCatalogs + "Tanque";
             RestGenerico _rest = new RestGenerico();
             var _result = _rest.getApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url + "/" + Id);
@@ -7414,6 +7294,18 @@ namespace LiberacionProductoWeb.Controllers
 
                 productosTag += "</select>";
 
+                var gradoTag = "<select  id='iD_GRADO' class='form-control' >";
+
+                foreach (var item in grados)
+                {
+                    if (entity.iD_GRADO == item.iD_GRADO)
+                        gradoTag += "<option value='" + item.iD_GRADO + "' selected >" + item.descripcion + " </option>";
+                    else
+                        gradoTag += "<option value='" + item.iD_GRADO + "'>" + item.descripcion + " </option>";
+                }
+
+                gradoTag += "</select>";
+
                 response += "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
                         "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TANQUE + "' ><i class='fa fa-save'></i></a> </td>" +
@@ -7421,6 +7313,7 @@ namespace LiberacionProductoWeb.Controllers
                 "<td><input class='form-control' id='clavE_PALS' maxlength='100' type='text'  value='" + entity.clavE_PALS + "'></td>" +
                 "<td>" + plantasTag + "</td>" +
                 "<td>" + productosTag + "</td>" +
+                "<td>" + gradoTag + "</td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -8214,13 +8107,13 @@ namespace LiberacionProductoWeb.Controllers
                 var restClient = new RestGenerico();
 
                 var getResult = restClient.getApi<Transporte, Transporte>(url);
-                var existingTransporte = DeserializeResponse<Transporte>(getResult, "data");
+                var transporte = DeserializeResponse<Transporte>(getResult, "data");
 
-                existingTransporte.iD_STATUS = 0;
-                existingTransporte.usR_MODIFICA = 1;
-                existingTransporte.iD_GRADO = "1";
+                transporte.iD_STATUS = 0;
+                transporte.usR_MODIFICA = 1;
+                transporte.iD_GRADO = "1";
 
-                var postResult = restClient.postApi<Transporte, Transporte>(url, existingTransporte);
+                var postResult = restClient.postApi<Transporte, Transporte>(url, transporte);
                 var postResponse = DeserializeResponse(postResult);
 
                 if (postResponse["error"].Trim() != "False")
@@ -8684,6 +8577,15 @@ namespace LiberacionProductoWeb.Controllers
         private int? ParseNullableInt(string value)
         {
             return int.TryParse(value, out int result) ? result : (int?)null;
+        }
+
+        private void HandleApiResponse(IRestResponse response, string errorMessage)
+        {
+            var responseData = DeserializeResponse<Dictionary<string, string>>(response);
+            if (responseData["error"].Trim() != "False")
+            {
+                throw new Exception(errorMessage);
+            }
         }
 
         private T DeserializeResponse<T>(IRestResponse response, string key = null)

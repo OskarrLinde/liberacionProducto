@@ -289,7 +289,7 @@
     <script>
         var commonUrl = @Json.Serialize(@Configuration.GetSection("publishUrl").GetSection("commonUrl").Value)
 
-        console.log(commonUrl);
+            console.log(commonUrl);
 
         var pb = {
             base: commonUrl
@@ -366,18 +366,6 @@
         }
 
         @{
-            // var plantasTag = "<select id='iD_PLANTA' class='form-control' data-style='btn-white'  title='Selecciona'>";
-
-            // if (Model.PlantasFilter != null)
-            // {
-            // 	foreach (var item in Model.PlantasFilter)
-            // 	{
-            // 		plantasTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
-            // 	}
-
-            // 	plantasTag += "</select>";
-            // }
-
             var paisTag = "<select id='iD_PAIS' class='form-control' data-style='btn-white'  title='Selecciona'>";
 
             if (Model.PaisesFilter != null)
@@ -428,7 +416,7 @@
             }
         }
 
-        var getEditRow = function (Id) {
+                var getEditRow = function (Id) {
             var ret = null;
             $.ajax({
                 async: false,
@@ -537,11 +525,11 @@
                         saveOrEditPlantaRequest.iD_STATUS = $(this).find("#iD_STATUS").val();
                     }
 
-                    if ($(this).find("#ID_FUENTE_SUMINISTRO").length){
+                    if ($(this).find("#ID_FUENTE_SUMINISTRO").length) {
                         saveOrEditPlantaRequest.ID_FUENTE_SUMINISTRO = $(this).find("#ID_FUENTE_SUMINISTRO").val();
                     }
 
-                    if ($(this).find("#ID_PLANTA_APROBADA").length){
+                    if ($(this).find("#ID_PLANTA_APROBADA").length) {
                         saveOrEditPlantaRequest.ID_PLANTA_APROBADA = $(this).find("#ID_PLANTA_APROBADA").val();
                     }
                 });
@@ -574,7 +562,6 @@
             });
         }
 
-
         var validateForm = function () {
             let descripcion = $("#descripcion").val();
             let identificador = $("#identificador").val();
@@ -597,7 +584,6 @@
                 errors.push('El campo Clave Certificado es requerido');
                 isValid = false;
             }
-
 
             if (!isValid) {
                 errors.forEach(error => {
@@ -634,10 +620,6 @@
         $(document).ready(function () {
             App.init();
             Demo.init();
-
-            //radioswitch.init()
-
-            //$("#form").validate();
 
             $('#data-table thead tr').clone(true).appendTo('#data-table thead');
             $('#data-table thead tr:eq(1) th').each(function (i) {

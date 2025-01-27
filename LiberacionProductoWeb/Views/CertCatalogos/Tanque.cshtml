@@ -108,7 +108,8 @@
                                     <th style="white-space: nowrap">Descripción</th>
                                     <th style="white-space: nowrap">Clave Pals</th>
                                     <th style="white-space: nowrap">Planta</th>                                    
-                                    <th style="white-space: nowrap">Producto</th>                                    
+                                    <th style="white-space: nowrap">Producto</th>
+                                    <th style="white-space: nowrap">Grado</th>
                                     <th style="white-space: nowrap">Estatus</th>
                                 </tr>
                             </thead>
@@ -160,7 +161,22 @@
                                                     }
                                                 }
                                             }
-                                        </td>                                                                            
+                                        </td>
+                                        <td>
+                                            @{
+                                                foreach (var item in Model.GradosList)
+                                                {
+                                                    if (item.iD_GRADO == entry.iD_GRADO)
+                                                    {
+                                                        @item.descripcion
+                                                    }
+                                                    else
+                                                    {
+                                                        @:
+                                                    }
+                                                }
+                                            }
+                                        </td>
                                         <td>
                                             @{
                                                 if (Convert.ToBoolean(entry.iD_STATUS))
@@ -356,6 +372,18 @@
 
                 productoTag += "</select>";
             }
+
+            var gradoTag = "<select id='iD_GRADO' class='form-control' data-style='btn-white'  title='Selecciona'>";
+
+            if (Model.GradosFilter != null)
+            {
+                foreach (var item in Model.GradosFilter)
+                {
+                    gradoTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                }
+
+                gradoTag += "</select>";
+            }
         }
 
         var getEditRow = function (Id) {
@@ -380,7 +408,8 @@
                 "<td><input class='form-control' maxlength='100' id='clavE_PALS' type='text'></td>" +
                 "<td>@Html.Raw(plantasTag)</td>" +
                 "<td>@Html.Raw(productoTag)</td>" +
-                "<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
+                "<td>@Html.Raw(gradoTag)</td>" +
+            "<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
                 "</tr>"
             return result;
         };
@@ -426,68 +455,47 @@
                 id = "";
             }
 
-            var iD_TANQUE = "";
-            var descripcion = "";
-            var clavE_PALS = "";
-            var iD_PLANTA = "";            
-            var iD_PRODUCTO = "";            
-            var iD_STATUS = "";
+            let saveOrEditTanqueRequest = {
+                iD_TANQUE: "",
+                descripcion: "",
+                clavE_PALS: "",
+                iD_PLANTA: "",
+                iD_PRODUCTO: "",
+                iD_GRADO: "",
+                iD_STATUS: ""
+            }
 
             $(event).closest("tr").each(function () {
                 $.each(this.cells, function () {
-                    //gets values for each cell
+                    saveOrEditTanqueRequest.iD_TANQUE = id.toString();
 
                     if ($(this).find("#iD_TANQUE").length) {
-                        iD_TANQUE = $(this).find("#iD_TANQUE").val();
+                        saveOrEditTanqueRequest.iD_TANQUE = $(this).find("#iD_TANQUE").val();
                     }
 
-                    // var selectElementTank = document.getElementById("iD_TANQUE");
-                    // var selectedIndexTank = selectElementTank.selectedIndex;
-                    // var selectedValueTank = selectElementTank.options[selectedIndexTank].value;
-
-                    // iD_TANQUE = selectedValueTransport;
-
                     if ($(this).find("#descripcion").length) {
-                        descripcion = $(this).find("#descripcion").val();
+                        saveOrEditTanqueRequest.descripcion = $(this).find("#descripcion").val();
                     }
 
                     if ($(this).find("#clavE_PALS").length) {
-                        clavE_PALS = $(this).find("#clavE_PALS").val();
+                        saveOrEditTanqueRequest.clavE_PALS = $(this).find("#clavE_PALS").val();
                     }
 
                     if ($(this).find("#iD_PLANTA").length) {
-                        iD_PLANTA = $(this).find("#iD_PLANTA").val();
+                        saveOrEditTanqueRequest.iD_PLANTA = $(this).find("#iD_PLANTA").val();
                     }
-
-                    // var selectElementPlant = document.getElementById("iD_PLANTA");
-                    // var selectedIndexPlant = selectElementPlant.selectedIndex;
-                    // var selectedValuePlant = selectElementPlant.options[selectedIndexPlant].value;
-
-                    // iD_PLANTA = selectedValuePlant;
 
                     if ($(this).find("#iD_PRODUCTO").length) {
-                        iD_PRODUCTO = $(this).find("#iD_PRODUCTO").val();
+                        saveOrEditTanqueRequest.iD_PRODUCTO = $(this).find("#iD_PRODUCTO").val();
                     }
 
-                    // var selectElementProduct = document.getElementById("iD_PRODUCTO");
-                    // var selectedIndexProduct = selectElementProduct.selectedIndex;
-                    // var selectedValueProduct = selectElementProduct.options[selectedIndexProduct].value;
-
-                    // iD_PRODUCTO = selectedValueProduct;
+                    if ($(this).find("#iD_GRADO").length) {
+                        saveOrEditTanqueRequest.iD_GRADO = $(this).find("#iD_GRADO").val();
+                    }
 
                     if ($(this).find("#iD_STATUS").length) {
-                        iD_STATUS = $(this).find("#iD_STATUS").val();
+                        saveOrEditTanqueRequest.iD_STATUS = $(this).find("#iD_STATUS").val();
                     }
-
-                    // var selectElementStatus = document.getElementById("status");
-                    // var selectedIndexStatus = selectElementStatus.selectedIndex;
-                    // var selectedValueStatus = selectElementStatus.options[selectedIndexStatus].value;
-
-                    // iD_STATUS = selectedValueStatus;
-
-                    // if ($(this).find("#status").length) {
-                    //     estado = $(this).find("#status").val();
-                    // }
                 });
             });
 
@@ -498,14 +506,7 @@
                     xhr.setRequestHeader("XSRF-TOKEN",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
-                data: JSON.stringify({
-                    iD_TANQUE: String(id),
-                    descripcion: descripcion,
-                    clavE_PALS: clavE_PALS,
-                    iD_PLANTA: iD_PLANTA,                    
-                    iD_PRODUCTO: iD_PRODUCTO,                    
-                    iD_STATUS: iD_STATUS
-                }),
+                data: JSON.stringify(saveOrEditTanqueRequest),
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
