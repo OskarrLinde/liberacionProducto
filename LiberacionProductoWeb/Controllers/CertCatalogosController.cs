@@ -2012,9 +2012,9 @@ namespace LiberacionProductoWeb.Controllers
 
         #endregion
 
-        #region Especificacion Master
+        #region Especificacion Master - Especificacion Planta Producto
 
-        public IActionResult EspecificacionMaster()
+        public IActionResult EspecificacionMaster(bool showAll = false)
         {
             var especificacionDetalleExportExcel = getEspecificacionDetalle();
             var especificacionMasterExportExcel = getEspecificacionMaster();
@@ -2028,6 +2028,7 @@ namespace LiberacionProductoWeb.Controllers
             var unidadMedida = getUnidadMedidas();
 
             EspecificacionMasterViewModel _especificacionMasterVM = new EspecificacionMasterViewModel();
+            _especificacionMasterVM.showAll = showAll;
 
             //_especificacionMasterVM.EspecificacionMasterList = especificacionMaster;
             //_especificacionMasterVM.EspecificacionMasterFilter = especificacionMaster.ConvertAll(a =>
@@ -2087,6 +2088,9 @@ namespace LiberacionProductoWeb.Controllers
                 observaciones = gcs.Key.observaciones,
                 iD_STATUS = gcs.Key.iD_STATUS
             }).ToList();
+
+            if (!showAll)
+                _especificacionMasterVM.EspecificacionMasterList = _especificacionMasterVM.EspecificacionMasterList.Where(x => x.iD_STATUS == 1).ToList();
 
             _especificacionMasterVM.EspecificacionMasterFilter = especificacionMaster.ConvertAll(a =>
             {
@@ -2589,9 +2593,9 @@ namespace LiberacionProductoWeb.Controllers
 
         #endregion
 
-        #region Especificacion Master 2
+        #region Especificacion Master 2 - Especificacion Cliente
 
-        public async Task<IActionResult> EspecificacionMaster2()
+        public async Task<IActionResult> EspecificacionMaster2(bool showAll = false)
         {
             var especificacionDetalleExportExcel = getEspecificacionDetalle();
             var especificacionMasterExportExcel = getEspecificacionMaster();
@@ -2606,6 +2610,7 @@ namespace LiberacionProductoWeb.Controllers
             var unidadMedida = getUnidadMedidas();
 
             EspecificacionMasterViewModel _especificacionMasterVM = new EspecificacionMasterViewModel();
+            _especificacionMasterVM.showAll = showAll;
 
             //_especificacionMasterVM.EspecificacionMasterList = especificacionMaster;
             //_especificacionMasterVM.EspecificacionMasterFilter = especificacionMaster.ConvertAll(a =>
@@ -2663,6 +2668,9 @@ namespace LiberacionProductoWeb.Controllers
                 observaciones = gcs.Key.observaciones,
                 iD_STATUS = gcs.Key.iD_STATUS
             }).ToList();
+
+            if (!showAll)
+                _especificacionMasterVM.EspecificacionMasterList = _especificacionMasterVM.EspecificacionMasterList.Where(x => x.iD_STATUS == 1).ToList();
 
             _especificacionMasterVM.EspecificacionMasterFilter = especificacionMaster.ConvertAll(a =>
             {
@@ -3055,9 +3063,9 @@ namespace LiberacionProductoWeb.Controllers
 
         #endregion
 
-        #region Especificacion Master 3
+        #region Especificacion Master 3 - Especificacion Producto Grado
 
-        public IActionResult EspecificacionMaster3()
+        public IActionResult EspecificacionMaster3(bool showAll = false)
         {
             var especificacionDetalleExportExcel = getEspecificacionDetalle();
             var especificacionMasterExportExcel = getEspecificacionMaster();
@@ -3071,6 +3079,7 @@ namespace LiberacionProductoWeb.Controllers
             var unidadMedida = getUnidadMedidas();
 
             EspecificacionMasterViewModel _especificacionMasterVM = new EspecificacionMasterViewModel();
+            _especificacionMasterVM.showAll = showAll;
 
             //_especificacionMasterVM.EspecificacionMasterList = especificacionMaster;
             //_especificacionMasterVM.EspecificacionMasterFilter = especificacionMaster.ConvertAll(a =>
@@ -3122,6 +3131,9 @@ namespace LiberacionProductoWeb.Controllers
                 observaciones = gcs.Key.observaciones,
                 iD_STATUS = gcs.Key.iD_STATUS
             }).ToList();
+
+            if (!showAll)
+                _especificacionMasterVM.EspecificacionMasterList = _especificacionMasterVM.EspecificacionMasterList.Where(x => x.iD_STATUS == 1).ToList();
 
             _especificacionMasterVM.EspecificacionMasterFilter = especificacionMaster.ConvertAll(a =>
             {
@@ -3480,12 +3492,16 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Grado
 
-        public IActionResult Grado()
+        public IActionResult Grado(bool showAll = false)
         {
             var grado = getGrado();
             GradoViewModel _gradoVM = new GradoViewModel();
+            _gradoVM.showAll = showAll;
 
             _gradoVM.GradosList = grado;
+            if (!showAll)
+                _gradoVM.GradosList = _gradoVM.GradosList.Where(x => x.iD_STATUS == 1).ToList();
+
             _gradoVM.GradosFilter = grado.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -3708,13 +3724,17 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Metodo
 
-        public IActionResult Metodo()
+        public IActionResult Metodo(bool showAll = false)
         {
             var metodo = getMetodo();
 
             MetodoViewModel _metodoVM = new MetodoViewModel();
+            _metodoVM.showAll = showAll;
 
             _metodoVM.MetodoList = metodo;
+            if (!showAll)
+                _metodoVM.MetodoList = _metodoVM.MetodoList.Where(x => x.iD_STATUS == 1).ToList();
+
             _metodoVM.MetodoFilter = metodo.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -3941,13 +3961,17 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Pais
 
-        public IActionResult Pais()
+        public IActionResult Pais(bool showAll = false)
         {
             var paises = getPaises();
 
             PaisesViewModel _paisesVM = new PaisesViewModel();
+            _paisesVM.showAll = showAll;
 
             _paisesVM.PaisesList = paises;
+            if (!showAll)
+                _paisesVM.PaisesList = _paisesVM.PaisesList.Where(x => x.iD_STATUS == 1).ToList();
+
             _paisesVM.PaisesFilter = paises.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -4185,14 +4209,18 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Parametro
 
-        public IActionResult Parametro()
+        public IActionResult Parametro(bool showAll = false)
         {
             var parametro = getParametro();
             var unidadMedida = getUnidadMedidas();
 
             ParametroViewModel _parametroVM = new ParametroViewModel();
+            _parametroVM.showAll = showAll;
 
             _parametroVM.ParametroList = parametro;
+            if (!showAll)
+                _parametroVM.ParametroList = _parametroVM.ParametroList.Where(x => x.iD_STATUS == 1).ToList();
+
             _parametroVM.ParametroFilter = parametro.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -4459,7 +4487,7 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Plantas
 
-        public async Task<IActionResult> Planta()
+        public async Task<IActionResult> Planta(bool showAll = false)
         {
             var plants = getPlantas();
             var country = getPaises();
@@ -4468,10 +4496,15 @@ namespace LiberacionProductoWeb.Controllers
             var approvedPlant = await getPlantaAprobada();
 
             PlantaViewModel _plantaVM = new PlantaViewModel();
+            _plantaVM.showAll = showAll;
 
             if (plants != null)
             {
                 _plantaVM.PlantaList = plants;
+
+                if (!showAll) 
+                    _plantaVM.PlantaList = _plantaVM.PlantaList.Where(x => x.iD_STATUS == 1).ToList();
+
                 _plantaVM.PlantasFilter = plants.ConvertAll(a =>
                 {
                     return new SelectListItem()
@@ -5210,13 +5243,17 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Producto
 
-        public IActionResult Producto()
+        public IActionResult Producto(bool showAll = false)
         {
             var producto = getProductos();
 
             ProductoViewModel _productoVM = new ProductoViewModel();
+            _productoVM.showAll = showAll;
 
             _productoVM.ProductosList = producto;
+            if (!showAll)
+                _productoVM.ProductosList = _productoVM.ProductosList.Where(x => x.iD_STATUS == 1).ToList();
+
             _productoVM.ProductosFilter = producto.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -6410,9 +6447,9 @@ namespace LiberacionProductoWeb.Controllers
 
         #endregion
 
-        #region Rol Alias
+        #region Rol Alias - Funciones Paises
 
-        public IActionResult RolAlias()
+        public IActionResult RolAlias(bool showAll = false)
         {
             var rolAliasExportExce = getRolAlias();
             var rolAlias = getRolAlias();
@@ -6420,6 +6457,7 @@ namespace LiberacionProductoWeb.Controllers
             var paises = getPaises();
 
             RolAliasViewModel _rolAliasVM = new RolAliasViewModel();
+            _rolAliasVM.showAll = showAll;
 
             _rolAliasVM.RolAliasExportExcelList = rolAliasExportExce;
             _rolAliasVM.RolAliasExportExcelFilter = rolAliasExportExce.ConvertAll(a =>
@@ -6454,6 +6492,9 @@ namespace LiberacionProductoWeb.Controllers
             });
 
             _rolAliasVM.RolList = rol;
+            if (!showAll)
+                _rolAliasVM.RolList = _rolAliasVM.RolList.Where(x => x.iD_STATUS == 1).ToList();
+
             _rolAliasVM.RolFilter = rol.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -6879,13 +6920,18 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Status Pipa
 
-        public IActionResult StatusPipa()
+        public IActionResult StatusPipa(bool showAll = false)
         {
             var statusPipa = getStatusPipa();
 
             StatusPipaViewModel _statusPipaVM = new StatusPipaViewModel();
+            _statusPipaVM.showAll = showAll;
+
 
             _statusPipaVM.StatusPipasList = statusPipa;
+            if (!showAll)
+                _statusPipaVM.StatusPipasList = _statusPipaVM.StatusPipasList.Where(x => x.iD_STATUS == 1).ToList();
+
             _statusPipaVM.StatusPipasFilter = statusPipa.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -7101,7 +7147,7 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Tanque
 
-        public async Task<IActionResult> Tanque()
+        public async Task<IActionResult> Tanque(bool showAll = false)
         {
             var tanque = await getTanque();
             var plantas = getPlantas();
@@ -7109,8 +7155,12 @@ namespace LiberacionProductoWeb.Controllers
             var grados = getGrado();
 
             TanqueViewModel _tanqueVM = new TanqueViewModel();
+            _tanqueVM.showAll = showAll;
 
             _tanqueVM.TanqueList = tanque;
+            if (!showAll)
+                _tanqueVM.TanqueList = _tanqueVM.TanqueList.Where(x => x.iD_STATUS == 1).ToList();
+
             _tanqueVM.TanqueFilter = tanque.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -7541,13 +7591,17 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Tipo Suministro
 
-        public IActionResult TipoSuministro()
+        public IActionResult TipoSuministro(bool showAll = false)
         {
             var tSuministro = getTipoSuministro();
 
             TipoSuministroViewModel _tSuministroVM = new TipoSuministroViewModel();
+            _tSuministroVM.showAll = showAll;
 
             _tSuministroVM.TipoSuministrosList = tSuministro;
+            if (!showAll)
+                _tSuministroVM.TipoSuministrosList = _tSuministroVM.TipoSuministrosList.Where(x => x.iD_STATUS == 1).ToList();
+
             _tSuministroVM.TipoSuministrosFilter = tSuministro.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -7771,13 +7825,17 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Tipo Transporte
 
-        public IActionResult TipoTransporte()
+        public IActionResult TipoTransporte(bool showAll = false)
         {
             var tipoTransporte = getTipoTransporte();
 
             TipoTransporteViewModel _tipoTransporteVM = new TipoTransporteViewModel();
+            _tipoTransporteVM.showAll = showAll;
 
             _tipoTransporteVM.TipoTransporteList = tipoTransporte;
+            if (!showAll)
+                _tipoTransporteVM.TipoTransporteList = _tipoTransporteVM.TipoTransporteList.Where(x => x.iD_STATUS == 1).ToList();
+
             _tipoTransporteVM.TipoTransporteFilter = tipoTransporte.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -8000,7 +8058,7 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Transporte
 
-        public IActionResult Transporte()
+        public IActionResult Transporte(bool showAll = false)
         {
             var transporte = getTransporte();
             var tipoTransporte = getTipoTransporte();
@@ -8009,8 +8067,12 @@ namespace LiberacionProductoWeb.Controllers
             var statusPipa = getStatusPipa();
 
             TransporteViewModel _transporteVM = new TransporteViewModel();
+            _transporteVM.showAll = showAll;
 
             _transporteVM.TransporteList = transporte;
+            if (!showAll)
+                _transporteVM.TransporteList = _transporteVM.TransporteList.Where(x => x.iD_STATUS == 1).ToList();
+
             _transporteVM.TransporteFilter = transporte.ConvertAll(a =>
             {
                 return new SelectListItem()
@@ -8292,12 +8354,16 @@ namespace LiberacionProductoWeb.Controllers
 
         #region Unidad de Medida
 
-        public IActionResult UnidadMedida()
+        public IActionResult UnidadMedida(bool showAll = false)
         {
             var unidadMedida = getUnidadMedidas();
             UnidadMedidaViewModel _unidadMedidaVM = new UnidadMedidaViewModel();
+            _unidadMedidaVM.showAll = showAll;
 
             _unidadMedidaVM.UnidadMedidasList = unidadMedida;
+            if (!showAll)
+                _unidadMedidaVM.UnidadMedidasList = _unidadMedidaVM.UnidadMedidasList.Where(x => x.iD_STATUS == 1).ToList();
+
             _unidadMedidaVM.UnidadMedidasFilter = unidadMedida.ConvertAll(a =>
             {
                 return new SelectListItem()

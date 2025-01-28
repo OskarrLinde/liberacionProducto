@@ -27,6 +27,7 @@
     var zeroRecords = resource.GetString("ZeroRecords");
     var infoEmpty = resource.GetString("InfoEmpty");
     var infoFiltered = resource.GetString("InfoFiltered");
+    bool isChecked = Model.showAll;
 }
 
 @* @await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml") *@
@@ -45,32 +46,6 @@
     <!-- begin page-header -->
     <h1 class="page-header">Catálogo Planta</h1>
     <!-- end page-header -->
-    @* <div class="section-container section-with-top-border p-b-10">
-    <div class="row">
-    <div class="col-lg-20">
-    <form>
-    <div class="row">
-    <div class="col-lg-6 m-b-15">
-    <div class="m-b-5"><b>Planta:</b></div>
-    <select multiple asp-for="SelectedPlantasFilter" asp-items="Model.PlantasFilter"
-    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
-    data-live-search="true" title="Selecciona">
-    </select>
-    </div>
-    <div class="col-lg-6 m-b-15">
-    <div class="m-b-5"> &nbsp; </div>
-    <div class="input-group">
-    <button type="submit" class="btn btn-inverse">Buscar</button>
-    <a href="@Url.Action("ClearFiltersPlanta", "CertCatalogos" )" class="btn btn-white m-r-5">
-    <i class="fa fa-eraser"></i> Limpiar filtros
-    </a>
-    </div>
-    </div>
-    </div>
-    </form>
-    </div>
-    </div>
-    </div> *@
 
     <div class="section-container section-with-top-border p-b-5">
         <div class="row">
@@ -92,6 +67,13 @@
                             <i class="fa fa-eraser"></i>Limpiar filtros
                         </a>
                     </div>
+
+                    <label class="switch-container pull-right">
+                        <input type="checkbox" id="showAllSwitch" @(isChecked ? "checked" : "")>
+                        <span class="switch"></span>
+                        <span class="switch-text">Mostrar todos</span>
+                    </label>
+
                     <h4 class="panel-title">
                         &nbsp;
                     </h4>
@@ -249,6 +231,7 @@
     <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 
     <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/css/default.css" rel="stylesheet" />
 
 }
 
@@ -616,6 +599,28 @@
                 });
             }
         };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const switchElement = document.getElementById('showAllSwitch');
+
+            switchElement.addEventListener('change', function() {
+                if (this.checked) {
+                    onSwitchActive();
+                } else {
+                    onSwitchInactive();
+                }   
+            });
+
+            function onSwitchActive() {
+                console.log('El switch está activo');
+                window.location.href = '@Url.Action("Planta", "CertCatalogos")?showAll=true';
+            }
+
+            function onSwitchInactive() {
+                console.log('El switch está inactivo');
+                window.location.href = '@Url.Action("Planta", "CertCatalogos")?showAll=false';
+            }
+        });
 
         $(document).ready(function () {
             App.init();
