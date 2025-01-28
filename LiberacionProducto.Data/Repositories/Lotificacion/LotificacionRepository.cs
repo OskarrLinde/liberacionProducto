@@ -558,6 +558,16 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             Direction = ParameterDirection.Output
                         };
 
+                        // Reemplazar punto por coma si es necesario                            
+                        if (data.MasterData.NivelIni.Contains(".") && !data.MasterData.NivelIni.Contains(","))
+                        {
+                            data.MasterData.NivelIni = data.MasterData.NivelIni.Replace(".", ",");
+                        }
+                        if (data.MasterData.NivelFin.Contains(".") && !data.MasterData.NivelFin.Contains(","))
+                        {
+                            data.MasterData.NivelFin = data.MasterData.NivelFin.Replace(".", ",");
+                        }
+
                         // Guardar datos en la tabla maestra y obtener el nuevo IdAnalisis
                         using (var command = new SqlCommand("sp_EditarLotificacionMaestro", connection, transaction))
                         {
@@ -709,6 +719,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                         ValorAnalisis = reader.GetDecimal("valor_analisis"),
                                         IdAnalizador = reader.IsDBNull(reader.GetOrdinal("descAnalizador")) ? null : reader.GetString(reader.GetOrdinal("descAnalizador")),
                                         IdMetodo = reader.IsDBNull(reader.GetOrdinal("descMetodo")) ? null : reader.GetString(reader.GetOrdinal("descMetodo")),
+                                        IdMetodoVal = reader.IsDBNull(reader.GetOrdinal("ID_METODO")) ? null : reader.GetInt32(reader.GetOrdinal("ID_METODO")),
                                         DescUnidadMedida = reader.IsDBNull(reader.GetOrdinal("descUMedidaDetalle")) ? null : reader.GetString(reader.GetOrdinal("descUMedidaDetalle")),
                                         MotivoCancelBitacora = reader.IsDBNull(reader.GetOrdinal("motivo_bitacLotif")) ? null : reader.GetString(reader.GetOrdinal("motivo_bitacLotif")),
                                         FechaCancelBitacora = reader.IsDBNull(reader.GetOrdinal("Fec_bitaclotif")) ? null : reader.GetDateTime(reader.GetOrdinal("Fec_bitaclotif")),

@@ -861,7 +861,8 @@
                                 '<th class="hiddenLotificacion_UM">&nbsp;</th>' +
                                 '<th class="hiddenLotificacion_UM">&nbsp;</th>' +
                                 '<th class="hiddenLotificacion_UM">Analizador Original</th>' +
-                                '<th>Método Analítico</th>';
+                                '<th class="hiddenListadoLotes_detail">Método Analítico</th>' +
+                                '<th class="hiddenListadoLotes_detail idMetodoOriginal">Método Analítico Original</th>';
 
                                 // Agregar columna adicional si permisoUsuario es true
                                 if (flagPermisoUser)
@@ -886,7 +887,8 @@
                                     '<td class="hiddenLotificacion_UM idAnalizadorValue">' + item.idAnalizadorVal + '</td>' +
                                     '<td class="hiddenLotificacion_UM idAnalizadorValueDesc">' + item.idAnalizador +' </td>' +
                                     '<td class="hiddenListadoLotes_analizador IdAnalizadorOriginal">' + item.idAnalizadorVal + '</td>' +
-                                    '<td>' + item.idMetodo + '</td>';
+                                    '<td class="hiddenListadoLotes_detail idMetodo">' + item.idMetodoVal + '</td>' +
+                                    '<td class="hiddenListadoLotes_detail idMetodoOriginal">' + item.idMetodoVal + '</td>';
 
                                     // Agregar botón de acción si permisoUsuario es true
                                     if (flagPermisoUser)
@@ -906,6 +908,19 @@
 
                         // Almacena los datos originales antes de la cancelacion
                         var originalData = {};
+
+                        function validateInput(event) {
+                            this.value = this.value.replace(/[^0-9.]/g, '');
+                            if ((this.value.match(/\./g) || []).length > 1) {
+                                this.value = this.value.replace(/\.+$/, "");
+                            }
+                            // Permitir hasta 4 dígitos después del punto decimal
+                            if (this.value.includes('.')) {
+                                var parts = this.value.split('.');
+                                parts[1] = parts[1].substring(0, 5);
+                                this.value = parts.join('.');
+                            }
+                        }
 
                         // Manejar el evento de clic en el botón "Editar Lote"
                         // Asociar el nuevo evento
@@ -945,7 +960,7 @@
                             // Columna derecha
                             var colRight = $('<div>', {class: 'col-12'}).append(formGroup);
 
-                            cellValorNivelInicial.html('<input type="text" class="form-control" value="' + cellValorNivelInicialText + '">').append(colRight);
+                            cellValorNivelInicial.html('<input type="text" id="initial-level" class="form-control" value="' + cellValorNivelInicialText + '">').append(colRight);
 
                             // Encontrar el elemento que tiene la clase hiddenListadoLotes_UMNIValue y obtener su valor
                             var defaultValueInicial = tr.find('.hiddenListadoLotes_UMNIValue');
@@ -976,7 +991,7 @@
 
                              // cellValorNivelInicial.html('<input type="text" class="form-control" value="' + cellValorNivelInicialText + '">').append(colRight);
 
-                            cellValorNivelFinal.html('<input type="text" class="form-control" value="' + cellValorNivelFinalText + '">').append(colRight2);
+                            cellValorNivelFinal.html('<input type="text" id="final-level" class="form-control" value="' + cellValorNivelFinalText + '">').append(colRight2);
 
                             // Encontrar el elemento que tiene la clase hiddenListadoLotes_UMNIValue y obtener su valor
                             var defaultValueFinal = tr.find('.hiddenListadoLotes_UMNFValue');
@@ -984,6 +999,8 @@
 
                             // // Seleccionar el radio correcto basado en el valor obtenido
                             tr.find('input[name="final-unit' + IdAnalisisRow + '"][value="' + defaultValueFinalText + '"]').prop('checked', true);
+
+                            tr.find('#initial-level, #final-level').on('input', validateInput);
 
                         });
 
@@ -1027,6 +1044,72 @@
                             var tableData = []; // Array para almacenar los datos de la tabla
                             var BanderaProductoConforme = true;
 
+                            //Validaciones de los inputs de valor inicial y final
+                            var nivelInicialTd = currentRow.find('td.nivelinicial');
+                            var valnivelInicial = nivelInicialTd.find('input').val();
+                            console.log("Valor inicial");
+                            console.log(valnivelInicial);
+
+                            var nivelFinalTd = currentRow.find('td.nivelfinal');
+                            var valnivelFinal = nivelFinalTd.find('input').val();
+                            console.log("Valor final");
+                            console.log(valnivelFinal);
+
+                            if (valnivelInicial === '' || parseFloat(valnivelInicial) < 0)
+                            {
+                                allValid = false;
+                                nivelInicialTd.addClass('invalid');
+                                // Resaltar input inválido (opcional)
+                                alert('El nivel inicial debe ser mayor a 0 y no estar vacío.');
+                                return;
+                                // Salir de la función si el valor es inválido
+                            }
+                            else {
+                                nivelInicialTd.removeClass('invalid');
+                                // Remover resaltado si es válido (opcional)
+                            }
+
+                            if (valnivelFinal === '' || parseFloat(valnivelFinal) <= 0)
+                            {
+                                allValid = false;
+                                nivelFinalTd.addClass('invalid');
+                                // Resaltar input inválido (opcional)
+                                alert('El nivel final debe ser mayor a 0 y no estar vacío.');
+                                return;
+                                // Salir de la función si el valor es inválido
+                            }
+                            else {
+                                nivelFinalTd.removeClass('invalid');
+                                // Remover resaltado si es válido (opcional)
+                            }
+
+                            valnivelInicial = parseFloat(valnivelInicial);
+                            valnivelFinal = parseFloat(valnivelFinal);
+
+                            // console.log("Valor Inicial:", valnivelInicial); // Para depuración
+                            // console.log("Valor Final:", valnivelFinal); // Para depuración
+
+                            if (valnivelInicial > valnivelFinal)
+                            {
+                                allValid = false;
+                                nivelFinalTd.addClass('invalid');
+                                // Resaltar input inválido (opcional)
+                                alert('El nivel inicial no debe ser mayor a nivel final.');
+                                return;
+                            }
+
+                            
+
+
+                            if (valnivelInicial === valnivelFinal)
+                            {
+                                allValid = false;
+                                nivelFinalTd.addClass('invalid');
+                                // Resaltar input inválido (opcional)
+                                alert('El nivel inicial no debe ser igual a nivel final.');
+                                return;
+                            }
+
 
                             //Validacion de los inputs dentro de la tabla detalle
                             currentRow.next('tr').find('table').find('tr:not(:first-child)').each(function () {
@@ -1065,6 +1148,8 @@
                                         // Remueve la clase si es válida (opcional)
                                     }
 
+                                   
+
                                     var cellAnalizador = registro.find('.idAnalizadorValue');
                                     var cellDropdownText = cellAnalizador.text().trim();
 
@@ -1087,6 +1172,26 @@
                                     }
                                     else
                                     {
+                                         //Bandera para validar si es un producto conforme para la Edicicion
+                                        var cvalorLimiteInf = registro.find('.valorLimiteInf').text().trim();
+                                        cvalorLimiteInf = parseFloat(cvalorLimiteInf);
+                                        var cvalorLimiteSup = registro.find('.valorLimiteSup').text().trim();
+                                        cvalorLimiteSup = parseFloat(cvalorLimiteSup);
+
+                                        console.log("Valor Analisis");
+                                        console.log(cellText);
+                                        console.log("Valor Limite Inf");
+                                        console.log(cvalorLimiteInf);
+                                        console.log("Valor Limite Sup");
+                                        console.log(cvalorLimiteSup);
+
+                            
+
+                                        if (isNaN(cellText) || parseFloat(cellText) < cvalorLimiteInf || cellText > cvalorLimiteSup)
+                                        {
+                                            BanderaProductoConforme = false;
+                                        }
+
                                         var rowData =
                                         {
                                             IdAnalisis: registro.find('.idAnalisisDetalle').text().trim(),
@@ -1096,7 +1201,7 @@
                                             ValorAnalisis: registro.find('.idValorAnalisis').text().trim(),
                                             //IdUnidadMedida: currentRow.find('.idUnidadMedida').text().trim(),
                                             IdAnalizador: registro.find('.idAnalizadorValue').text().trim(),
-                                            //IdMetodo: currentRow.find('.idMetodo').text().trim(),
+                                            IdMetodo: registro.find('.idMetodo').text().trim(),
                                             UsrAlta: idUsuarioLogueado
                                         };
 
@@ -1108,12 +1213,10 @@
 
                             if (allValid)
                             {
-                                var nivelInicialTd = currentRow.find('td.nivelinicial');
-                                var valnivelInicial = nivelInicialTd.find('input').val();
+                                
                                 var idUMInicial = currentRow.find('input[name="initial-unit' + IdAnalisisRow + '"]:checked').val();
 
-                                var nivelFinalTd = currentRow.find('td.nivelfinal');
-                                var valnivelFinal = nivelFinalTd.find('input').val();
+                               
                                 var idUMFinal = currentRow.find('input[name="final-unit' + IdAnalisisRow + '"]:checked').val();
 
                                 // Datos de la tabla maestra
@@ -1129,8 +1232,8 @@
                                     IdUMedidaFin: idUMFinal,
                                     //Comentarios: $('#commentarios').val(),
                                     // LoteOrigen: $('#LoteOrigen').val(),
-                                    UsrAlta: idUsuarioLogueado
-                                    //,Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6
+                                    UsrAlta: idUsuarioLogueado,
+                                    Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6
                                 };
 
                                 console.log("Maestro:")
@@ -1245,7 +1348,9 @@
                             var cellValorAnalizador = currentRow.find('.idAnalizador');
                             var currentValAnalizadorText = cellValorAnalizador.text();
 
-                            console.log(cellValorAnalizador.text());
+                            var idMetodoCell = currentRow.find('.idMetodo');
+
+                            //console.log(cellValorAnalizador.text());
                             // console.log(currentValAnalizadorText);
 
                             // Obtener el valor del elemento con la clase .IdAnalizadorOriginal (id del analizaador que se tiene en la base de datos)
@@ -1278,6 +1383,21 @@
                                     });
                                     // Agregar el select al dropdownCell
                                     cellValorAnalizador.html(select);
+
+                                    function actualizarIdMetodo() {
+                                        // var editableCells = currentRow.find('.editable');
+
+                                        var selectedOption = currentRow.find('.idAnalizador select option:selected');
+                                        var idMetodo = selectedOption.data('idMetodo');
+                                        idMetodoCell.text(idMetodo);
+                                    }
+
+                                    // Ejecutar al cargar la página para el primer elemento
+                                    actualizarIdMetodo();
+
+                                    // Evento para actualizar el idMetodo al cambiar la selección
+                                    currentRow.find('.idAnalizador select').on('change', actualizarIdMetodo);
+
                                 },
                                 error: function (xhr, status, error) {
                                     console.log('Error al obtener los analizadores: ' + error);
@@ -1310,6 +1430,10 @@
                             var celldescAnalizador = row.find('.idAnalizadorValueDesc');
                             var celldIdAnalizador = row.find('.idAnalizador');
                             celldIdAnalizador.html(celldescAnalizador.text());
+
+                            var cellMetodoAnalitico = row.find('.idMetodo');
+                            var cellMetodoanaliticoOriginal = row.find('.idMetodoOriginal');
+                            cellMetodoAnalitico.html(cellMetodoanaliticoOriginal.text());
 
                             row.find('td:last').html('<button class="editarparametro">✏️</button>');
                         });
@@ -1366,6 +1490,10 @@
                                 // Guardar el valor en una celda oculta
                                 currentRow.find('.idAnalizadorValue').html(selectedValue);
                                 currentRow.find('.idAnalizadorValueDesc').html(selectedText);
+
+                                 // Guardar el valor en una celda oculta
+                                currentRow.find('.idMetodoOriginal').html(currentRow.find('.idMetodo').text());
+
                             }
 
                             // Restaurar los botones

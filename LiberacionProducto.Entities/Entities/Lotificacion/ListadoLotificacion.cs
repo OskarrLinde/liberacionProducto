@@ -46,6 +46,7 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
             public decimal ValorAnalisis { get; set; }
             public string? IdAnalizador { get; set; }
             public string? IdMetodo { get; set; }
+            public int? IdMetodoVal { get; set; }
             public string? DescUnidadMedida { get; set; }
             public string? MotivoCancelBitacora { get; set; }
             public DateTime? FechaCancelBitacora { get; set; }
