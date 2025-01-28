@@ -27,6 +27,7 @@
     var zeroRecords = resource.GetString("ZeroRecords");
     var infoEmpty = resource.GetString("InfoEmpty");
     var infoFiltered = resource.GetString("InfoFiltered");
+    bool isChecked = Model.showAll;
 }
 
 @* @await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml") *@
@@ -91,6 +92,13 @@
                             <i class="fa fa-eraser"></i>Limpiar filtros
                         </a>
                     </div>
+
+                    <label class="switch-container pull-right">
+                        <input type="checkbox" id="showAllSwitch" @(isChecked ? "checked" : "")>
+                        <span class="switch"></span>
+                        <span class="switch-text">Mostrar todos</span>
+                    </label>
+
                     <h4 class="panel-title">
                         &nbsp;
                     </h4>
@@ -414,6 +422,7 @@
     <link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 
     <link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/css/default.css" rel="stylesheet" />
 }
 
 @section scripts {
@@ -1050,6 +1059,28 @@
                 }
                 $('.selectpicker').selectpicker();
         };
+
+        document.addEventListener('DOMContentLoaded', function () {
+             const switchElement = document.getElementById('showAllSwitch');
+
+             switchElement.addEventListener('change', function () {
+                 if (this.checked) {
+                     onSwitchActive();
+                 } else {
+                     onSwitchInactive();
+                 }
+             });
+
+             function onSwitchActive() {
+                 console.log('El switch está activo');
+                 window.location.href = '@Url.Action("EspecificacionMaster2", "CertCatalogos")?showAll=true';
+             }
+
+             function onSwitchInactive() {
+                 console.log('El switch está inactivo');
+                 window.location.href = '@Url.Action("EspecificacionMaster2", "CertCatalogos")?showAll=false';
+             }
+        });
 
         $(document).ready(function () {
             App.init();

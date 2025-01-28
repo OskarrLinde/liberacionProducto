@@ -31,6 +31,8 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         //messages views
         public String MensajeInfo { get; set; }
         public String MensajeError { get; set; }
+
+        public bool showAll { get; set; }
     }
 
     public class Plantas

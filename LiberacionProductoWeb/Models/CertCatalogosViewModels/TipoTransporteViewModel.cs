@@ -15,6 +15,7 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         //messages vieews
         public String MensajeInfo { get; set; }
         public String MensajeError { get; set; }
+        public bool showAll { get; internal set; }
     }
 
     public class TipoTransporte
