@@ -27,6 +27,7 @@
 	var zeroRecords = resource.GetString("ZeroRecords");
 	var infoEmpty = resource.GetString("InfoEmpty");
 	var infoFiltered = resource.GetString("InfoFiltered");
+	bool isChecked = Model.showAll;
 }
 
 @* @await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml") *@
@@ -80,9 +81,6 @@
 					<div class="btn-group pull-left">
 						@*  @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_PRODUCTO))
                         { *@
-						<a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
-							<i class="fa fa-plus"></i> Agregar Registro
-						</a>
 						@* } *@
 						<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
 							<i class="fa fa-file-excel"></i> Exportar a excel
@@ -93,6 +91,13 @@
 							<i class="fa fa-eraser"></i>Limpiar filtros
 						</a>
 					</div>
+
+					<label class="switch-container pull-right">
+						<input type="checkbox" id="showAllSwitch" @(isChecked ? "checked" : "")>
+						<span class="switch"></span>
+						<span class="switch-text">Mostrar todos</span>
+					</label>
+
 					<h4 class="panel-title">
 						&nbsp;
 					</h4>
@@ -113,7 +118,6 @@
 									<th style="white-space: nowrap">Descripción</th>
 									<th style="white-space: nowrap">Clave Certificado</th>
 									<th style="white-space: nowrap">Estatus</th>
-									<th style="white-space: nowrap; width:1%"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -172,14 +176,6 @@
 													@: Inactivo
 												}
 											}
-										</td>
-										<td>
-											@* <a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_PLANTA" class="btn btn-default btn-xs">
-												<i class="fa fa-trash-alt"></i>
-											</a>
-											<a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_PLANTA'>
-												<i class='fa fa-edit'></i>
-											</a> *@
 										</td>
 									</tr>
 								}
@@ -314,7 +310,7 @@
 	<link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 
 	<link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
-
+	<link href="~/css/default.css" rel="stylesheet" />
 }
 
 @section scripts {
@@ -890,6 +886,28 @@
 				}
 				$('.selectpicker').selectpicker();
 		};
+
+		document.addEventListener('DOMContentLoaded', function () {
+            const switchElement = document.getElementById('showAllSwitch');
+
+            switchElement.addEventListener('change', function () {
+                if (this.checked) {
+                    onSwitchActive();
+                } else {
+                    onSwitchInactive();
+                }
+            });
+
+            function onSwitchActive() {
+                console.log('El switch está activo');
+                window.location.href = '@Url.Action("PlantaProducto", "CertCatalogos")?showAll=true';
+            }
+
+            function onSwitchInactive() {
+                console.log('El switch está inactivo');
+                window.location.href = '@Url.Action("PlantaProducto", "CertCatalogos")?showAll=false';
+            }
+        });
 
 		$(document).ready(function () {
 			App.init();

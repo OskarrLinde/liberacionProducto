@@ -80,9 +80,6 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<div class="btn-group pull-left">
-						<a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
-							<i class="fa fa-plus"></i> Agregar Registro
-						</a>
 						<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
 							<i class="fa fa-file-excel"></i> Exportar a excel
 						</a>
@@ -122,7 +119,6 @@
 									<th style="white-space: nowrap; display: none;">Tipo Especificación</th>
 									<th style="white-space: nowrap">Observaciones</th>
 									<th style="white-space: nowrap">Estatus</th>
-									<th style="white-space: nowrap; width:1%"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -226,14 +222,6 @@
 													@: Inactivo
 												}
 											}
-										</td>
-										<td>
-											<a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_ESPECIFICACION" class="btn btn-default btn-xs">
-												<i class="fa fa-trash-alt"></i>
-											</a>
-											<a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_ESPECIFICACION'>
-												<i class='fa fa-edit'></i>
-											</a>
 										</td>
 									</tr>
 								}

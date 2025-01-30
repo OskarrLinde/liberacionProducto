@@ -27,6 +27,7 @@
 	var zeroRecords = resource.GetString("ZeroRecords");
 	var infoEmpty = resource.GetString("InfoEmpty");
 	var infoFiltered = resource.GetString("InfoFiltered");
+	bool isChecked = Model.showAll;
 }
 
 @* @await Html.PartialAsync("~/Views/Shared/_Navigation.cshtml") *@
@@ -46,42 +47,12 @@
 	<!-- begin page-header -->
 	<h1 class="page-header">Catálogo Analizador - Parámetros</h1>
 	<!-- end page-header -->
-	@* <div class="section-container section-with-top-border p-b-10">
-    <div class="row">
-    <div class="col-lg-20">
-    <form>
-    <div class="row">
-    <div class="col-lg-6 m-b-15">
-    <div class="m-b-5"><b>Producto:</b></div>
-    <select multiple asp-for="SelectedAnalizadorParametrosFilter" asp-items="Model.AnalizadorParametrosFilter"
-    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
-    data-live-search="true" title="Selecciona">
-    </select>
-    </div>
-    <div class="col-lg-6 m-b-15">
-    <div class="m-b-5"> &nbsp; </div>
-    <div class="input-group">
-    <button type="submit" class="btn btn-inverse">Buscar</button>
-    <a href="@Url.Action("ClearFiltersAnalizadorParametros", "CertCatalogos" )" class="btn btn-white m-r-5">
-    <i class="fa fa-eraser"></i> Limpiar filtros
-    </a>
-    </div>
-    </div>
-    </div>
-    </form>
-    </div>
-    </div>
-    </div>
-    *@
 
 	<div class="section-container section-with-top-border p-b-5">
 		<div class="row">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<div class="btn-group pull-left">
-						<a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
-							<i class="fa fa-plus"></i> Agregar Registro
-						</a>
 						<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
 							<i class="fa fa-file-excel"></i> Exportar a excel
 						</a>
@@ -91,6 +62,13 @@
 							<i class="fa fa-eraser"></i>Limpiar filtros
 						</a>
 					</div>
+
+					<label class="switch-container pull-right">
+                        <input type="checkbox" id="showAllSwitch" @(isChecked ? "checked" : "")>
+                        <span class="switch"></span>
+                        <span class="switch-text">Mostrar todos</span>
+                    </label>
+
 					<h4 class="panel-title">
 						&nbsp;
 					</h4>
@@ -105,40 +83,93 @@
 							<thead>
 								<tr>
 									<th class="no-sort" style="width:1%"></th>
-									<th style="white-space: nowrap; display: none;">IdAnalizador</th>
-									<th style="white-space: nowrap">Descripción</th>
-									<th style="white-space: nowrap">Clave Pals</th>
-									<th style="white-space: nowrap">Producto</th>
-									<th style="white-space: nowrap">Estatus</th>
-									<th style="white-space: nowrap; width:1%"></th>
+                                    <th style="white-space: nowrap">País</th>
+                                    <th style="white-space: nowrap">Tipo Suministro</th>
+                                    <th style="white-space: nowrap">Descripción</th>
+                                    <th style="white-space: nowrap">Identificador</th>
+                                    <th style="white-space: nowrap">Clave Certificado</th>
+                                    <th style="white-space: nowrap">Fuente Suministro</th>
+                                    <th style="white-space: nowrap">Planta Aprobada</th>
+                                    <th style="white-space: nowrap">Estatus</th>
 								</tr>
 							</thead>
 							<tbody>
 
-								@foreach (var entry in Model.AnalizadorList)
+								@foreach (var entry in Model.PlantasList)
 								{
 									<tr>
 										<td></td>
-										<td style="display: none;">
-											@entry.iD_ANALIZADOR
+										<td>
+											@{
+												foreach (var item in Model.PaisesList)
+												{
+													if (item.iD_PAIS == entry.iD_PAIS)
+													{
+														@item.nombre
+													}
+													else
+													{
+														@:
+													}
+												}
+											}
+										</td>
+										<td>
+											@{
+												foreach (var item in Model.TipoSuministrosList)
+												{
+													if (item.iD_TIPO_SUMINISTRO == entry.iD_TIPO_SUMINISTRO)
+													{
+														@item.descripcion
+													}
+													else
+													{
+														@:
+													}
+												}
+											}
 										</td>
 										<td>
 											@entry.descripcion
 										</td>
 										<td>
-											@entry.clavE_PALS
+											@entry.identificador
+										</td>
+										<td>
+											@entry.clavE_CERTIFICADO
 										</td>
 										<td>
 											@{
-												foreach (var item in Model.ProductosList)
+												if (Model.FuenteSuministroList != null)
 												{
-													if (item.iD_PRODUCTO == entry.iD_PRODUCTO)
+													foreach (var item in Model.FuenteSuministroList)
 													{
-															@item.nombrE_ESP
-													}
-													else
-													{
+														if (item.ID_FUENTE_SUMINISTRO == entry.ID_FUENTE_SUMINISTRO)
+														{
+															@item.descripcion
+														}
+														else
+														{
 															@:
+														}
+													}
+												}
+											}
+										</td>
+										<td>
+											@{
+												if (Model.PlantaAprobadaList != null)
+												{
+													foreach (var item in Model.PlantaAprobadaList)
+													{
+														if (item.ID_PLANTA_APROBADA == entry.ID_PLANTA_APROBADA)
+														{
+															@item.descripcion
+														}
+														else
+														{
+															@:
+														}
 													}
 												}
 											}
@@ -147,21 +178,13 @@
 											@{
 												if (Convert.ToBoolean(entry.iD_STATUS))
 												{
-														@: Activo
+													@: Activo
 												}
 												else
 												{
-														@: Inactivo
+													@: Inactivo
 												}
 											}
-										</td>
-										<td>
-											<a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_ANALIZADOR" class="btn btn-default btn-xs">
-												<i class="fa fa-trash-alt"></i>
-											</a>
-											<a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_ANALIZADOR'>
-												<i class='fa fa-edit'></i>
-											</a>
 										</td>
 									</tr>
 								}
@@ -279,6 +302,7 @@
 	<link href="~/plugins/gritter/css/jquery.gritter.css" rel="stylesheet" />
 
 	<link href="~/plugins/jquery/jquery.dataTables.min.css" rel="stylesheet" />
+	<link href="~/css/default.css" rel="stylesheet" />
 }
 
 @section scripts {
@@ -338,27 +362,6 @@
 			window.location.href = '@Url.Action("AnalizadorParametros", "CertCatalogos")';
 		}
 
-		var deleteOnClick = function (event) {
-			bootbox.confirm({
-				message: "¿Deseas eliminar el registro?",
-				buttons: {
-					confirm: {
-						label: 'Si',
-						className: 'btn-success'
-					},
-					cancel: {
-						label: 'No',
-						className: 'btn-danger'
-					}
-				},
-				callback: function (result) {
-					if (result) {
-						deleteConfirm(event);
-					}
-				}
-			});
-		};
-
 		var deleteOnClickAnalizadorParametros = function (event) {
 			bootbox.confirm({
 				message: "¿Deseas eliminar el registro?",
@@ -379,39 +382,6 @@
 				}
 			});
 		};
-
-		var deleteConfirm = function (event) {
-			var id = $(event).data("id");
-
-			if (id === -1) {
-				id = "";
-			}
-
-			$.ajax({
-				type: "POST",
-				url: pb.base + "/CertCatalogos/DeleteAnalizador/" + id,
-				dataType: "json",
-				success: function (response) {
-					if (response.message) {
-						$.gritter.add({
-							title: "Error",
-							text: response.message,
-							class_name: "gritter-light"
-						})
-					} else {
-						//sucess add, needs to refresh and show message
-						window.location.href = '@Url.Action("AnalizadorParametros", "CertCatalogos")';
-					}
-				},
-				failure: function (response) {
-					$.gritter.add({
-						title: "Error",
-						text: "Ocurrio un error, por favor comunicate con el Administrador",
-						class_name: "gritter-light"
-					})
-				}
-			});
-		}
 
 		var deleteConfirmAnalizadorParametros = function (event) {
 			var id = $(event).data("id");
@@ -508,20 +478,6 @@
 			}
 		}
 
-		var getEditRow = function (Id) {
-			var ret = null;
-			$.ajax({
-				async: false,
-				url: pb.base + "/CertCatalogos/GetAnalizadorHTMLTagsById/" + Id,
-				dataType: "json",
-				success: function (data) {
-					ret = data.html;
-				}
-			});
-
-			return ret;
-		};
-
 		var getEditRowAnalizadorParametros = function (Id) {
 			var ret = null;
 			$.ajax({
@@ -534,18 +490,6 @@
 			});
 
 			return ret;
-		};
-
-		var getNewRow = function () {
-			var result = "<tr>" +
-				"<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-				"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
-				"<td><input class='form-control' maxlength='50' id='descripcion' type='text'></td>" +
-				"<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'></td>" +
-				"<td>@Html.Raw(productoTag)</td>" +
-				"<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
-				"</tr>"
-			return result;
 		};
 
 		var getNewRowAnalizadorParametro = function (Id) {
@@ -912,6 +856,28 @@
 				}
 				$('.selectpicker').selectpicker();
 		};
+
+		 document.addEventListener('DOMContentLoaded', function() {
+            const switchElement = document.getElementById('showAllSwitch');
+
+            switchElement.addEventListener('change', function() {
+                if (this.checked) {
+                    onSwitchActive();
+                } else {
+                    onSwitchInactive();
+                }   
+            });
+
+            function onSwitchActive() {
+                console.log('El switch está activo');
+                window.location.href = '@Url.Action("AnalizadorParametros", "CertCatalogos")?showAll=true';
+            }
+
+            function onSwitchInactive() {
+                console.log('El switch está inactivo');
+                window.location.href = '@Url.Action("AnalizadorParametros", "CertCatalogos")?showAll=false';
+            }
+        });
 
 		$(document).ready(function () {
 			App.init();
