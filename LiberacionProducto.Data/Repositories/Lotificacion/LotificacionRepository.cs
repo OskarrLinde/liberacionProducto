@@ -600,6 +600,12 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                 Direction = ParameterDirection.Output
                             };
 
+                            // Reemplazar punto por coma si es necesario                            
+                            if (item.ValorAnalisis.Contains(".") && !item.ValorAnalisis.Contains(","))
+                            {
+                                item.ValorAnalisis = item.ValorAnalisis.Replace(".", ",");
+                            }
+
                             using (var command = new SqlCommand("sp_EditarLotificacionDetalle", connection, transaction))
                             {
                                 command.CommandType = CommandType.StoredProcedure;
