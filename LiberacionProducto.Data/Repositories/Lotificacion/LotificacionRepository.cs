@@ -398,7 +398,8 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                 var tanque = new CatTanques
                                 {
                                     idTanque = reader.GetInt32(reader.GetOrdinal("idTanque")),
-                                    DescTanque = reader.GetString(reader.GetOrdinal("DescTanque"))
+                                    DescTanque = reader.GetString(reader.GetOrdinal("DescTanque")),
+                                    descGrado = reader.GetString(reader.GetOrdinal("descGrado"))
                                 };
                                 lstcattanque.Add(tanque);
                             }
@@ -466,6 +467,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             command.Parameters.Add(new SqlParameter("@LoteOrigen", data.MasterData.LoteOrigen));
                             command.Parameters.Add(new SqlParameter("@UsrAlta", Convert.ToInt32(data.MasterData.UsrAlta)));
                             command.Parameters.Add(new SqlParameter("@EstatusAnalisis", Convert.ToInt32(data.MasterData.Estatus_Analisis)));
+                            command.Parameters.Add(new SqlParameter("@EstatusRevision", Convert.ToInt32(data.MasterData.Estatus_Revision)));
                             command.Parameters.Add(nuevoIdAnalisisParam);
 
                             command.ExecuteNonQuery();

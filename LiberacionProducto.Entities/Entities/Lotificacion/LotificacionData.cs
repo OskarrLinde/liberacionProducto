@@ -28,6 +28,7 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
         public string LoteOrigen { get; set; } // Lote de origen
         public int UsrAlta { get; set; }
         public int Estatus_Analisis { get; set; }
+        public int Estatus_Revision { get; set; }
                                                
     }
 

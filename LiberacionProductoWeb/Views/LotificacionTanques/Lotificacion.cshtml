@@ -133,6 +133,7 @@
                                         </div>
                                         <div class="col-md-5">
                                             <input class='form-control' id='LoteOrigen' type='text'>
+                                            <input class='form-control' id='idGradoSeleccionado' type='hidden'>
                                         </div>
                                     </div>
                                 </div>
@@ -598,6 +599,18 @@
                             // Aquí puedes agregar la funcionalidad que debe ocurrir después de guardar los datos
                             $("#dynamicSelectTank").empty();
                             $("#dynamicSelectTank").prop("disabled", false);
+
+                            // Crear el elemento select
+                            // var select = $('<select class="form-control"></select>');
+
+                            // // Agregar la opción por defecto
+                            // select.append($('<option>', {
+                            //     value: '',
+                            //     text: 'Seleccione un Tanque'
+                            // }));
+
+
+
                             $('#dynamicSelectTank').append($('<option>',
                                 {
                                     value: '',
@@ -606,17 +619,29 @@
 
                             if (Array.isArray(response.data)) {
                                 response.data.forEach(function (item) {
-                                    $("#dynamicSelectTank").append($('<option>',
-                                        {
-                                            value: item.idTanque,
-                                            text: item.descTanque
-                                        }));
+                                    // $("#dynamicSelectTank").append($('<option>',
+                                    //     {
+                                    //         value: item.idTanque,
+                                    //         text: item.descTanque
+                                    //     }));
+                                    var option = $('<option></option>')
+                                        .val(item.idTanque)
+                                        .text(item.descTanque)
+                                        .data('descGrado', item.descGrado); // Agregar el descGrado como data
+
+                                    $('#dynamicSelectTank').append(option);
                                 });
                             }
                             else {
                                 console.error("La respuesta no es un array. Estructura inesperada.");
                             }
+
+                            // // Agregar el select al elemento dropdown existente
+                            // $("#dynamicSelectTank").append(select).prop("disabled", false);
+
                             $('#dynamicSelectTank').selectpicker('refresh');
+
+                            
 
                         },
                         error: function (xhr, status, error) {
@@ -650,6 +675,15 @@
 
             $("#dynamicSelectTank").change(function ()
             {
+                // Obtener la opción seleccionada en el select con id #dynamicSelectTank
+                var selectedOption = $('#dynamicSelectTank option:selected');
+
+                var descGrado = selectedOption.data('descGrado');
+
+                // Guardar el valor en el input con id #idGradoSeleccionado
+                $('#idGradoSeleccionado').val(descGrado);
+                
+
                 if (notifyInstanceTank)
                 {
                     //$(".custom-notifyTanque").remove();
@@ -851,6 +885,7 @@
                 $('#btnGenerateLoteTanque').click(function () {
                     var tanqueSeleccionado = $('#dynamicSelectTank').val();
                     var tanqueSeleccionadoText = $("#dynamicSelectTank option:selected").text();
+                    var GradoTanque = $('#idGradoSeleccionado').val();
 
                     idPlantaSeleccionado = $('#dynamicSelectPlant').val();
                     // console.log("tanque seleccionada Val:", tanqueSeleccionado);
@@ -1045,7 +1080,8 @@
                             Comentarios: $('#commentarios').val(),
                             LoteOrigen: $('#LoteOrigen').val(),
                             UsrAlta: idUsuarioAlta,
-                            Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6
+                            Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6,
+                            Estatus_Revision: GradoTanque.toLowerCase().includes("medicinal") ? 3 : 8
                         };
 
                         //console.log("Datos a enviar:", masterData);

@@ -10,5 +10,6 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
     {
         public int idTanque { get; set; }
         public string DescTanque { get; set; }
+        public string descGrado { get; set; }
     }
 }
