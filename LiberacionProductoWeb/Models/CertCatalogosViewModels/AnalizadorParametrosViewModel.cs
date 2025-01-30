@@ -32,13 +32,30 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         public List<Metodo> MetodoList { get; set; }
         public List<SelectListItem> MetodoFilter { get; set; }
 
-        // List Excel Export
-        public List<AnalizadorParametros> AnalizadorParametrosExportExcelList { get; set; }
+		// Pais Lista
+		public List<Paises> PaisesList { get; set; }
+		public List<SelectListItem> PaisesFilter { get; set; }
+
+		// Tipo Suministros Lista
+		public List<TipoSuministros> TipoSuministrosList { get; set; }
+		public List<SelectListItem> TipoSuministrosFilter { get; set; }
+
+		// Fuente Suministro Lista
+		public List<FuenteSuministro> FuenteSuministroList { get; set; }
+		public List<SelectListItem> FuenteSuministroFilter { get; set; }
+
+		// Planta Aprobada Lista
+		public List<PlantaAprobada> PlantaAprobadaList { get; set; }
+		public List<SelectListItem> PlantaAprobadFilter { get; set; }
+
+		// List Excel Export
+		public List<AnalizadorParametros> AnalizadorParametrosExportExcelList { get; set; }
         public List<SelectListItem> AnalizadorParametrosExportExcelFilter { get; set; }
 
         //messages views
         public String MensajeInfo { get; set; }
         public String MensajeError { get; set; }
+        public bool showAll { get; set; }
     }
 
     public class AnalizadorParametros
