@@ -709,7 +709,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                         //IdProducto = reader.GetInt32(10), 
                                         Detalles = new List<DetalleAnalisisTanque>()
                                     };
-
+                                     
                                     analisisDict[idAnalisis] = analisis;
                                 }
 
