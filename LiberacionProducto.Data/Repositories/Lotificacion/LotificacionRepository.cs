@@ -710,7 +710,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                         Detalles = new List<DetalleAnalisisTanque>()
                                     };
                                      
-                                    analisisDict[idAnalisis] = analisis;
+                                    analisisDict[idAnalisis] = analisis; 
                                 }
 
                                 // Agregar el detalle solo si id_parametro no es nulo
