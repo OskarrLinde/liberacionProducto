@@ -11,5 +11,6 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
         public int IdAnalizador { get; set; }
         public string DescAnalizador { get; set; }
         public int IdMetodo { get; set; }
+        public string descMetodo { get; set; }
     }
 }

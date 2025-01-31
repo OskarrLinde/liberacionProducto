@@ -93,5 +93,10 @@ namespace LiberacionProducto.Services.Implementation.Lotificacion
         {
             return await _lotificacionRepository.GetPermisosUsuario(idUsuario);
         }
+
+        public string EditarLoteEstatusRevision(EditarEstatusRevisionData data)
+        {
+            return  _lotificacionRepository.EditarLoteEstatusRevision(data);
+        }
     }
 }

@@ -9,6 +9,8 @@
 
 
 <script src="~/lib/sweetalert/sweetalert2.min.js"></script>
+
+
 @* 
 <script src="~/lib/notify/notify.min.js"></script>
  *@
@@ -618,16 +620,30 @@
                                 }));
 
                             if (Array.isArray(response.data)) {
-                                response.data.forEach(function (item) {
-                                    // $("#dynamicSelectTank").append($('<option>',
-                                    //     {
-                                    //         value: item.idTanque,
-                                    //         text: item.descTanque
-                                    //     }));
+                                response.data.forEach(function (item) {                                   
+
+                                    var optionText = item.descTanque;                                  
+
+                                    // Comprobar si descGrado incluye la palabra "medicinal"
+                                    if (item.descGrado.toLowerCase().includes("medicinal")) {
+                                        optionText += ' ⚠️ Grado Medicinal';                                       
+                                    }
+
                                     var option = $('<option></option>')
                                         .val(item.idTanque)
-                                        .text(item.descTanque)
+                                        //.text(item.descTanque)
+                                        .html(optionText)
                                         .data('descGrado', item.descGrado); // Agregar el descGrado como data
+                                        // .attr('data-alert-icon', optionTitle) // Agregar el data-attribute para la leyenda
+                                        //.attr('title', '');  // Asegurar que title esté vacío
+                                        //.attr('title', optionTitle) // Agregar el atributo title con la leyenda
+                                        // .attr('data-toggle', 'tooltip') // Activar tooltip de Bootstrap
+                                        // .attr('data-placement', 'right'); // Colocar el tooltip a la derecha
+
+                                    //Agregar el ícono de alerta como atributo de datos para su uso en otros lugares
+                                    // if (optionTitle !== '') {
+                                    //     option.data('alertIcon', 'Grado medicinal ⚠️'); // Emoji de alerta
+                                    // }
 
                                     $('#dynamicSelectTank').append(option);
                                 });
@@ -885,6 +901,15 @@
                 $('#btnGenerateLoteTanque').click(function () {
                     var tanqueSeleccionado = $('#dynamicSelectTank').val();
                     var tanqueSeleccionadoText = $("#dynamicSelectTank option:selected").text();
+
+                            // Expresión regular para eliminar el ícono ⚠️ y el texto "Grado medicinal"
+                    // tanqueSeleccionadoText = tanqueSeleccionadoText.replace(/ ⚠️ Grado medicinal/, '').trim();
+                    // tanqueSeleccionadoText = tanqueSeleccionadoText.replace(/ ⚠️$/, '').replace(/Grado Medicinal /, '').trim();
+                            // Expresión regular para eliminar el ícono ⚠️ y el texto "Grado medicinal", en cualquier orden
+                    tanqueSeleccionadoText = tanqueSeleccionadoText.replace(/ ⚠️/g, '').replace(/Grado Medicinal/g, '').trim();
+
+                    console.log(tanqueSeleccionadoText);
+
                     var GradoTanque = $('#idGradoSeleccionado').val();
 
                     idPlantaSeleccionado = $('#dynamicSelectPlant').val();

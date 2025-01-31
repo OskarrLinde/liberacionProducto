@@ -27,11 +27,14 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
             public string? Comentarios { get; set; }
             public string? LoteOrigen { get; set; }
             public string? Estatus { get; set; }
+            public int? Estatus_RevisionVal { get; set; }
+            public string? Estatus_Revision { get; set; }
             public DateTime? FechaAlta { get; set; }
             public string? UsrAlta { get; set; }
             public int GetUseralta { get; set; }
             public bool PermisoUser { get; set; }
             public bool PermisoUserAdmin { get; set; }
+            public bool PermisoRevisionLote { get; set; }
             public List<DetalleAnalisisTanque> Detalles { get; set; }
         }
 

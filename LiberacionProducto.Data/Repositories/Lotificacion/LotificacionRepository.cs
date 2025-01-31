@@ -256,6 +256,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                     IdAnalizador = reader.GetInt32(0),
                                     DescAnalizador = reader.GetString(1),
                                     IdMetodo = reader.GetInt32(2),
+                                    descMetodo = reader.GetString(3)
                                 };
                                 lstAnalizadores.Add(analizador);
                             }
@@ -702,6 +703,8 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                         Comentarios = reader.IsDBNull(reader.GetOrdinal("comentarios")) ? null : reader.GetString(reader.GetOrdinal("comentarios")),
                                         FechaAlta = reader.IsDBNull(reader.GetOrdinal("FEC_ALTA")) ? null : reader.GetDateTime(reader.GetOrdinal("FEC_ALTA")),
                                         Estatus = reader.IsDBNull(reader.GetOrdinal("DESCRIPCION_ESTATUS")) ? null : reader.GetString(reader.GetOrdinal("DESCRIPCION_ESTATUS")),
+                                        Estatus_RevisionVal = reader.IsDBNull(reader.GetOrdinal("ESTATUS_REVISION")) ? null : reader.GetInt32(reader.GetOrdinal("ESTATUS_REVISION")),
+                                        Estatus_Revision = reader.IsDBNull(reader.GetOrdinal("descEstatusRevision")) ? null : reader.GetString(reader.GetOrdinal("descEstatusRevision")),
 
                                         UsrAlta = reader.IsDBNull(reader.GetOrdinal("nomUsuarioAlta")) ? null : reader.GetString(reader.GetOrdinal("nomUsuarioAlta")),
                                         GetUseralta = reader.GetInt32("Usr_Alta"),
@@ -865,6 +868,63 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                 // Aquí podrías registrar el error o tomar alguna acción específica
             }
             return lstPermisosUsuario;
+        }
+
+        public string EditarLoteEstatusRevision(EditarEstatusRevisionData data)
+        {
+            var _connectionString2 = "Data Source=MLGMTY00DBTST01;Database=CertAnaliticosBulkDB;User Id=syscer_a; Password=Test394mx;";
+            CultureInfo culture = new CultureInfo("es-ES");
+
+            using (var connection = new SqlConnection(_connectionString2))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Declarar el parámetro de salida para el Resultado
+                        var ResultadoParam = new SqlParameter("@Resultado", SqlDbType.Int)
+                        {
+                            Direction = ParameterDirection.Output
+                        };
+
+
+                        // Guardar datos en la tabla maestra y obtener el nuevo IdAnalisis
+                        using (var command = new SqlCommand("sp_EditarLoteEstatusRevision", connection, transaction))
+                        {
+                            command.CommandType = CommandType.StoredProcedure;
+                            command.Parameters.Add(new SqlParameter("@IdAnalisis", data.IdAnalisis));                            
+                            command.Parameters.Add(new SqlParameter("@EstatusRevision", Convert.ToInt32(data.Estatus_Revision)));
+                            command.Parameters.Add(new SqlParameter("@Comentarios", data.Comentarios));
+                            command.Parameters.Add(ResultadoParam);
+
+                            command.ExecuteNonQuery();
+                        }
+
+                        int ResultadoEstatusRevisionLote = (int)ResultadoParam.Value;
+
+                        transaction.Commit();
+
+                        return ResultadoEstatusRevisionLote.ToString();
+                    }
+                    catch (SqlException sqlEx)
+                    {
+                        // Manejo de excepciones específicas de SQL
+                        //Console.WriteLine($"SQL Error: {sqlEx.Message}");
+                        // Aquí podrías registrar el error o tomar alguna acción específica
+                        transaction.Rollback();
+                        return sqlEx.Message;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Manejo de excepciones generales
+                        //Console.WriteLine($"Error: {ex.Message}");
+                        // Aquí podrías registrar el error o tomar alguna acción específica
+                        transaction.Rollback();
+                        return ex.Message;
+                    }
+                }
+            }
         }
 
     }

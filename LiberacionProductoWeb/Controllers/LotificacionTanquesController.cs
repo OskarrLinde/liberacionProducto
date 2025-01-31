@@ -296,6 +296,22 @@ namespace LiberacionProductoWeb.Controllers
                                 }
                             });
                         }
+
+                        //Se utiliza para ver los permisos de Aceptar o rechazar el lote generado cuando es producto medicinal
+                        //Primero validar si el usuario logueado tiene permiso para entrar al modulo de listado de lotes.
+                        bool tienePermisoGetListadoLotificacionUser = permisosUsuario.Any(p => p.nombrePermiso.Equals("GetListadoLotificacionUser") && p.tienePermiso);
+                        if(tienePermisoGetListadoLotificacionUser)
+                        {
+                            // Actualizar el campo PermisoRevisionLote a true donde GetListadoLotificacionUser coincida con el criterio
+                            datos.ForEach(item =>
+                            {
+                                if (item.GetUseralta != userInfo.ExternalId)
+                                {
+                                    item.PermisoRevisionLote = true;
+                                }
+                            });
+                        }
+
                     }
                 }
 
@@ -307,6 +323,23 @@ namespace LiberacionProductoWeb.Controllers
                 Console.WriteLine($"Error al obtener analizadores: {ex.Message}");
                 return StatusCode(500, "Error interno del servidor");
             }
+        }
+
+
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> EditarLoteEstatusRevision(EditarEstatusRevisionData data)
+        {
+            try
+            {                
+                var retVal = _lotificacionService.EditarLoteEstatusRevision(data);
+                return Ok(retVal);                  
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error al cancelar el lote: " + ex.Message);
+            }
+
         }
     }
 }

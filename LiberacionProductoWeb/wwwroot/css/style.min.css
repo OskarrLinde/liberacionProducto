@@ -14892,6 +14892,11 @@ td.difuminado .no-difuminar {
     display: none;
 }
 
+
+.hiddenListadoLotes_permisoRevisionLote {
+    display: none;
+}
+
 .hiddenListadoLotes_UMNIValue {
     display: none;
 }
@@ -14909,6 +14914,15 @@ td.difuminado .no-difuminar {
     .form-inline .form-check {
         justify-content: left;
         /*align-items: flex-start !important;*/
+    }
+}
+
+@media (min-width: 576px) {
+    .form-inline .form-control {
+        display: inline-block;
+        width: 100%;
+        /* width: auto; */ /* Este comentario indica que se ha eliminado el width auto */
+        vertical-align: middle;
     }
 }
 

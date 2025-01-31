@@ -190,6 +190,9 @@
                                                 <th>Comentarios</th>
                                                 <th>Fecha Alta</th>
                                                 <th>Estatus</th>
+
+                                                <th class="hiddenListadoLotes_Maestra">Estatus Revisión</th>
+
                                                 <th>Estatus Revisión</th>
                                                 <th>Creado por</th>
                                                 <th class="hiddenListadoLotes_user">user</th>
@@ -214,6 +217,9 @@
                                                 <th><input type="text" placeholder="" /></th>
                                                 <th><input type="text" placeholder="" /></th>
                                                 <th><input type="text" placeholder="" /></th>
+
+                                                <th class="hiddenListadoLotes_Maestra"><input type="text" placeholder="" /></th>
+
                                                 <th><input type="text" placeholder="" /></th>
                                                 <th><input type="text" placeholder="" /></th>
                                                 <th class="hiddenListadoLotes_user"><input type="text" placeholder="" /></th>
@@ -547,6 +553,7 @@
                             item.comentariosNormalized = normalizeData(item.comentarios);
                             item.fechaAltaNormalized = normalizeData(item.fechaAlta);
                             item.estatusNormalized = normalizeData(item.estatus);
+                            item.estatus_RevisionNormalized = normalizeData(item.estatus_Revision);
                             item.usrAltaNormalized = normalizeData(item.usrAlta);
                             if (item.detalles) {
                                 item.detalles.forEach(function (detalle)
@@ -610,11 +617,16 @@
                                         return data !== null ? data : '';
                                     }
                                 },
+                                { "data": "permisoRevisionLote", "className": "hiddenListadoLotes_permisoRevisionLote" },
                                 {
-                                    "data": null,
+                                    "data": "estatus_Revision",
                                     "defaultContent": "N/A",
                                     "render": function (data, type, row, meta) {
-                                        return "N/A"; // Valor predeterminado para la columna "Estatus Revisión"
+                                        return data;
+                                        // if (row.permisoRevisionLote ) {
+                                           // return '<span class="red-text">' + data + '</span>';
+                                        // }
+                                        // return "N/A"; // Valor predeterminado para la columna "Estatus Revisión"
                                     }
                                 },
                                 { "data": "usrAlta" },
@@ -635,7 +647,7 @@
                                         //     return '';
                                         // }
 
-                                         if (row.permisoUser && (row.estatus == 'CANCELADO')) {
+                                        if (row.permisoUser && (row.estatus == 'CANCELADO')) {
                                             return '<button class="btn btn-success reactivar-btnRow" disabled>Reactivar</button>';
                                         }
                                         else if (row.permisoUserAdmin && (row.estatus != 'CANCELADO')) {
@@ -708,6 +720,7 @@
                                                 item.comentariosNormalized.includes(searchValue) ||
                                                 item.fechaAltaNormalized.includes(searchValue) ||
                                                 item.estatusNormalized.includes(searchValue) ||
+                                                item.estatus_RevisionNormalized.includes(searchValue) ||
                                                 item.usrAltaNormalized.includes(searchValue);
                                     });
                                     table.clear().rows.add(filteredData).draw();
@@ -795,7 +808,7 @@
                                 console.log(rowData);
                                 if (rowData && rowData.hasOwnProperty('detalles')) {
                                     var detalle = rowData.detalles;
-                                    row.child(generarDetalle(detalle, rowData.idAnalisis, false)).show();
+                                    row.child(generarDetalle(detalle, rowData.idAnalisis, false, rowData.permisoRevisionLote, rowData.estatus_RevisionVal)).show();
                                     tr.addClass('shown');
                                 }
                                 else {
@@ -811,7 +824,7 @@
                             }
                         });
 
-                        function generarDetalle(detalleData, rowIdAnalisis, flagPermisoUser) {
+                        function generarDetalle(detalleData, rowIdAnalisis, flagPermisoUser, flagPermisoRevisionEstatus, estatus_RevisionVal) {
                             // console.log("Objeto recibido: ");
                             console.log(detalleData);
 
@@ -846,7 +859,33 @@
                                 mensaje = mensajeGuardado;
                             }
 
-                            var detalleHtml = ' <div id="targetMensaje" class="mt-3 target-div">' + mensaje + '</div><br><table class="compact-table tablecentradamin" border="0" >';
+                            var permisoRevisionEstatusDetalleHtml = '';
+                            console.log(flagPermisoRevisionEstatus);
+                            console.log(estatus_RevisionVal);
+                            if (flagPermisoRevisionEstatus && estatus_RevisionVal == 3) //PENDIENTE
+                            {
+                                       permisoRevisionEstatusDetalleHtml = ' <br> <div id="" class="mt-3 target-div">' +
+                                                        '<div class="row">' +
+                                                           '<div class="col-12 text-left">' + // Botones alineados a la izquierda ocupando 12 columnas
+                                                              '<button class="cumplelote">Cumple</button>' +
+                                                              '<button class="nocumplelote">No Cumple</button>' +
+                                                           '</div>' +
+                                                        '</div>' +
+                                                        '<div class="row mt-2">' +
+                                                           '<div class="col-12">' + // Textarea ocupando 12 columnas
+                                                              '<textarea class="form-control" id="comentarios_estatusrevision" placeholder="Escribe tus comentarios aquí..."></textarea>' +
+                                                           '</div>' +
+                                                        '</div>' +
+                                                        '</div> <br>';
+                            }
+
+
+                            var detalleHtml = permisoRevisionEstatusDetalleHtml + ' <div id="targetMensaje" class="mt-3 target-div">' + mensaje + '</div><br><table class="compact-table tablecentradamin" border="0" >';
+
+                            // Verificar si flagPermisoRevisionEstatus es igual a "PENDIENTE"
+                           
+
+
                             detalleHtml += '<tr>' +
                                 '<th class="hiddenListadoLotes_detail">IdPlanta</th>' +
                                 '<th class="hiddenListadoLotes_detail">IdParámetro</th>' +
@@ -862,7 +901,9 @@
                                 '<th class="hiddenLotificacion_UM">&nbsp;</th>' +
                                 '<th class="hiddenLotificacion_UM">Analizador Original</th>' +
                                 '<th class="hiddenListadoLotes_detail">Método Analítico</th>' +
-                                '<th class="hiddenListadoLotes_detail idMetodoOriginal">Método Analítico Original</th>';
+                                '<th class="hiddenListadoLotes_detail idMetodoOriginal">Método Analítico Original</th>' +
+                                '<th>Método Analítico Original</th>' +
+                                '<th class="hiddenListadoLotes_detail">Método Analítico Original desc</th>';
 
                                 // Agregar columna adicional si permisoUsuario es true
                                 if (flagPermisoUser)
@@ -888,7 +929,9 @@
                                     '<td class="hiddenLotificacion_UM idAnalizadorValueDesc">' + item.idAnalizador +' </td>' +
                                     '<td class="hiddenListadoLotes_analizador IdAnalizadorOriginal">' + item.idAnalizadorVal + '</td>' +
                                     '<td class="hiddenListadoLotes_detail idMetodo">' + item.idMetodoVal + '</td>' +
-                                    '<td class="hiddenListadoLotes_detail idMetodoOriginal">' + item.idMetodoVal + '</td>';
+                                    '<td class="hiddenListadoLotes_detail idMetodoOriginal">' + item.idMetodoVal + '</td>' +
+                                    '<td class="descdMetodoOriginal">' + item.idMetodo + '</td>' +
+                                    '<td class="hiddenListadoLotes_detail descdMetodoOriginaldesc">' + item.idMetodo + '</td>' ;
 
                                     // Agregar botón de acción si permisoUsuario es true
                                     if (flagPermisoUser)
@@ -933,7 +976,7 @@
                             var rowData = row.data();
                             if (rowData && rowData.hasOwnProperty('detalles')) {
                                 var detalle = rowData.detalles;
-                                row.child(generarDetalle(detalle, rowData.idAnalisis, true)).show();
+                                row.child(generarDetalle(detalle, rowData.idAnalisis, true, false, rowData.estatus_RevisionVal)).show();
                                 tr.addClass('shown');
 
                                 // Aqui iria la logica de edicion por cada registro mostrado en la tabla de deetalle
@@ -1004,7 +1047,243 @@
 
                         });
 
-                        $(document).off('click', '.editarparametro').on('click', '.cancelarLoteEditado', function () {
+
+                        $(document).off('click', '.cumplelote').on('click', '.cumplelote', function () {
+                            // Obtener el botón "Cumple" clickeado
+                            var button = $(this);
+
+                            // Obtener el `tr` que contiene el botón "Cumple"
+                            var parentRow = button.closest('tr');                                                    
+
+                            // Encontrar el `textarea` dentro del mismo `tr`
+                            var textareaComentarios = parentRow.find('#comentarios_estatusrevision').val();
+
+                            // Obtener el `tr` anterior al `tr` actual
+                            var previousRow = parentRow.prev('tr');
+
+                            var idAnalisisEstatusRevision = previousRow.find('.hiddenListadoLotes_Analisis').text();
+                            var idLoteEstatusRevision = previousRow.find('.noLoteDesc').text();
+
+                           
+                            var row = table.row(previousRow);
+
+                            // Almacenar los datos originales de la fila utilizando el index de la fila como clave
+                            var rowIndex = row.index();
+                            originalData[rowIndex] = $.extend(true, {}, row.data());
+
+                            var datosEstatusRevision = {
+                                    IdAnalisis: idAnalisisEstatusRevision,
+                                    Estatus_Revision: 9,
+                                    Comentarios: textareaComentarios
+                                };
+
+                            // console.log(datosEstatusRevision);
+
+                            $.ajax({
+                                    type: 'POST',
+                                    url: pb.base + '/LotificacionTanques/EditarLoteEstatusRevision',                                    
+                                    data: datosEstatusRevision,
+                                    success: function (response) {
+                                        console.log(response);
+                                        if (response == "1") {
+                                            Swal.fire({
+                                                title: "Lote Aprobado:",
+                                                text: idLoteEstatusRevision,
+                                                icon: "success",
+                                                button: "Aceptar",
+                                                allowOutsideClick: false, // Bloquear clics fuera del modal
+                                                allowEscapeKey: false, // Bloquear la tecla ESC
+                                                allowEnterKey: false // Bloquear la tecla Enter
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    // Restaurar los datos originales de la fila utilizando el index de la fila como clave
+                                                    var rowIndex = row.index();
+                                                    if (originalData[rowIndex]) {
+                                                        row.data(originalData[rowIndex]).draw();
+                                                        delete originalData[rowIndex]; // Elimina los datos originales almacenados
+                                                    }
+
+                                                    // Guardar la página actual
+                                                    var currentPage = table.page();
+                                               
+
+                                                    if (row.child.isShown()) {
+                                                        row.child.hide();
+                                                        previousRow.removeClass('shown');
+
+                                                        // var rowData = row.data();
+                                                        // var actionsCell = currentRow.find('td:last');
+
+                                                        // if (rowData.permisoUser) {
+                                                        //     actionsCell.html('<button class="btn btn-primary editarlote">Editar Lote</button>');
+
+                                                        //     var cellValueNivelInicial = currentRow.find(".nivelinicial");
+                                                        //     cellValueNivelInicial.html(valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"));
+
+                                                        //     var cellValueNivelFinal = currentRow.find(".nivelfinal");
+                                                        //     cellValueNivelFinal.html(valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"));
+                                                        // }
+                                                    }
+
+                                                    // // Volver a la página guardada
+                                                    table.page(currentPage).draw(false);
+
+                                                     // Después de cada búsqueda, eliminar iconos de ordenamiento
+                                                    $('#lotificacionTable thead th').removeClass('sorting sorting_asc sorting_desc');
+                                                }
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Swal.fire({
+                                                title: "Lote Aprobado:",
+                                                text: "Algo salio mal" + response,
+                                                icon: "error",
+                                                button: "Aceptar",
+                                                allowOutsideClick: false, // Bloquear clics fuera del modal
+                                                allowEscapeKey: false, // Bloquear la tecla ESC
+                                                allowEnterKey: false // Bloquear la tecla Enter
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+
+                                                    // Restaurar los datos originales de la fila utilizando el index de la fila como clave
+                                                    // var rowIndex = row.index();
+                                                    // if (originalData[rowIndex]) {
+                                                    //     row.data(originalData[rowIndex]).draw();
+                                                    //     delete originalData[rowIndex]; // Elimina los datos originales almacenados
+                                                    // }
+
+                                                    // // // Quitar la clase de difuminado de la fila
+                                                    // $('td', tr).removeClass('difuminado no-difuminar');
+
+                                                    // // Volver a la página guardada
+                                                    // table.page(currentPage).draw(false);
+
+                                                    // // Después de cada búsqueda, eliminar iconos de ordenamiento
+                                                    // $('#lotificacionTable thead th').removeClass('sorting sorting_asc sorting_desc');
+                                                }
+                                            });
+                                        }
+
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.log('Error al guardar los datos: ' + error);
+                                    }
+                                });
+                        });
+
+                        $(document).off('click', '.nocumplelote').on('click', '.nocumplelote', function () {
+                             var allValid = true;
+                             // Obtener el botón "No Cumple" clickeado
+                            var button = $(this);
+
+                            // Obtener el `tr` que contiene el botón "No Cumple"
+                            var parentRow = button.closest('tr');
+
+                            // Encontrar el `textarea` dentro del mismo `tr`
+                            var textareaComentarios = parentRow.find('#comentarios_estatusrevision').val();
+
+                            // Comprobar si el valor del textarea está vacío
+                            if (!textareaComentarios) {
+                                allValid = false;
+                                alert('Escribe un comentario antes de rechazar, no debe estar vacío.');
+                                return;
+                            }
+
+                            // Obtener el `tr` anterior al `tr` actual
+                            var previousRow = parentRow.prev('tr');
+
+                            var idAnalisisEstatusRevision = previousRow.find('.hiddenListadoLotes_Analisis').text();
+                            var idLoteEstatusRevision = previousRow.find('.noLoteDesc').text();
+
+                            var datosEstatusRevision = {
+                                    IdAnalisis: idAnalisisEstatusRevision,
+                                    Estatus_Revision: 10,
+                                    Comentarios: textareaComentarios
+                                };
+
+                            // console.log(datosEstatusRevision);
+
+                             if (allValid)
+                             {
+                                    $.ajax({
+                                    type: 'POST',
+                                    url: pb.base + '/LotificacionTanques/EditarLoteEstatusRevision',
+                                    data: datosEstatusRevision,
+                                    success: function (response) {
+                                        console.log(response);
+                                        if (response == "1") {
+                                            Swal.fire({
+                                                title: "Lote Rechazado:",
+                                                text: idLoteEstatusRevision,
+                                                icon: "success",
+                                                button: "Aceptar",
+                                                allowOutsideClick: false, // Bloquear clics fuera del modal
+                                                allowEscapeKey: false, // Bloquear la tecla ESC
+                                                allowEnterKey: false // Bloquear la tecla Enter
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+                                                    // Restaurar los datos originales de la fila utilizando el index de la fila como clave
+                                                    // var rowIndex = row.index();
+                                                    // if (originalData[rowIndex]) {
+                                                    //     row.data(originalData[rowIndex]).draw();
+                                                    //     delete originalData[rowIndex]; // Elimina los datos originales almacenados
+                                                    // }
+
+
+
+                                                    // // Volver a la página guardada
+                                                    // table.page(currentPage).draw(false);
+                                                }
+                                            });
+                                        }
+                                        else
+                                        {
+                                            Swal.fire({
+                                                title: "Lote Rechazado:",
+                                                text: "Algo salio mal" + response,
+                                                icon: "error",
+                                                button: "Aceptar",
+                                                allowOutsideClick: false, // Bloquear clics fuera del modal
+                                                allowEscapeKey: false, // Bloquear la tecla ESC
+                                                allowEnterKey: false // Bloquear la tecla Enter
+                                            }).then((result) => {
+                                                if (result.isConfirmed) {
+
+                                                    // Restaurar los datos originales de la fila utilizando el index de la fila como clave
+                                                    // var rowIndex = row.index();
+                                                    // if (originalData[rowIndex]) {
+                                                    //     row.data(originalData[rowIndex]).draw();
+                                                    //     delete originalData[rowIndex]; // Elimina los datos originales almacenados
+                                                    // }
+
+                                                    // // // Quitar la clase de difuminado de la fila
+                                                    // $('td', tr).removeClass('difuminado no-difuminar');
+
+                                                    // // Volver a la página guardada
+                                                    // table.page(currentPage).draw(false);
+
+                                                    // // Después de cada búsqueda, eliminar iconos de ordenamiento
+                                                    // $('#lotificacionTable thead th').removeClass('sorting sorting_asc sorting_desc');
+                                                }
+                                            });
+                                        }
+
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.log('Error al guardar los datos: ' + error);
+                                    }
+                                });
+                             }
+
+                         
+                        });
+
+
+
+
+
+                        $(document).off('click', '.cancelarLoteEditado').on('click', '.cancelarLoteEditado', function () {
                             var tr = $(this).closest('tr');
                             var row = table.row(tr);
 
@@ -1349,6 +1628,7 @@
                             var currentValAnalizadorText = cellValorAnalizador.text();
 
                             var idMetodoCell = currentRow.find('.idMetodo');
+                            var descMetodoCell = currentRow.find('.descdMetodoOriginal');
 
                             //console.log(cellValorAnalizador.text());
                             // console.log(currentValAnalizadorText);
@@ -1367,12 +1647,13 @@
                                     // Crear el elemento select
                                     var select = $('<select class="form-control"></select>');
                                     // Iterar sobre la respuesta y agregar opciones al select
-                                    //console.log(response);
+                                    console.log(response);
                                     response.forEach(function (analizador, index) {
                                         var option = $('<option></option>')
                                             .val(analizador.idAnalizador)
                                             .text(analizador.descAnalizador)
-                                            .data('idMetodo', analizador.idMetodo);
+                                            .data('idMetodo', analizador.idMetodo)
+                                            .data('descMetodo', analizador.descMetodo);
 
                                         // Seleccionar por defecto el registro que coincide con el valorOriginal
                                         if (analizador.idAnalizador == valOrigAnalizadorId) {
@@ -1389,7 +1670,10 @@
 
                                         var selectedOption = currentRow.find('.idAnalizador select option:selected');
                                         var idMetodo = selectedOption.data('idMetodo');
+                                        var descMetodo = selectedOption.data('descMetodo');
+
                                         idMetodoCell.text(idMetodo);
+                                        descMetodoCell.text(descMetodo);
                                     }
 
                                     // Ejecutar al cargar la página para el primer elemento
@@ -1433,7 +1717,11 @@
 
                             var cellMetodoAnalitico = row.find('.idMetodo');
                             var cellMetodoanaliticoOriginal = row.find('.idMetodoOriginal');
-                            cellMetodoAnalitico.html(cellMetodoanaliticoOriginal.text());
+                            var cellMetodoanaliticoOriginaldesc = row.find('.descdMetodoOriginaldesc');
+                            var cellMetodoanaliticoOriginalReturn = row.find('.descdMetodoOriginal');
+
+                            cellMetodoanaliticoOriginalReturn.html(cellMetodoanaliticoOriginaldesc.text());
+                            cellMetodoAnalitico.html(cellMetodoanaliticoOriginaldesc.text());
 
                             row.find('td:last').html('<button class="editarparametro">✏️</button>');
                         });
@@ -1493,6 +1781,7 @@
 
                                  // Guardar el valor en una celda oculta
                                 currentRow.find('.idMetodoOriginal').html(currentRow.find('.idMetodo').text());
+                                currentRow.find('.descdMetodoOriginaldesc').html(currentRow.find('.descdMetodoOriginal').text());
 
                             }
 
@@ -1536,12 +1825,12 @@
                             }
 
                             // Cambiar el botón "Cancelar Lote" a "Guardar" y "Cancelar"
-                            $('td', tr).eq(17).html('<button class="btn btn-success save-btnRow">Guardar</button> <button class="btn btn-danger cancel-btnRow">Cancelar</button>');
+                            $('td', tr).eq(18).html('<button class="btn btn-success save-btnRow">Guardar</button> <button class="btn btn-danger cancel-btnRow">Cancelar</button>');
 
 
                             // Aplicar la clase de difuminado a las celdas excepto las columnas especificadas
                             $('td', tr).each(function (index) {
-                                if (index !== 11 && index !== 13 && index !== 17) {
+                                if (index !== 11 && index !== 13 && index !== 18) {
                                     $(this).addClass('difuminado');
                                 }
                                 else if (index === 11) {
@@ -1661,7 +1950,7 @@
                                                     // // Quitar la clase de difuminado de la fila
                                                     $('td', tr).removeClass('difuminado no-difuminar' );
 
-                                                    $('td', tr).eq(17).html('<span style="color: red; font-weight: bold;">CANCELADO</span>');
+                                                    $('td', tr).eq(18).html('<span style="color: red; font-weight: bold;">CANCELADO</span>');
 
                                                     // Cambiar el botón "Reactivar"
                                                     // $('td', tr).eq(17).html('<button class="btn btn-success reactivar-btnRow" disabled>Reactivar</button>');
