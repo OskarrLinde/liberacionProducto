@@ -1,4 +1,5 @@
-﻿using LiberacionProducto.Entities.CertCatalogos;
+﻿using DevExpress.Web.Internal;
+using LiberacionProducto.Entities.CertCatalogos;
 using LiberacionProductoWeb.Models.CertCatalogosViewModels;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,6 @@ namespace LiberacionProductoWeb.Mappers
                     iD_TANQUE = item.IdTanque,
                     iD_PLANTA = item.IdPlanta,
                     iD_PRODUCTO = item.IdProducto,
-                    iD_GRADO = item.IdGrado,
                     descripcion = item.Descripcion,
                     iD_STATUS = item.IdStatus,
                     clavE_PALS = item.ClavePals
@@ -63,7 +63,6 @@ namespace LiberacionProductoWeb.Mappers
         {
             return new TanqueData()
             {
-                IdGrado = Convert.ToInt32(data.iD_GRADO),
                 IdProducto = Convert.ToInt32(data.iD_PRODUCTO),
                 IdPlanta = Convert.ToInt32(data.iD_PLANTA),
                 Descripcion = data.descripcion,
@@ -71,5 +70,20 @@ namespace LiberacionProductoWeb.Mappers
                 IdStatus = data.iD_STATUS == "true" ? (short)1 : (short)0
             };
         }
-    }
+
+		public static PlantaParametroAnalizadorData MapAnalizadorParametrosToPlantaParametroAnalizadorData(DtoAnalizadorParametros data)
+		{
+            return new PlantaParametroAnalizadorData()
+            {
+                IdAnalizador = Convert.ToInt32(data.iD_ANALIZADOR),
+                IdPlanta = data.iD_PLANTA == "" ? 0 : Convert.ToInt32(data.iD_PLANTA),
+                IdParametro = Convert.ToInt32(data.iD_PARAMETRO),
+                IdMetodo = Convert.ToInt32(data.iD_METODO),
+                LimiteInferior = Convert.ToDecimal(data.limitE_INFERIOR),
+                LeyendaReporte = data.leyendA_REPORTE,
+                ClavePals = data.clave_Pals,
+				IdStatus = data.iD_STATUS == "true" ? (short)1 : (short)0
+			};
+		}
+	}
 }

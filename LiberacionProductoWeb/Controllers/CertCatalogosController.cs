@@ -1,4 +1,5 @@
 ﻿using LiberacionProducto.Entities.CertCatalogos;
+using LiberacionProducto.Entities.Entities.CertCatalogos;
 using LiberacionProducto.Services.Interfaces;
 using LiberacionProductoWeb.Data;
 using LiberacionProductoWeb.Data.Repository;
@@ -511,13 +512,17 @@ namespace LiberacionProductoWeb.Controllers
 
 		#region Analizador
 
-		public IActionResult Analizador()
+		public IActionResult Analizador(bool showAll = false)
 		{
 			var analizador = getAnalizador();
 			var producto = getProductos();
 			AnalizadorViewModel _analizadorVM = new AnalizadorViewModel();
+			_analizadorVM.showAll = showAll;
 
 			_analizadorVM.AnalizadorList = analizador;
+			if (!showAll)
+				_analizadorVM.AnalizadorList = _analizadorVM.AnalizadorList.Where(x => x.iD_STATUS == 1).ToList();
+
 			_analizadorVM.AnalizadorFilter = analizador.ConvertAll(a =>
 			{
 				return new SelectListItem()
@@ -554,25 +559,16 @@ namespace LiberacionProductoWeb.Controllers
 					if (String.IsNullOrEmpty(data.iD_ANALIZADOR))
 					{
 						var iD_STATUS = data.iD_STATUS; //?.Trim().Replace(" ", "").Split(",");
-						var iD_PRODUCTO = data.iD_PRODUCTO; //?.Trim().Replace(" ", "").Split(",");
+						var iD_PRODUCTO = 0; //?.Trim().Replace(" ", "").Split(",");
 						var descripcion = data.descripcion; //?.Trim().Replace(" ", "").Split(",");
 						var clavE_PALS = data.clavE_PALS; //?.Trim().Replace(" ", "").Split(",");
 
-						if (iD_PRODUCTO != null && descripcion != null)
+						if (descripcion != null)
 						{
 							Analizador _analizador = new Analizador();
 
-							string _iDSTATUS = iD_STATUS;
-
-							int _resultiDSTATUS;
-
-							if (_iDSTATUS == "true")
-								_resultiDSTATUS = 1;
-							else
-								_resultiDSTATUS = 0;
-
-							_analizador.iD_STATUS = _resultiDSTATUS;
-							_analizador.iD_PRODUCTO = int.Parse(iD_PRODUCTO);
+							_analizador.iD_STATUS = Convert.ToInt32(iD_STATUS);
+							_analizador.iD_PRODUCTO = iD_PRODUCTO;
 							_analizador.descripcion = descripcion;
 							_analizador.clavE_PALS = clavE_PALS;
 							_analizador.usR_ALTA = 1;
@@ -601,11 +597,11 @@ namespace LiberacionProductoWeb.Controllers
 
 						var iD_STATUS = data.iD_STATUS; //?.Trim().Replace(" ", "").Split(",");
 						var iD_ANALIZADOR = data.iD_ANALIZADOR; //?.Trim().Replace(" ", "").Split(",");
-						var iD_PRODUCTO = data.iD_PRODUCTO; //?.Trim().Replace(" ", "").Split(",");
+						var iD_PRODUCTO = 0; //?.Trim().Replace(" ", "").Split(",");
 						var descripcion = data.descripcion; //?.Trim().Replace(" ", "").Split(",");
 						var clavE_PALS = data.clavE_PALS; //?.Trim().Replace(" ", "").Split(",");
 
-						if (iD_PRODUCTO != null && descripcion != null)
+						if (descripcion != null)
 						{
 							Analizador _analizador = new Analizador();
 
@@ -620,7 +616,7 @@ namespace LiberacionProductoWeb.Controllers
 
 							_analizador.iD_STATUS = _resultiDSTATUS;
 							_analizador.iD_ANALIZADOR = int.Parse(iD_ANALIZADOR);
-							_analizador.iD_PRODUCTO = int.Parse(iD_PRODUCTO);
+							_analizador.iD_PRODUCTO = iD_PRODUCTO;
 							_analizador.descripcion = descripcion;
 							_analizador.clavE_PALS = data.clavE_PALS;
 							_analizador.usR_MODIFICA = 1;
@@ -647,7 +643,6 @@ namespace LiberacionProductoWeb.Controllers
 			}
 			catch (Exception ex)
 			{
-				//TODO send to log
 				return Json(new { Result = "Fail", Message = ex.Message });
 			}
 
@@ -702,6 +697,7 @@ namespace LiberacionProductoWeb.Controllers
 			String response = String.Empty;
 
 			var analizador = getAnalizador();
+			var products = getProductos();
 			var _url = _catalogCertificate.urlCatalogs + "Analizador";
 			RestGenerico _rest = new RestGenerico();
 			var _result = _rest.getApi<Analizador, Analizador>(_url + "/" + Id);
@@ -723,6 +719,18 @@ namespace LiberacionProductoWeb.Controllers
 
 				idTag += "</select>";
 
+				var productoTag = "<select  id='iD_PRODUCTO' class='form-control'>";
+
+				foreach (var item in products)
+				{
+					if (entity.iD_PRODUCTO == item.iD_PRODUCTO)
+						productoTag += "<option value='" + item.iD_PRODUCTO + "' selected >" + item.nombre + " </option>";
+					else
+						productoTag += "<option value='" + item.iD_PRODUCTO + "'>" + item.nombre + " </option>";
+				}
+
+				productoTag += "</select>";
+
 				var estatusTag = "<select  id='iD_STATUS' class='form-control'>";
 
 				if (entity.iD_STATUS == 1)
@@ -740,30 +748,26 @@ namespace LiberacionProductoWeb.Controllers
 
 				response += "<tr>" +
 				"<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-						"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_ANALIZADOR + "' ><i class='fa fa-save'></i></a> </td>" +
+				"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_ANALIZADOR + "' ><i class='fa fa-save'></i></a> </td>" +
 				"<td><input class='form-control' maxlength='50' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
 				"<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'  value='" + entity.clavE_PALS + "'></td>" +
-				"<td><input class='form-control' id='iD_PRODUCTO' type='text'  value='" + entity.iD_PRODUCTO + "'></td>" +
 				"<td>" + estatusTag + "</td>" +
 				"</tr>";
 			}
 
 			return Json(new { Result = "Ok", Html = response });
 		}
+		        
+        #endregion
 
-		#endregion
+        #region Analizador Parametros
 
-		#region Analizador Parametros
-
-		public async Task<IActionResult>AnalizadorParametros(bool showAll = false)
+        public async Task<IActionResult> AnalizadorParametros(bool showAll = false)
 		{
-			var analizadorParametrosExportExcel = getAnalizadorParametros();
-			//var analizadorParametros = getAnalizadorParametros();
 			var analizador = getAnalizador();
+			var parametros = getParametro();
 			var plantas = getPlantas();
-			//var parametros = getParametro();
-			//var metodos = getMetodo();
-			//var producto = getProductos();
+			var metodos = getMetodo();
 
 			var country = getPaises();
 			var supplyType = getTipoSuministro();
@@ -773,45 +777,35 @@ namespace LiberacionProductoWeb.Controllers
 			AnalizadorParametrosViewModel _analizadorParametrosVM = new AnalizadorParametrosViewModel();
 			_analizadorParametrosVM.showAll = showAll;
 
-			//_analizadorParametrosVM.AnalizadorParametrosExportExcelList = analizadorParametrosExportExcel;
-			//_analizadorParametrosVM.AnalizadorParametrosExportExcelFilter = analizadorParametrosExportExcel.ConvertAll(a =>
-			//{
-			//	return new SelectListItem()
-			//	{
-			//		Text = a.descripcion,
-			//		Value = a.iD_ANALIZADOR_PARAM.ToString()
-			//	};
-			//});
+			_analizadorParametrosVM.AnalizadorList = analizador;
+			_analizadorParametrosVM.AnalizadorFilter = analizador.ConvertAll(a =>
+			{
+				return new SelectListItem()
+				{
+					Text = a.descripcion,
+					Value = a.iD_ANALIZADOR.ToString()
+				};
+			});
 
-			//_analizadorParametrosVM.AnalizadorParametrosList = analizadorParametros;
-			//_analizadorParametrosVM.AnalizadorParametrosFilter = analizadorParametros.ConvertAll(a =>
-			//{
-			//	return new SelectListItem()
-			//	{
-			//		Text = a.descripcion,
-			//		Value = a.iD_ANALIZADOR_PARAM.ToString()
-			//	};
-			//});
+			_analizadorParametrosVM.ParametrosList = parametros;
+			_analizadorParametrosVM.ParametrosFilter = parametros.ConvertAll(a =>
+			{
+				return new SelectListItem()
+				{
+					Text = a.descripcion,
+					Value = a.iD_PARAMETRO.ToString()
+				};
+			});
 
-			//_analizadorParametrosVM.AnalizadorList = analizador;
-			//_analizadorParametrosVM.AnalizadorFilter = analizador.ConvertAll(a =>
-			//{
-			//	return new SelectListItem()
-			//	{
-			//		Text = a.descripcion,
-			//		Value = a.iD_ANALIZADOR.ToString()
-			//	};
-			//});
-
-			//_analizadorParametrosVM.ProductosList = producto;
-			//_analizadorParametrosVM.ProductosFilter = producto.ConvertAll(a =>
-			//{
-			//	return new SelectListItem()
-			//	{
-			//		Text = a.nombre,
-			//		Value = a.iD_PRODUCTO.ToString()
-			//	};
-			//});
+			_analizadorParametrosVM.MetodoList = metodos;
+			_analizadorParametrosVM.MetodoFilter = metodos.ConvertAll(a =>
+			{
+				return new SelectListItem()
+				{
+					Text = a.descripcion,
+					Value = a.iD_METODO.ToString()
+				};
+			});
 
 			_analizadorParametrosVM.PlantasList = plantas;
 			if (!showAll)
@@ -825,26 +819,6 @@ namespace LiberacionProductoWeb.Controllers
 					Value = a.iD_PLANTA.ToString()
 				};
 			});
-
-			//_analizadorParametrosVM.ParametrosList = parametros;
-			//_analizadorParametrosVM.ParametrosFilter = parametros.ConvertAll(a =>
-			//{
-			//	return new SelectListItem()
-			//	{
-			//		Text = a.descripcion,
-			//		Value = a.iD_PARAMETRO.ToString()
-			//	};
-			//});
-
-			//_analizadorParametrosVM.MetodoList = metodos;
-			//_analizadorParametrosVM.MetodoFilter = metodos.ConvertAll(a =>
-			//{
-			//	return new SelectListItem()
-			//	{
-			//		Text = a.descripcion,
-			//		Value = a.iD_METODO.ToString()
-			//	};
-			//});
 
 			if (country != null)
 			{
@@ -906,210 +880,75 @@ namespace LiberacionProductoWeb.Controllers
 			return RedirectToAction("AnalizadorParametros");
 		}
 
-		public JsonResult SaveOrEditAnalizadorParametros([FromBody] DtoAnalizadorParametros data)
+		public async Task<JsonResult> SaveOrEditAnalizadorParametros([FromBody] DtoAnalizadorParametros data)
 		{
 			try
 			{
-				if (data != null)
+				if (data == null)
 				{
-					if (String.IsNullOrEmpty(data.iD_ANALIZADOR_PARAM))
-					{
-						var iD_STATUS = data.iD_STATUS; //?.Trim().Replace(" ", "").Split(",");
-														//var iD_ANALIZADOR_PARAM = data.iD_ANALIZADOR_PARAM?.Trim().Replace(" ", "").Split(",");
-						var iD_ANALIZADOR = data.iD_ANALIZADOR; //?.Trim().Replace(" ", "").Split(",");
-						var iD_PLANTA = data.iD_PLANTA; //?.Trim().Replace(" ", "").Split(",");
-						var iD_PARAMETRO = data.iD_PARAMETRO; //?.Trim().Replace(" ", "").Split(",");
-						var iD_METODO = data.iD_METODO; //?.Trim().Replace(" ", "").Split(",");
-						var descripcion = data.descripcion; //?.Trim().Replace(" ", "").Split(",");
-						var limitE_INFERIOR = data.limitE_INFERIOR; //?.Trim().Replace(" ", "").Split(",");
-						var leyendA_REPORTE = data.leyendA_REPORTE; //?.Trim().Replace(" ", "").Split(",");
-
-						if (iD_ANALIZADOR != null && descripcion != null)
-						{
-							AnalizadorParametros _analizadorParametros = new AnalizadorParametros();
-
-							string _iDSTATUS = iD_STATUS;
-
-							int _resultiDSTATUS;
-
-							if (_iDSTATUS == "true")
-								_resultiDSTATUS = 1;
-							else
-								_resultiDSTATUS = 0;
-
-							_analizadorParametros.iD_STATUS = _resultiDSTATUS;
-							_analizadorParametros.iD_ANALIZADOR = int.Parse(iD_ANALIZADOR);
-							_analizadorParametros.iD_PLANTA = int.Parse(iD_PLANTA);
-							_analizadorParametros.iD_PARAMETRO = int.Parse(iD_PARAMETRO);
-							_analizadorParametros.iD_METODO = int.Parse(iD_METODO);
-							_analizadorParametros.descripcion = descripcion;
-							_analizadorParametros.limitE_INFERIOR = limitE_INFERIOR == string.Empty ? 0.ToString() : limitE_INFERIOR;
-							_analizadorParametros.leyendA_REPORTE = leyendA_REPORTE;
-							_analizadorParametros.usR_ALTA = 1;
-
-							var _url = _catalogCertificate.urlCatalogs + "AnalizadorParam";
-
-							RestGenerico _rest = new RestGenerico();
-							var _result = _rest.postApi<AnalizadorParametros, AnalizadorParametros>(_url, _analizadorParametros);
-							JsonDeserializer deserial = new JsonDeserializer();
-							var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-							var _error = JSONObj["error"];
-
-							if (_error.Trim() == "False")
-							{
-								_result = _rest.getApi<AnalizadorParametros, AnalizadorParametros>(_url);
-								JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-							}
-							else
-							{
-								throw new Exception("Los datos ya existen, no es posible agregar el catálogo");
-							}
-						}
-					}
-					else
-					{
-						var iD_STATUS = data.iD_STATUS; //?.Trim().Replace(" ", "").Split(",");
-						var iD_ANALIZADOR_PARAM = data.iD_ANALIZADOR_PARAM; //?.Trim().Replace(" ", "").Split(",");
-						var iD_ANALIZADOR = data.iD_ANALIZADOR; //?.Trim().Replace(" ", "").Split(",");
-						var iD_PLANTA = data.iD_PLANTA; //?.Trim().Replace(" ", "").Split(",");
-						var iD_PARAMETRO = data.iD_PARAMETRO; //?.Trim().Replace(" ", "").Split(",");
-						var iD_METODO = data.iD_METODO; //?.Trim().Replace(" ", "").Split(",");
-						var descripcion = data.descripcion; //?.Trim().Replace(" ", "").Split(",");
-						var limitE_INFERIOR = data.limitE_INFERIOR; //?.Trim().Replace(" ", "").Split(",");
-						var leyendA_REPORTE = data.leyendA_REPORTE; //?.Trim().Replace(" ", "").Split(",");
-
-						if (iD_ANALIZADOR_PARAM != null && descripcion != null)
-						{
-							AnalizadorParametros _analizadorParametros = new AnalizadorParametros();
-
-							string _iDSTATUS = iD_STATUS;
-
-							int _resultiDSTATUS;
-
-							if (_iDSTATUS == "true")
-								_resultiDSTATUS = 1;
-							else
-								_resultiDSTATUS = 0;
-
-							_analizadorParametros.iD_STATUS = _resultiDSTATUS;
-							_analizadorParametros.iD_ANALIZADOR_PARAM = int.Parse(iD_ANALIZADOR_PARAM);
-							_analizadorParametros.iD_ANALIZADOR = int.Parse(iD_ANALIZADOR);
-							_analizadorParametros.iD_PLANTA = int.Parse(iD_PLANTA);
-							_analizadorParametros.iD_PARAMETRO = int.Parse(iD_PARAMETRO);
-							_analizadorParametros.iD_METODO = int.Parse(iD_METODO);
-							_analizadorParametros.descripcion = descripcion;
-							_analizadorParametros.limitE_INFERIOR = limitE_INFERIOR;
-							_analizadorParametros.leyendA_REPORTE = leyendA_REPORTE;
-							_analizadorParametros.usR_MODIFICA = 1;
-
-							var _url = _catalogCertificate.urlCatalogs + "AnalizadorParam";
-							RestGenerico _rest = new RestGenerico();
-							var _result = _rest.postApi<AnalizadorParametros, AnalizadorParametros>(_url + "/" + _analizadorParametros.iD_ANALIZADOR_PARAM, _analizadorParametros);
-							JsonDeserializer deserial = new JsonDeserializer();
-							var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-							var _error = JSONObj["error"];
-
-							if (_error.Trim() == "False")
-							{
-								_result = _rest.getApi<AnalizadorParametros, AnalizadorParametros>(_url);
-								JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-							}
-							else
-							{
-								throw new Exception("Los datos ya existen, no es posible agregar el catálogo");
-							}
-						}
-					}
+					throw new ArgumentNullException(nameof(data), "La información proporcionada es nula.");
 				}
-			}
-			catch (Exception ex)
-			{
-				return Json(new { Result = "Fail", Message = ex.Message });
-			}
 
-			return Json(new { Result = "Ok" });
-		}
+				var analizadorParametroData = CerCatalogosMappers.MapAnalizadorParametrosToPlantaParametroAnalizadorData(data);
 
-		public JsonResult DeleteAnalizadorParametros(String Id)
-		{
-			try
-			{
-				var _url = _catalogCertificate.urlCatalogs + "AnalizadorParam";
-				AnalizadorParametros model2 = new AnalizadorParametros();
-				RestGenerico _rest = new RestGenerico();
-				var _result = _rest.getApi<AnalizadorParametros, AnalizadorParametros>(_url + "/" + Id);
-				JsonDeserializer deserial = new JsonDeserializer();
-				var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-				var result = JsonConvert.DeserializeObject<AnalizadorParametros>(JSONObj["data"]);
-
-				model2.iD_ANALIZADOR_PARAM = result.iD_ANALIZADOR_PARAM;
-				model2.iD_ANALIZADOR = result.iD_ANALIZADOR;
-				model2.iD_PLANTA = result.iD_PLANTA;
-				model2.iD_PARAMETRO = result.iD_PARAMETRO;
-				model2.iD_METODO = result.iD_METODO;
-				model2.descripcion = result.descripcion;
-				model2.limitE_INFERIOR = result.limitE_INFERIOR;
-				model2.leyendA_REPORTE = result.leyendA_REPORTE;
-				model2.iD_STATUS = 0;
-				model2.usR_MODIFICA = 1;
-
-				_result = _rest.postApi<AnalizadorParametros, AnalizadorParametros>(_url + "/" + Id, model2);
-				JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-
-				var _error = JSONObj["error"];
-
-				if (_error.Trim() == "False")
+				if (string.IsNullOrWhiteSpace(data.iD_ANALIZADOR_PARAM))
 				{
-					ViewBag.Error = "false";
-					_result = _rest.getApi<AnalizadorParametros, AnalizadorParametros>(_url);
-					JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
+					analizadorParametroData.UsrAlta = 1;
+
+					await _certCatalogosService.InsertPlantaParametroAnalizador(analizadorParametroData);
 				}
 				else
 				{
-					throw new Exception("El registro no existe");
+					analizadorParametroData.IdPlantaParametroAnalizador = ParseMandatoryInt(data.iD_ANALIZADOR_PARAM, "El ID del tanque es inválido.");
+					analizadorParametroData.UsrModifica = 1;
+					analizadorParametroData.IsDelete = false;
+
+					await _certCatalogosService.UpdatePlantaParametroAnalizador(analizadorParametroData);
 				}
+
+				return Json(new { Result = "Ok" });
 			}
 			catch (Exception ex)
 			{
 				return Json(new { Result = "Fail", Message = ex.Message });
 			}
-
-			return Json(new { Result = "Ok" });
 		}
 
-		public JsonResult GetAnalizadorParametrosHTMLTagsById(string Id)
+		public async Task<JsonResult> DeleteAnalizadorParametros(string Id)
 		{
-			String response = String.Empty;
+			try
+			{
+				var analizadorParametroData = new PlantaParametroAnalizadorData();
+				analizadorParametroData.IdPlantaParametroAnalizador = ParseMandatoryInt(Id, "El ID del tanque es inválido.");
+				analizadorParametroData.UsrModifica = 1;
+				analizadorParametroData.IsDelete = true;
 
-			var analizadorParametros = getAnalizadorParametros();
-			var planta = getPlantas();
+				await _certCatalogosService.UpdatePlantaParametroAnalizador(analizadorParametroData);
+
+				return Json(new { Result = "Ok" });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { Result = "Fail", Message = ex.Message });
+			}
+		}
+
+		public async Task<JsonResult> GetAnalizadorParametrosHTMLTagsById(string Id)
+		{
+			var response = string.Empty;
+			
+			var analizadorParametro = await _certCatalogosService.GetPlantaParametroAnalizador(null);
+			var analizador = getAnalizador();
 			var parametro = getParametro();
 			var metodo = getMetodo();
 
-			var _url = _catalogCertificate.urlCatalogs + "AnalizadorParam";
-			RestGenerico _rest = new RestGenerico();
-			var _result = _rest.getApi<AnalizadorParametros, AnalizadorParametros>(_url + "/" + Id);
-			JsonDeserializer deserial = new JsonDeserializer();
-			var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-			var entity = JsonConvert.DeserializeObject<AnalizadorParametros>(JSONObj["data"]);
+			var entity = analizadorParametro.Where(x => x.IdPlantaParametroAnalizador == Convert.ToInt32(Id)).FirstOrDefault();
 
 			if (entity != null)
 			{
-				var idTag = "<select  id='iD_ANALIZADOR_PARAM' class='form-control' >";
-
-				foreach (var item in analizadorParametros)
-				{
-					if (entity.iD_ANALIZADOR_PARAM == item.iD_ANALIZADOR_PARAM)
-						idTag += "<option value='" + item.iD_ANALIZADOR_PARAM + "' selected >" + item.descripcion + " </option>";
-					else
-						idTag += "<option value='" + item.iD_ANALIZADOR_PARAM + "'>" + item.descripcion + " </option>";
-				}
-
-				idTag += "</select>";
-
 				var estatusTag = "<select  id='iD_STATUS' class='form-control'>";
 
-				if (entity.iD_STATUS == 1)
+				if (entity.IdStatus == 1)
 				{
 					estatusTag += "<option value='true' selected >Activo</option>";
 					estatusTag += "<option value='false' >Inactivo</option>";
@@ -1122,23 +961,23 @@ namespace LiberacionProductoWeb.Controllers
 
 				estatusTag += "</select>";
 
-				var plantaTag = "<select  id='iD_PLANTA' class='form-control' >";
+				var analizadorTag = "<select id='iD_ANALIZADOR' class='form-control' >";
 
-				foreach (var item in planta)
+				foreach (var item in analizador)
 				{
-					if (entity.iD_PLANTA == item.iD_PLANTA)
-						plantaTag += "<option value='" + item.iD_PLANTA + "' selected >" + item.descripcion + " </option>";
+					if (entity.IdAnalizador == item.iD_ANALIZADOR)
+						analizadorTag += "<option value='" + item.iD_ANALIZADOR + "' selected >" + item.descripcion + " </option>";
 					else
-						plantaTag += "<option value='" + item.iD_PLANTA + "'>" + item.descripcion + " </option>";
+						analizadorTag += "<option value='" + item.iD_ANALIZADOR + "'>" + item.descripcion + " </option>";
 				}
 
-				plantaTag += "</select>";
+				analizadorTag += "</select>";
 
 				var parametroTag = "<select  id='iD_PARAMETRO' class='form-control' >";
 
 				foreach (var item in parametro)
 				{
-					if (entity.iD_PARAMETRO == item.iD_PARAMETRO)
+					if (entity.IdParametro == item.iD_PARAMETRO)
 						parametroTag += "<option value='" + item.iD_PARAMETRO + "' selected >" + item.descripcion + " </option>";
 					else
 						parametroTag += "<option value='" + item.iD_PARAMETRO + "'>" + item.descripcion + " </option>";
@@ -1150,7 +989,7 @@ namespace LiberacionProductoWeb.Controllers
 
 				foreach (var item in metodo)
 				{
-					if (entity.iD_METODO == item.iD_METODO)
+					if (entity.IdMetodo == item.iD_METODO)
 						metodoTag += "<option value='" + item.iD_METODO + "' selected >" + item.descripcion + " </option>";
 					else
 						metodoTag += "<option value='" + item.iD_METODO + "'>" + item.descripcion + " </option>";
@@ -1160,14 +999,14 @@ namespace LiberacionProductoWeb.Controllers
 
 				response += "<tr>" +
 				"<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-						"<a href='javascript:void(0)' onclick='saveOnClickAnalizadorParametros(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_ANALIZADOR_PARAM + "' ><i class='fa fa-save'></i></a> </td>" +
-				"<td style='display: none'><input class='form-control' id='iD_ANALIZADOR' type='text' value='" + entity.iD_ANALIZADOR + "'></td>" +
-				"<td>" + plantaTag + "</td>" +
+						"<a href='javascript:void(0)' onclick='saveOnClickAnalizadorParametros(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.IdPlantaParametroAnalizador + "' ><i class='fa fa-save'></i></a> </td>" +
+				"<td style='display: none'><input class='form-control' id='iD_ANALIZADOR_PARAM' type='text' value='" + entity.IdPlantaParametroAnalizador + "'></td>" +
+				"<td>" + analizadorTag + "</td>" +
 				"<td>" + parametroTag + "</td>" +
 				"<td>" + metodoTag + "</td>" +
-				"<td><input class='form-control' id='limitE_INFERIOR' type='number'  value='" + entity.limitE_INFERIOR + "'></td>" +
-				"<td><input class='form-control' maxlength='25' id='leyendA_REPORTE' type='text'  value='" + entity.leyendA_REPORTE + "'></td>" +
-				//"<td><input class='form-control' id='descripcion' type='text'  value='" + entity.descripcion + "'></td>" +
+				"<td><input class='form-control' id='limitE_INFERIOR' type='number'  value='" + entity.LimiteInferior + "'></td>" +
+				"<td><input class='form-control' maxlength='25' id='leyendA_REPORTE' type='text'  value='" + entity.LeyendaReporte + "'></td>" +
+				"<td><input class='form-control' id='clavE_PALS' type='text' value='" + entity.ClavePals + "'></td>" +
 				"<td>" + estatusTag + "</td>" +
 				"</tr>";
 			}
@@ -1175,29 +1014,22 @@ namespace LiberacionProductoWeb.Controllers
 			return Json(new { Result = "Ok", Html = response });
 		}
 
-		public JsonResult GetAnalyzerParameterById(string Id)
+		public async Task<JsonResult> GetAnalyzerParameterById(string Id)
 		{
-			String response = String.Empty;
-
-			var analizadorParametros = getAnalizadorParametros();
-			var planta = getPlantas();
+			var response = string.Empty;
+			var lstAnalyzerParameter = await _certCatalogosService.GetPlantaParametroAnalizador(Convert.ToInt32(Id));
+			var analizador = getAnalizador();
 			var parametro = getParametro();
 			var metodo = getMetodo();
 
-			List<AnalizadorParametros> _lstAnalyzerParameter = new List<AnalizadorParametros>();
-			List<Plantas> _lstPlants = new List<Plantas>();
+			List<Analizador> _lstAnalizador = new List<Analizador>();
 			List<Parametro> _lstParameter = new List<Parametro>();
 			List<Metodo> _lstMethod = new List<Metodo>();
 
-			if (!string.IsNullOrEmpty(Id))
-				_lstAnalyzerParameter = analizadorParametros.Where(x => x.iD_ANALIZADOR == int.Parse(Id)).ToList();
+			if (analizador != null && analizador.Any())
+				_lstAnalizador = analizador;
 			else
-				_lstAnalyzerParameter = new List<AnalizadorParametros>();
-
-			if (planta != null && planta.Any())
-				_lstPlants = planta;
-			else
-				_lstPlants = new List<Plantas>();
+				_lstAnalizador = new List<Analizador>();
 
 			if (parametro != null && parametro.Any())
 				_lstParameter = parametro;
@@ -1209,150 +1041,262 @@ namespace LiberacionProductoWeb.Controllers
 			else
 				_lstMethod = new List<Metodo>();
 
-			var idTag = "<select id='iD_PRODUCTO_GRADO' class='form-control'>";
-
-			foreach (var item in _lstAnalyzerParameter)
+			foreach (var item in lstAnalyzerParameter)
 			{
-				if (item.iD_ANALIZADOR_PARAM == item.iD_ANALIZADOR_PARAM)
-					idTag += "<option value='" + item.iD_ANALIZADOR_PARAM + "' selected >" + item.descripcion + " </option>";
-				else
-					idTag += "<option value='" + item.iD_ANALIZADOR_PARAM + "'>" + item.descripcion + " </option>";
-
-				idTag += "</select>";
-
-				//var estatusTag = "<select id='iD_STATUS' class='form-control'>";
-
-				//if (item.iD_STATUS == 1)
-				//{
-				//    estatusTag += "<option value='true' selected >Activo</option>";
-				//    estatusTag += "<option value='false'>Inactivo</option>";
-				//}
-				//else
-				//{
-				//    estatusTag += "<option value='false' selected >Inactivo</option>";
-				//    estatusTag += "<option value='true'>Activo</option>";
-				//}
-
-				//estatusTag += "</select>";
-
 				string _estatus = string.Empty;
 
-				if (item.iD_STATUS == 1)
+				if (item.IdStatus == 1)
 					_estatus = "Activo";
 				else
 					_estatus = "Inactivo";
 
-				string _descripcionPlanta = string.Empty;
+				string _descripcionAnalizador = string.Empty;
 
-				if (item.iD_PLANTA > 0)
-					_descripcionPlanta = _lstPlants.FirstOrDefault(x => x.iD_PLANTA == item.iD_PLANTA).descripcion;
+				if (item.IdAnalizador > 0)
+					_descripcionAnalizador = _lstAnalizador.FirstOrDefault(x => x.iD_ANALIZADOR == item.IdAnalizador).descripcion;
 				else
-					_descripcionPlanta = string.Empty;
+					_descripcionAnalizador = string.Empty;
 
 				string _descripcionParametro = string.Empty;
 
-				if (item.iD_PARAMETRO > 0)
-					_descripcionParametro = _lstParameter.FirstOrDefault(x => x.iD_PARAMETRO == item.iD_PARAMETRO).descripcion;
+				if (item.IdParametro > 0)
+					_descripcionParametro = _lstParameter.FirstOrDefault(x => x.iD_PARAMETRO == item.IdParametro).descripcion;
 				else
 					_descripcionParametro = string.Empty;
 
 				string _descripcionMetodo = string.Empty;
 
-				if (item.iD_METODO > 0)
-					_descripcionMetodo = _lstMethod.FirstOrDefault(x => x.iD_METODO == item.iD_METODO).descripcion;
+				if (item.IdMetodo > 0)
+					_descripcionMetodo = _lstMethod.FirstOrDefault(x => x.iD_METODO == item.IdMetodo).descripcion;
 				else
 					_descripcionMetodo = string.Empty;
 
 				response +=
 				"<tr>" +
 					"<td></td>" +
-					"<td>" + _descripcionPlanta + "</td>" +
+					"<td>" + _descripcionAnalizador + "</td>" +
 					"<td>" + _descripcionParametro + "</td>" +
 					"<td>" + _descripcionMetodo + "</td>" +
-					"<td>" + item.limitE_INFERIOR + "</td>" +
-					"<td>" + item.leyendA_REPORTE + "</td>" +
+					"<td>" + item.LimiteInferior + "</td>" +
+					"<td>" + item.LeyendaReporte + "</td>" +
+					"<td>" + item.ClavePals + "</td>" +
 					"<td>" + _estatus + "</td>" +
 					"<td>" +
-						"<a href='javascript:void(0)' onclick='deleteOnClickAnalizadorParametros(this); return false;' data-id='" + item.iD_ANALIZADOR_PARAM + "' class='btn btn-default btn-xs'>" +
+						"<a href='javascript:void(0)' onclick='deleteOnClickAnalizadorParametros(this); return false;' data-id='" + item.IdPlantaParametroAnalizador + "' class='btn btn-default btn-xs'>" +
 							"<i class='fa fa-trash-alt'></i>" +
 						"</a>" +
-						"<a href='javascript:void(0)' onclick='editOnClickAnalizadorParametros(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='" + item.iD_ANALIZADOR_PARAM + "'>" +
+						"<a href='javascript:void(0)' onclick='editOnClickAnalizadorParametros(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='" + item.IdPlantaParametroAnalizador + "'>" +
 							"<i class='fa fa-edit'></i>" +
 						"</a>" +
-					//"<a href='javascript:void(0)' onclick='refresh();return false;' class='btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-					//"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + item.iD_GRADO + "'><i class='fa fa-save'></i></a>" +
 					"</td>" +
 				"</tr>";
 			}
 
-			String _tableHead = String.Empty;
+			string _tableHead = string.Empty;
 
 			_tableHead +=
-									//"<div id='content' class='content'>" +
-									//    "<div class='section-container section-with-top-border p-b-5'>" +
-									//        "<div class='row'>" +
-									//            "<div class='panel panel-primary'>" +
-									//                "<div class='panel-heading'>" +
-									//                    "<div class='btn-group pull-left'>" +
-									//"<a href='javascript:void(0)' onclick='addEntryRolAlias(this); return false;' class='waves-effect waves-light btn btn-white m-r-5' id='add-entry'>" +
-									//"<i class='fa fa-plus'></i> Agregar Registro" +
-									//"</a>" +
-									//"<a href='javascript:;' class='btn btn-white m-r-5' id='ExporttoExcel'>" +
-									//    "<i class='fa fa-file-excel'></i> Exportar a excel" +
-									//"</a>" +
-									//"</div>" +
-									//"<div class='btn-group pull-right'>" +
-									//    "<a href='javascript:;' class='btn btn-white m-r-5' id='ClearFilters'>" +
-									//        "<i class='fa fa-eraser'></i>Limpiar filtros" +
-									//    "</a>" +
-									//"</div>" +
-									//"<h4 class='panel-title'>" +
-									//"&nbsp;" +
-									//"</h4>" +
-									//"</div>" +
+				"<table id='data-table-analizador-parametros-" + Id + "' class='table table-bordered table-hover'>" +
+					"<thead>" +
+						"<tr>" +
+							"<th class='no-sort' style='width:1%'></th>" +
+							"<th style='white-space: nowrap'>Analizador</th>" +
+							"<th style='white-space: nowrap'>Parámetro</th>" +
+							"<th style='white-space: nowrap'>Método</th>" +
+							"<th style='white-space: nowrap'>Límite Inferior</th>" +
+							"<th style='white-space: nowrap'>Leyenda Reporte</th>" +
+							"<th style='white-space: nowrap'>Clave Pals</th>" +
+							"<th style='white-space: nowrap'>Estatus</th>" +
+							"<th style='white-space: nowrap; width: 1%'>" +
+								"<a href='javascript:void(0)' onclick='addEntryAnalizadorParametro(this, " + Id + "); return false;' class='waves-effect waves-light btn btn-white m-r-5' id='add-entry'>" +
+									"<i class='fa fa-plus'></i>" +
+								"</a>" +
+							"</th> " +
+						"</tr>" +
+					"</thead>";
 
-									//"<!-- Mensaje de error -->" +
-									//"<div class='col-md-12' id='message'></div>" +
+			string _tableFoot = string.Empty;
 
-									//"<div class='panel-body'>" +
-									//    "<div>" +
-									"<table id='data-table-analizador-parametros-" + Id + "' class='table table-bordered table-hover'>" +
-										"<thead>" +
-											"<tr>" +
-												"<th class='no-sort' style='width:1%'></th>" +
-												"<th style='white-space: nowrap'>Planta</th>" +
-												"<th style='white-space: nowrap'>Parámetro</th>" +
-												"<th style='white-space: nowrap'>Método</th>" +
-												"<th style='white-space: nowrap'>Límite Inferior</th>" +
-												"<th style='white-space: nowrap'>Leyenda Reporte</th>" +
-												"<th style='white-space: nowrap'>Estatus</th>" +
-												"<th style='white-space: nowrap; width: 1%'>" +
-													"<a href='javascript:void(0)' onclick='addEntryAnalizadorParametro(this, " + Id + "); return false;' class='waves-effect waves-light btn btn-white m-r-5' id='add-entry'>" +
-														"<i class='fa fa-plus'></i>" +
-													"</a>" +
-												"</th> " +
-											"</tr>" +
-										"</thead>";
-
-			String _tableFoot = String.Empty;
-
-			_tableFoot +=
-									"</table>"; // +
-												//                    "</div>" +
-												//                "</div>" +
-												//            "</div>" +
-												//        "</div>" +
-												//    "</div>" +
-												//"</div";
+			_tableFoot += "</table>"; 
 
 			return Json(new { Result = "Ok", Html = _tableHead + "<tbody>" + response + "</tbody>" + _tableFoot });
 		}
 
-		#endregion
+        #endregion
 
-		#region Clientes
+        #region Analizador Producto
+        public async Task<JsonResult> SaveOrEditAnalizadorProducto([FromBody] AnalizadorProductoData analizadorProductoData)
+        {
+            try
+            {
+                if (analizadorProductoData == null)
+                {
+                    throw new ArgumentNullException(nameof(analizadorProductoData), "La información proporcionada es nula.");
+                }
 
-		public async Task<IActionResult> Clientes()
+                if (ValidateInsert(analizadorProductoData.IdAnalizadorProducto))
+                {
+                    analizadorProductoData.UsrAlta = 1;
+
+                    await _certCatalogosService.InsertAnalizadorProducto(analizadorProductoData);
+                }
+                else
+                {
+                    analizadorProductoData.UsrModifica = 1;
+                    analizadorProductoData.IsDelete = false;
+
+                    await _certCatalogosService.UpdateAnalizadorProducto(analizadorProductoData);
+                }
+
+                return Json(new { Result = "Ok" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Fail", Message = ex.Message });
+            }
+        }
+
+        public async Task<JsonResult> DeleteAnalizadorProducto(string Id)
+        {
+            try
+            {
+                var analizadorProductoData = new AnalizadorProductoData();
+                analizadorProductoData.IdAnalizadorProducto = ParseMandatoryInt(Id, "El ID del tanque es inválido.");
+                analizadorProductoData.UsrModifica = 1;
+                analizadorProductoData.IsDelete = true;
+
+                await _certCatalogosService.UpdateAnalizadorProducto(analizadorProductoData);
+
+                return Json(new { Result = "Ok" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Fail", Message = ex.Message });
+            }
+        }
+
+        public async Task<JsonResult> GetAnalizadorProductoById(string Id)
+        {
+            var response = string.Empty;
+            var lstAnalizadorProducto = await _certCatalogosService.GetAnalizadorProducto(Convert.ToInt32(Id));
+			var producto = getProductos();
+
+            List<Productos> _lstProductos = new List<Productos>();
+
+            if (producto != null && producto.Any())
+                _lstProductos = producto;				
+            else
+                _lstProductos = new List<Productos>();
+
+            foreach (var item in lstAnalizadorProducto)
+            {
+                string _estatus = string.Empty;
+
+                if (item.IdStatus == 1)
+                    _estatus = "Activo";
+                else
+                    _estatus = "Inactivo";
+
+                string _descripcionProducto = string.Empty;
+
+                if (item.IdAnalizador > 0)
+                    _descripcionProducto = _lstProductos.FirstOrDefault(x => x.iD_PRODUCTO == item.IdProducto).nombre;
+                else
+                    _descripcionProducto = string.Empty;
+
+                response +=
+                "<tr>" +
+                    "<td></td>" +
+                    "<td>" + _descripcionProducto + "</td>" +
+                    "<td>" + _estatus + "</td>" +
+                    "<td>" +
+                        "<a href='javascript:void(0)' onclick='deleteOnClickAnalizadorProducto(this); return false;' data-id='" + item.IdAnalizadorProducto + "' class='btn btn-default btn-xs'>" +
+                            "<i class='fa fa-trash-alt'></i>" +
+                        "</a>" +
+                        "<a href='javascript:void(0)' onclick='editOnClickAnalizadorProducto(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='" + item.IdAnalizadorProducto + "'>" +
+                            "<i class='fa fa-edit'></i>" +
+                        "</a>" +
+                    "</td>" +
+                "</tr>";
+            }
+
+            string _tableHead = string.Empty;
+
+            _tableHead +=
+                "<table id='data-table-analizador-producto-" + Id + "' class='table table-bordered table-hover'>" +
+                    "<thead>" +
+                        "<tr>" +
+                            "<th class='no-sort' style='width:1%'></th>" +
+                            "<th style='white-space: nowrap'>Producto</th>" +
+                            "<th style='white-space: nowrap'>Estatus</th>" +
+                            "<th style='white-space: nowrap; width: 1%'>" +
+                                "<a href='javascript:void(0)' onclick='addEntryAnalizadorProducto(this, " + Id + "); return false;' class='waves-effect waves-light btn btn-white m-r-5' id='add-entry'>" +
+                                    "<i class='fa fa-plus'></i>" +
+                                "</a>" +
+                            "</th> " +
+                        "</tr>" +
+                    "</thead>";
+
+            string _tableFoot = string.Empty;
+
+            _tableFoot += "</table>";
+
+            return Json(new { Result = "Ok", Html = _tableHead + "<tbody>" + response + "</tbody>" + _tableFoot });
+        }
+
+        public async Task<JsonResult> GetAnalizadorProductoHTMLTagsById(string Id)
+        {
+            var response = string.Empty;
+
+            var analizadorProductos = await _certCatalogosService.GetAnalizadorProducto(null);
+            var productos = getProductos();
+
+            var entity = analizadorProductos.Where(x => x.IdAnalizadorProducto == Convert.ToInt32(Id)).FirstOrDefault();
+
+            if (entity != null)
+            {
+                var estatusTag = "<select  id='IdStatus' class='form-control'>";
+
+                if (entity.IdStatus == 1)
+                {
+                    estatusTag += "<option value='true' selected >Activo</option>";
+                    estatusTag += "<option value='false' >Inactivo</option>";
+                }
+                else
+                {
+                    estatusTag += "<option value='false' selected >Inactivo</option>";
+                    estatusTag += "<option value='true' >Activo</option>";
+                }
+
+                estatusTag += "</select>";
+
+                var productoTag = "<select id='IdProducto' class='form-control' >";
+
+                foreach (var item in productos)
+                {
+                    if (entity.IdProducto == item.iD_PRODUCTO)
+                        productoTag += "<option value='" + item.iD_PRODUCTO + "' selected >" + item.nombre + " </option>";
+                    else
+                        productoTag += "<option value='" + item.iD_PRODUCTO + "'>" + item.nombre + " </option>";
+                }
+
+                productoTag += "</select>";
+
+                response += "<tr>" +
+                "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
+                        "<a href='javascript:void(0)' onclick='saveOnClickAnalizadorProducto(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.IdAnalizadorProducto + "' ><i class='fa fa-save'></i></a> </td>" +
+                "<td style='display: none'><input class='form-control' id='IdAnalizador' type='text' value='" + entity.IdAnalizadorProducto + "'></td>" +
+                "<td>" + productoTag + "</td>" +
+                "<td>" + estatusTag + "</td>" +
+                "</tr>";
+            }
+
+            return Json(new { Result = "Ok", Html = response });
+        }
+        #endregion
+
+        #region Clientes
+
+        public async Task<IActionResult> Clientes()
 		{
 			var clientes = getClientes();
 			var tanque = await getTanque();
@@ -5555,10 +5499,10 @@ namespace LiberacionProductoWeb.Controllers
 			var grado = getGrado();
 
 			ProductoGradoViewModel _productoGradoVM = new ProductoGradoViewModel();
-            _productoGradoVM.showAll = showAll;
+			_productoGradoVM.showAll = showAll;
 
-            _productoGradoVM.ProductoGradoExportExcelList = productoGradoExportExcel;
-            _productoGradoVM.ProductoGradoExportExcelFilter = productoGradoExportExcel.ConvertAll(a =>
+			_productoGradoVM.ProductoGradoExportExcelList = productoGradoExportExcel;
+			_productoGradoVM.ProductoGradoExportExcelFilter = productoGradoExportExcel.ConvertAll(a =>
 			{
 				return new SelectListItem()
 				{
@@ -5586,7 +5530,7 @@ namespace LiberacionProductoWeb.Controllers
 				iD_STATUS = gcs.Key.iD_STATUS
 			}).ToList();
 
-            _productoGradoVM.ProductoGradoFilter = productoGrado.ConvertAll(a =>
+			_productoGradoVM.ProductoGradoFilter = productoGrado.ConvertAll(a =>
 			{
 				return new SelectListItem()
 				{
@@ -6020,13 +5964,13 @@ namespace LiberacionProductoWeb.Controllers
 			var parametros = getParametro();
 
 			ProductoParametroViewModel _productoParametrosVM = new ProductoParametroViewModel();
-            _productoParametrosVM.showAll = showAll;
+			_productoParametrosVM.showAll = showAll;
 
-            _productoParametrosVM.ProductoParametroList = productoParametros;
-            if (!showAll)
-                _productoParametrosVM.ProductoParametroList = _productoParametrosVM.ProductoParametroList.Where(x => x.iD_STATUS == 1).ToList();
+			_productoParametrosVM.ProductoParametroList = productoParametros;
+			if (!showAll)
+				_productoParametrosVM.ProductoParametroList = _productoParametrosVM.ProductoParametroList.Where(x => x.iD_STATUS == 1).ToList();
 
-            _productoParametrosVM.ProductoParametroFilter = productoParametros.ConvertAll(a =>
+			_productoParametrosVM.ProductoParametroFilter = productoParametros.ConvertAll(a =>
 			{
 				return new SelectListItem()
 				{
@@ -7303,7 +7247,7 @@ namespace LiberacionProductoWeb.Controllers
 			}
 		}
 
-		public JsonResult DeleteTanque(String id)
+		public JsonResult DeleteTanque(string id)
 		{
 			try
 			{
@@ -7340,7 +7284,7 @@ namespace LiberacionProductoWeb.Controllers
 
 		public async Task<JsonResult> GetTanqueHTMLTagsById(string Id)
 		{
-			String response = String.Empty;
+			string response = string.Empty;
 			var tanque = await getTanque();
 			var plants = getPlantas();
 			var product = getProductos();
@@ -7354,18 +7298,6 @@ namespace LiberacionProductoWeb.Controllers
 
 			if (entity != null)
 			{
-				var idTag = "<select  id='iD_TANQUE' class='form-control' >";
-
-				foreach (var item in tanque)
-				{
-					if (entity.iD_TANQUE == item.iD_TANQUE)
-						idTag += "<option value='" + item.iD_TANQUE + "' selected >" + item.descripcion + " </option>";
-					else
-						idTag += "<option value='" + item.iD_TANQUE + "'>" + item.descripcion + " </option>";
-				}
-
-				idTag += "</select>";
-
 				var plantasTag = "<select  id='iD_PLANTA' class='form-control' >";
 
 				foreach (var item in plants)
@@ -7405,11 +7337,173 @@ namespace LiberacionProductoWeb.Controllers
 
 				productosTag += "</select>";
 
-				var gradoTag = "<select  id='iD_GRADO' class='form-control' >";
+				response += "<tr>" +
+				"<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
+						"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TANQUE + "' ><i class='fa fa-save'></i></a> </td>" +
+				"<td><input class='form-control' id='descripcion' maxlength='20' type='text'  value='" + entity.descripcion + "'></td>" +
+				"<td><input class='form-control' id='clavE_PALS' maxlength='100' type='text'  value='" + entity.clavE_PALS + "'></td>" +
+				"<td>" + plantasTag + "</td>" +
+				"<td>" + productosTag + "</td>" +
+				"<td>" + estatusTag + "</td>" +
+				"</tr>";
+			}
+
+			return Json(new { Result = "Ok", Html = response });
+		}
+
+		#endregion
+
+		#region Tanque Grado
+		public async Task<JsonResult> SaveOrEditTanqueGrado([FromBody] TanqueGradoData tanqueGradoData)
+		{
+			try
+			{
+				if (tanqueGradoData == null)
+				{
+					throw new ArgumentNullException(nameof(tanqueGradoData), "La información proporcionada es nula.");
+				}
+
+				if (ValidateInsert(tanqueGradoData.IdTanqueGrado))
+				{
+					tanqueGradoData.UsrAlta = 1;
+
+					await _certCatalogosService.InsertTanqueGrado(tanqueGradoData);
+				}
+				else
+				{
+					tanqueGradoData.UsrModifica = 1;
+					tanqueGradoData.IsDelete = false;
+
+					await _certCatalogosService.UpdateTanqueGrado(tanqueGradoData);
+				}
+
+				return Json(new { Result = "Ok" });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { Result = "Fail", Message = ex.Message });
+			}
+		}
+
+		public async Task<JsonResult> DeleteTanqueGrado(string Id)
+		{
+			try
+			{
+				var analizadorProductoData = new TanqueGradoData();
+				analizadorProductoData.IdTanqueGrado = ParseMandatoryInt(Id, "El ID del tanque es inválido.");
+				analizadorProductoData.UsrModifica = 1;
+				analizadorProductoData.IsDelete = true;
+
+				await _certCatalogosService.UpdateTanqueGrado(analizadorProductoData);
+
+				return Json(new { Result = "Ok" });
+			}
+			catch (Exception ex)
+			{
+				return Json(new { Result = "Fail", Message = ex.Message });
+			}
+		}
+
+		public async Task<JsonResult> GetTanqueGradoById(string Id)
+		{
+			var response = string.Empty;
+			var lstTanqueGrado = await _certCatalogosService.GetTanqueGrado(Convert.ToInt32(Id));
+			var grados = getGrado();
+
+			List<Grados> _lstGrados = new List<Grados>();
+
+			if (grados != null && grados.Any())
+				_lstGrados = grados;
+			else
+				_lstGrados = new List<Grados>();
+
+			foreach (var item in lstTanqueGrado)
+			{
+				string _estatus = string.Empty;
+
+				if (item.IdStatus == 1)
+					_estatus = "Activo";
+				else
+					_estatus = "Inactivo";
+
+				string _descripcionGado = string.Empty;
+
+				if (item.IdTanque > 0)
+					_descripcionGado = _lstGrados.FirstOrDefault(x => x.iD_GRADO == item.IdGrado).descripcion;
+				else
+					_descripcionGado = string.Empty;
+
+				response +=
+				"<tr>" +
+					"<td></td>" +
+					"<td>" + _descripcionGado + "</td>" +
+					"<td>" + _estatus + "</td>" +
+					"<td>" +
+						"<a href='javascript:void(0)' onclick='deleteOnClickTanqueGrado(this); return false;' data-id='" + item.IdTanqueGrado + "' class='btn btn-default btn-xs'>" +
+							"<i class='fa fa-trash-alt'></i>" +
+						"</a>" +
+						"<a href='javascript:void(0)' onclick='editOnClickTanqueGrado(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='" + item.IdTanqueGrado + "'>" +
+							"<i class='fa fa-edit'></i>" +
+						"</a>" +
+					"</td>" +
+				"</tr>";
+			}
+
+			string _tableHead = string.Empty;
+
+			_tableHead +=
+				"<table id='data-table-tanque-grado-" + Id + "' class='table table-bordered table-hover'>" +
+					"<thead>" +
+						"<tr>" +
+							"<th class='no-sort' style='width:1%'></th>" +
+							"<th style='white-space: nowrap'>Grado</th>" +
+							"<th style='white-space: nowrap'>Estatus</th>" +
+							"<th style='white-space: nowrap; width: 1%'>" +
+								"<a href='javascript:void(0)' onclick='addEntryTanqueGrado(this, " + Id + "); return false;' class='waves-effect waves-light btn btn-white m-r-5' id='add-entry'>" +
+									"<i class='fa fa-plus'></i>" +
+								"</a>" +
+							"</th> " +
+						"</tr>" +
+					"</thead>";
+
+			string _tableFoot = string.Empty;
+
+			_tableFoot += "</table>";
+
+			return Json(new { Result = "Ok", Html = _tableHead + "<tbody>" + response + "</tbody>" + _tableFoot });
+		}
+
+		public async Task<JsonResult> GetTanqueGradoHTMLTagsById(string Id)
+		{
+			var response = string.Empty;
+
+			var tanqueGrados = await _certCatalogosService.GetTanqueGrado(null);
+			var grados = getGrado();
+
+			var entity = tanqueGrados.Where(x => x.IdTanqueGrado == Convert.ToInt32(Id)).FirstOrDefault();
+
+			if (entity != null)
+			{
+				var estatusTag = "<select  id='IdStatus' class='form-control'>";
+
+				if (entity.IdStatus == 1)
+				{
+					estatusTag += "<option value='true' selected >Activo</option>";
+					estatusTag += "<option value='false' >Inactivo</option>";
+				}
+				else
+				{
+					estatusTag += "<option value='false' selected >Inactivo</option>";
+					estatusTag += "<option value='true' >Activo</option>";
+				}
+
+				estatusTag += "</select>";
+
+				var gradoTag = "<select id='IdGrado' class='form-control' >";
 
 				foreach (var item in grados)
 				{
-					if (entity.iD_GRADO == item.iD_GRADO)
+					if (entity.IdGrado == item.iD_GRADO)
 						gradoTag += "<option value='" + item.iD_GRADO + "' selected >" + item.descripcion + " </option>";
 					else
 						gradoTag += "<option value='" + item.iD_GRADO + "'>" + item.descripcion + " </option>";
@@ -7419,11 +7513,8 @@ namespace LiberacionProductoWeb.Controllers
 
 				response += "<tr>" +
 				"<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-						"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.iD_TANQUE + "' ><i class='fa fa-save'></i></a> </td>" +
-				"<td><input class='form-control' id='descripcion' maxlength='20' type='text'  value='" + entity.descripcion + "'></td>" +
-				"<td><input class='form-control' id='clavE_PALS' maxlength='100' type='text'  value='" + entity.clavE_PALS + "'></td>" +
-				"<td>" + plantasTag + "</td>" +
-				"<td>" + productosTag + "</td>" +
+						"<a href='javascript:void(0)' onclick='saveOnClickTanqueGrado(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.IdTanqueGrado + "' ><i class='fa fa-save'></i></a> </td>" +
+				"<td style='display: none'><input class='form-control' id='IdAnalizador' type='text' value='" + entity.IdTanqueGrado + "'></td>" +
 				"<td>" + gradoTag + "</td>" +
 				"<td>" + estatusTag + "</td>" +
 				"</tr>";
@@ -7431,7 +7522,6 @@ namespace LiberacionProductoWeb.Controllers
 
 			return Json(new { Result = "Ok", Html = response });
 		}
-
 		#endregion
 
 		#region Tipo Especificacion
@@ -8738,6 +8828,11 @@ namespace LiberacionProductoWeb.Controllers
 			var deserializer = new JsonDeserializer();
 			return deserializer.Deserialize<Dictionary<string, string>>(jsonResponse);
 		}
-		#endregion
-	}
+
+        private bool ValidateInsert(int Id)
+        {
+            return Id == 0;
+        }
+        #endregion
+    }
 }

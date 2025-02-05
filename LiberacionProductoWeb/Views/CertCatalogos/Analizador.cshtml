@@ -1,4 +1,4 @@
-﻿@model LiberacionProductoWeb.Models.CertCatalogosViewModels.TanqueViewModel;
+﻿@model LiberacionProductoWeb.Models.CertCatalogosViewModels.AnalizadorViewModel;
 @using Microsoft.Extensions.Localization;
 @using LiberacionProductoWeb.Localize;
 @using LiberacionProductoWeb.Helpers;
@@ -9,7 +9,7 @@
 @inject IConfiguration Configuration
 
 @{
-    ViewData["Title"] = "Tanque";
+    ViewData["Title"] = "Analizador";
     Layout = "~/Views/Shared/_LayoutCatalogs.cshtml";
 
     var btnFind = resource.GetString("BtnFind");
@@ -40,50 +40,20 @@
     <ol class="breadcrumb pull-right">
         <li class="breadcrumb-item"><a href="@Url.Action("Access", "Access")">Inicio</a></li>
         <li class="breadcrumb-item"><a href="@Url.Action("Catalogs", "CertCatalogos")">Certificados Catálogos</a></li>
-        <li class="breadcrumb-item active">Tanque</li>
+        <li class="breadcrumb-item active">Planta</li>
     </ol>
     <!-- end breadcrumb -->
-    <!-- begin page-header -->
-    <h1 class="page-header">Catálogo Tanque</h1>
-    <!-- end page-header -->
-    @* <div class="section-container section-with-top-border p-b-10">
-    <div class="row">
-    <div class="col-lg-20">
-    <form>
-    <div class="row">
-    <div class="col-lg-6 m-b-15">
-    <div class="m-b-5"><b>Producto:</b></div>
-    <select multiple asp-for="SelectedTanqueFilter" asp-items="Model.TanqueFilter"
-    class="selectpicker show-menu-arrow combobox" data-style="btn-inverse"
-    data-live-search="true" title="Selecciona">
-    </select>
-    </div>
-    <div class="col-lg-6 m-b-15">
-    <div class="m-b-5"> &nbsp; </div>
-    <div class="input-group">
-    <button type="submit" class="btn btn-inverse">Buscar</button>
-    <a href="@Url.Action("ClearFiltersTanque", "CertCatalogos" )" class="btn btn-white m-r-5">
-    <i class="fa fa-eraser"></i> Limpiar filtros
-    </a>
-    </div>
-    </div>
-    </div>
-    </form>
-    </div>
-    </div>
-    </div> *@
+
+    <h1 class="page-header">Catálogo Analizadores</h1>
 
     <div class="section-container section-with-top-border p-b-5">
         <div class="row">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="btn-group pull-left">
-                        @*  @if (User.HasClaim(SecurityConstants.PERMISSION, SecurityConstants.EDITAR_CATALOGO_DE_PRODUCTO))
-                        { *@
                         <a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
                             <i class="fa fa-plus"></i> Agregar Registro
                         </a>
-                        @*  } *@
                         <a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
                             <i class="fa fa-file-excel"></i> Exportar a excel
                         </a>
@@ -113,23 +83,20 @@
                             <thead>
                                 <tr>
                                     <th class="no-sort" style="width:1%"></th>
-                                    <th style="white-space: nowrap; display: none;">IdTanque</th>
+                                    <th style="white-space: nowrap; display: none;">IdAnalizador</th>
                                     <th style="white-space: nowrap">Descripción</th>
                                     <th style="white-space: nowrap">Clave Pals</th>
-                                    <th style="white-space: nowrap">Planta</th>                                    
-                                    <th style="white-space: nowrap">Producto</th>
                                     <th style="white-space: nowrap">Estatus</th>
                                     <th style="white-space: nowrap; width:1%"></th>
                                 </tr>
                             </thead>
                             <tbody>
-
-                                @foreach (var entry in Model.TanqueList)
+                                @foreach (var entry in Model.AnalizadorList)
                                 {
                                     <tr>
                                         <td></td>
                                         <td style="display: none;">
-                                            @entry.iD_TANQUE
+                                            @entry.iD_ANALIZADOR
                                         </td>
                                         <td>
                                             @entry.descripcion
@@ -139,53 +106,24 @@
                                         </td>
                                         <td>
                                             @{
-                                                foreach (var item in Model.PlantasList)
-                                                {
-                                                    if (item.iD_PLANTA == entry.iD_PLANTA)
-                                                    {
-                                                        @item.descripcion
-                                                    }
-                                                    else
-                                                    {
-                                                        @:
-                                                    }
-                                                }
-                                            }
-                                        </td>
-                                        <td>
-                                            @{
-                                                foreach (var item in Model.ProductosList)
-                                                {
-                                                    if (item.iD_PRODUCTO == entry.iD_PRODUCTO)
-                                                    {
-                                                        @item.nombre
-                                                    }
-                                                    else
-                                                    {
-                                                        @:
-                                                    }
-                                                }
-                                            }
-                                        </td>
-                                        <td>
-                                            @{
                                                 if (Convert.ToBoolean(entry.iD_STATUS))
                                                 {
-                                                    @: Activo
+                                                            @: Activo
                                                 }
                                                 else
                                                 {
-                                                    @: Inactivo
+                                                            @: Inactivo
                                                 }
                                             }
                                         </td>
                                         <td>
-                                            <a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_TANQUE" class="btn btn-default btn-xs">
+                                            <a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_ANALIZADOR" class="btn btn-default btn-xs">
                                                 <i class="fa fa-trash-alt"></i>
                                             </a>
-                                            <a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_TANQUE'>
+                                            <a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_ANALIZADOR'>
                                                 <i class='fa fa-edit'></i>
                                             </a>
+
                                         </td>
                                     </tr>
                                 }
@@ -254,29 +192,26 @@
     <script>
         var commonUrl = @Json.Serialize(@Configuration.GetSection("publishUrl").GetSection("commonUrl").Value)
 
-        console.log(commonUrl);
+            console.log(commonUrl);
 
         var pb = {
             base: commonUrl
         };
 
         $(function () {
-
             if ('@Model.MensajeError'.length > 1) {
                 $('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeError </div>');
             }
         });
 
         $(function () {
-
             if ('@Model.MensajeInfo'.length > 1) {
                 $('#message').append('<div class="alert alert-success"> <a class="close" data-dismiss="alert" href="#">&times;</a>@Model.MensajeInfo </div>');
             }
         });
 
-
         var refresh = function () {
-            window.location.href = '@Url.Action("Tanque", "CertCatalogos")';
+            window.location.href = '@Url.Action("Analizador", "CertCatalogos")';
         }
 
         var deleteOnClick = function (event) {
@@ -309,7 +244,7 @@
 
             $.ajax({
                 type: "POST",
-                url: pb.base + "/CertCatalogos/DeleteTanque/" + id,
+                url: pb.base + "/CertCatalogos/DeleteAnalizador/" + id,
                 dataType: "json",
                 success: function (response) {
                     if (response.message) {
@@ -319,8 +254,7 @@
                             class_name: "gritter-light"
                         })
                     } else {
-                        //sucess add, needs to refresh and show message
-                        window.location.href = '@Url.Action("Tanque", "CertCatalogos")';
+                        window.location.href = '@Url.Action("Analizador", "CertCatalogos")';
                     }
                 },
                 failure: function (response) {
@@ -333,7 +267,7 @@
             });
         }
 
-        var deleteOnClickTanqueGrado = function (event) {
+        var deleteOnClickAnalizadorProducto = function (event) {
             bootbox.confirm({
                 message: "¿Deseas eliminar el registro?",
                 buttons: {
@@ -348,13 +282,13 @@
                 },
                 callback: function (result) {
                     if (result) {
-                        deleteConfirmTanqueGrado(event);
+                        deleteConfirmAnalizadorProducto(event);
                     }
                 }
             });
         };
 
-        var deleteConfirmTanqueGrado = function (event) {
+        var deleteConfirmAnalizadorProducto = function (event) {
             var id = $(event).data("id");
 
             if (id === -1) {
@@ -363,7 +297,7 @@
 
             $.ajax({
                 type: "POST",
-                url: pb.base + "/CertCatalogos/DeleteTanqueGrado/" + id,
+                url: pb.base + "/CertCatalogos/DeleteAnalizadorProducto/" + id,
                 dataType: "json",
                 success: function (response) {
                     if (response.message) {
@@ -373,7 +307,7 @@
                             class_name: "gritter-light"
                         })
                     } else {
-                        window.location.href = '@Url.Action("Tanque", "CertCatalogos")';
+                        window.location.href = '@Url.Action("Analizador", "CertCatalogos")';
                     }
                 },
                 failure: function (response) {
@@ -386,21 +320,21 @@
             });
         }
 
-        @{
-            
-            var plantasTag = "<select id='iD_PLANTA' class='form-control' data-style='btn-white'  title='Selecciona'>";
-
-            if (Model.PlantasFilter != null)
-            {
-                foreach (var item in Model.PlantasFilter)
-                {
-                    plantasTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+        var getEditRow = function (Id) {
+            var ret = null;
+            $.ajax({
+                async: false,
+                url: pb.base + "/CertCatalogos/GetAnalizadorHTMLTagsById/" + Id,
+                dataType: "json",
+                success: function (data) {
+                    ret = data.html;
                 }
+            });
+            return ret;
+        };
 
-                plantasTag += "</select>";
-            }
-                        
-            var productoTag = "<select id='iD_PRODUCTO' class='form-control' data-style='btn-white'  title='Selecciona'>";
+        @{
+            var productoTag = "<select id='IdProducto' class='form-control' data-style='btn-white' title='Selecciona'>";
 
             if (Model.ProductosFilter != null)
             {
@@ -411,39 +345,13 @@
 
                 productoTag += "</select>";
             }
-
-            var gradoTag = "<select id='IdGrado' class='form-control' data-style='btn-white'  title='Selecciona'>";
-
-            if (Model.GradosFilter != null)
-            {
-                foreach (var item in Model.GradosFilter)
-                {
-                    gradoTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
-                }
-
-                gradoTag += "</select>";
-            }
         }
 
-        var getEditRow = function (Id) {
+        var getEditRowAnalizadorProducto = function (Id) {
             var ret = null;
             $.ajax({
                 async: false,
-                url: pb.base + "/CertCatalogos/GetTanqueHTMLTagsById/" + Id,
-                dataType: "json",
-                success: function (data) {
-                    ret = data.html;
-                }
-            });
-
-            return ret;
-        };
-
-        var getEditRowTanqueGrado = function (Id) {
-            var ret = null;
-            $.ajax({
-                async: false,
-                url: pb.base + "/CertCatalogos/GetTanqueGradoHTMLTagsById/" + Id,
+                url: pb.base + "/CertCatalogos/GetAnalizadorProductoHTMLTagsById/" + Id,
                 dataType: "json",
                 success: function (data) {
                     ret = data.html;
@@ -455,24 +363,21 @@
 
         var getNewRow = function () {
             var result = "<tr>" +
-                "<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-                "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
-                "<td><input class='form-control' maxlength='20' id='descripcion' type='text'></td>" +
-                "<td><input class='form-control' maxlength='100' id='clavE_PALS' type='text'></td>" +
-                "<td>@Html.Raw(plantasTag)</td>" +
-                "<td>@Html.Raw(productoTag)</td>" +
-                "<td>@Html.Raw(gradoTag)</td>" +
-            "<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
-                "</tr>"
+                "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
+                "<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
+                "<td><input class='form-control' maxlength='50' id='descripcion' type='text'></td>" +
+                "<td><input class='form-control' maxlength='10' id='clavE_PALS' type='text'></td>" +
+                "<td><select id='iD_STATUS' class='form-control'><option  value='1'>Activo</option><option value='0'>Inactivo</option></select> </td>" +
+                "</tr>";
             return result;
         };
 
-        var getNewRowTanqueGrado = function (Id) {
+        var getNewRowAnalizadorProducto = function (Id) {
             var result = "<tr>" +
                 "<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-                "<a href='javascript:void(0)' onclick='saveOnClickTanqueGrado(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
-                "<td style='display: none;'><input class='form-control' id='IdTanque' value='" + Id + "' type='text'></td>" +
-                "<td>@Html.Raw(gradoTag)</td>" +
+                "<a href='javascript:void(0)' onclick='saveOnClickAnalizadorProducto(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
+                "<td style='display: none;'><input class='form-control' id='IdAnalizador' value='" + Id + "' type='text'></td>" +
+                "<td>@Html.Raw(productoTag)</td>" +
                 "<td><select id='IdStatus' class='form-control'><option  value='1'>Activo</option><option value='0'>Inactivo</option></select> </td>" +
                 "</tr>";
             console.log(result);
@@ -496,7 +401,6 @@
             }
 
             if (!isEdit) {
-                //remueve y pinta los controles
                 isEdit = true;
                 $("#add-entry").addClass("disabled");
                 $("#ExporttoExcel").addClass("disabled");
@@ -504,7 +408,7 @@
             }
         };
 
-        var editOnClickTanqueGrado = function (event) {
+        var editOnClickAnalizadorProducto = function (event) {
             var Id = $(event).data("id");
 
             if (isCreate) {
@@ -516,11 +420,11 @@
                 isEdit = true;
                 $("#add-entry").addClass("disabled");
                 $("#ExporttoExcel").addClass("disabled");
-                $(event).closest("tr").replaceWith(getEditRowTanqueGrado(Id));
+                $(event).closest("tr").replaceWith(getEditRowAnalizadorProducto(Id));
             }
         };
 
-        var saveOnClickTanqueGrado = function (event) {
+        var saveOnClickAnalizadorProducto = function (event) {
             bootbox.confirm({
                 message: "¿Deseas guardar los cambios?",
                 buttons: {
@@ -535,13 +439,13 @@
                 },
                 callback: function (result) {
                     if (result) {
-                        saveConfirmTanqueGrado(event);
+                        saveConfirmAnalizadorProducto(event);
                     }
                 }
             });
         };
 
-        var saveConfirmTanqueGrado = function (event) {
+        var saveConfirmAnalizadorProducto = function (event) {
             if (isEdit) {
                 $("#add-entry").removeClass("disabled");
                 $("#ExporttoExcel").removeClass("disabled");
@@ -557,21 +461,21 @@
             }
 
             var request = {
-                IdTanqueGrado: id,
-                IdTanque: 0,
-                IdGrado: 0,
+                IdAnalizadorProducto: id,
+                IdAnalizador: 0,
+                IdProducto: 0,
                 IdStatus: 0
             };
 
             $(event).closest("tr").each(function () {
                 $.each(this.cells, function () {
 
-                    if ($(this).find("#IdTanque").length) {
-                        request.IdTanque = $(this).find("#IdTanque").val();
+                    if ($(this).find("#IdAnalizador").length) {
+                        request.IdAnalizador = $(this).find("#IdAnalizador").val();
                     }
 
-                    if ($(this).find("#IdGrado").length) {
-                        request.IdGrado = $(this).find("#IdGrado").val();
+                    if ($(this).find("#IdProducto").length) {
+                        request.IdProducto = $(this).find("#IdProducto").val();
                     }
 
                     if ($(this).find("#IdStatus").length) {
@@ -583,7 +487,7 @@
 
             $.ajax({
                 type: "POST",
-                url: pb.base + "/CertCatalogos/SaveOrEditTanqueGrado",
+                url: pb.base + "/CertCatalogos/SaveOrEditAnalizadorProducto",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("XSRF-TOKEN",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
@@ -600,7 +504,7 @@
                         })
                     } else {
                         //sucess add, needs to refresh and show message
-                        window.location.href = '@Url.Action("Tanque", "CertCatalogos")';
+                        window.location.href = '@Url.Action("Analizador", "CertCatalogos")';
                     }
                 },
                 failure: function (response) {
@@ -611,7 +515,6 @@
         }
 
         var saveConfirm = function (event) {
-
             if (isEdit) {
                 $("#add-entry").removeClass("disabled");
                 $("#ExporttoExcel").removeClass("disabled");
@@ -620,64 +523,49 @@
             isEdit = false;
             isCreate = false;
 
-            var id = $(event).data("id");
+            let id = $(event).data("id");
 
             if (id === -1) {
                 id = "";
             }
 
-            let saveOrEditTanqueRequest = {
-                iD_TANQUE: "",
+            let saveOrEditAnalizadorRequest = {
+                iD_PRODUCTO: "",
                 descripcion: "",
                 clavE_PALS: "",
-                iD_PLANTA: "",
-                iD_PRODUCTO: "",
-                iD_GRADO: "",
                 iD_STATUS: ""
             }
 
             $(event).closest("tr").each(function () {
                 $.each(this.cells, function () {
-                    saveOrEditTanqueRequest.iD_TANQUE = id.toString();
+                    saveOrEditAnalizadorRequest.iD_ANALIZADOR = id.toString();
 
-                    if ($(this).find("#iD_TANQUE").length) {
-                        saveOrEditTanqueRequest.iD_TANQUE = $(this).find("#iD_TANQUE").val();
+                    if ($(this).find("#iD_PRODUCTO").length) {
+                        saveOrEditAnalizadorRequest.iD_PRODUCTO = $(this).find("#iD_PRODUCTO").val();
                     }
 
                     if ($(this).find("#descripcion").length) {
-                        saveOrEditTanqueRequest.descripcion = $(this).find("#descripcion").val();
+                        saveOrEditAnalizadorRequest.descripcion = $(this).find("#descripcion").val();
                     }
 
                     if ($(this).find("#clavE_PALS").length) {
-                        saveOrEditTanqueRequest.clavE_PALS = $(this).find("#clavE_PALS").val();
-                    }
-
-                    if ($(this).find("#iD_PLANTA").length) {
-                        saveOrEditTanqueRequest.iD_PLANTA = $(this).find("#iD_PLANTA").val();
-                    }
-
-                    if ($(this).find("#iD_PRODUCTO").length) {
-                        saveOrEditTanqueRequest.iD_PRODUCTO = $(this).find("#iD_PRODUCTO").val();
-                    }
-
-                    if ($(this).find("#iD_GRADO").length) {
-                        saveOrEditTanqueRequest.iD_GRADO = $(this).find("#iD_GRADO").val();
+                        saveOrEditAnalizadorRequest.clavE_PALS = $(this).find("#clavE_PALS").val();
                     }
 
                     if ($(this).find("#iD_STATUS").length) {
-                        saveOrEditTanqueRequest.iD_STATUS = $(this).find("#iD_STATUS").val();
+                        saveOrEditAnalizadorRequest.iD_STATUS = $(this).find("#iD_STATUS").val();
                     }
                 });
             });
 
             $.ajax({
                 type: "POST",
-                url: pb.base + "/CertCatalogos/SaveOrEditTanque",
+                url: pb.base + "/CertCatalogos/SaveOrEditAnalizador",
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader("XSRF-TOKEN",
                         $('input:hidden[name="__RequestVerificationToken"]').val());
                 },
-                data: JSON.stringify(saveOrEditTanqueRequest),
+                data: JSON.stringify(saveOrEditAnalizadorRequest),
                 contentType: "application/json",
                 dataType: "json",
                 success: function (response) {
@@ -688,31 +576,29 @@
                             class_name: "gritter-light"
                         })
                     } else {
-                        //sucess add, needs to refresh and show message
-                        window.location.href = '@Url.Action("Tanque", "CertCatalogos")';
+                        window.location.href = '@Url.Action("Analizador", "CertCatalogos")';
                     }
                 },
                 failure: function (response) {
-                    //failure, shgow messahe with error
                     alert("Fail");
                 }
             });
         }
 
         var validateForm = function () {
-            let clavE_PALS = $("#clavE_PALS").val();
             let descripcion = $("#descripcion").val();
+            let clavE_PALS = $("#clavE_PALS").val();
 
             let isValid = true;
             let errors = [];
 
-            if (!clavE_PALS) {
-                errors.push('El campo clave Pals es requerido');
+            if (!descripcion) {
+                errors.push('El campo Descripcion es requerido');
                 isValid = false;
             }
 
-            if (!descripcion) {
-                errors.push('El campo descripcion es requerido');
+            if (!clavE_PALS) {
+                errors.push('El campo Clave Pals es requerido');
                 isValid = false;
             }
 
@@ -748,8 +634,8 @@
             }
         };
 
-        var addEntryTanqueGrado = function (event, Id) {
-            $(tableIdentificator + ' tr:eq(1)').after(getNewRowTanqueGrado(Id));
+        var addEntryAnalizadorProducto = function (event, Id) {
+            $(tableIdentificator + ' tr:eq(1)').after(getNewRowAnalizadorProducto(Id));
             $("#ExporttoExcel").addClass("disabled");
             $("#add-entry").addClass("disabled")
             if (!isCreate) {
@@ -775,15 +661,14 @@
 
             function onSwitchActive() {
                 console.log('El switch está activo');
-                window.location.href = '@Url.Action("Tanque", "CertCatalogos")?showAll=true';
+                window.location.href = '@Url.Action("Analizador", "CertCatalogos")?showAll=true';
             }
 
             function onSwitchInactive() {
                 console.log('El switch está inactivo');
-                window.location.href = '@Url.Action("Tanque", "CertCatalogos")?showAll=false';
+                window.location.href = '@Url.Action("Analizador", "CertCatalogos")?showAll=false';
             }
         });
-
 
         $(document).ready(function () {
             App.init();
@@ -872,16 +757,20 @@
 
                 $.ajax({
                     async: false,
-                    url: pb.base + "/CertCatalogos/GetTanqueGradoById/" + id,
+                    url: pb.base + "/CertCatalogos/GetAnalizadorProductoById/" + id,
                     dataType: "json",
                     success: function (data) {
                         ret = data.html;
+
+                        //console.log(ret);
                     }
                 });
 
                 let tabla = ret;
 
                 return $(tabla).toArray();
+
+                //return ret;
             }
 
             function getId(event) {
@@ -899,7 +788,7 @@
             table.on('click', 'td.dt-control', function (event) {
                 let tr = event.target.closest('tr');
                 let row = table.row(tr);
-                let tableId = '#data-table-tanque-grado-' + getId(row.data()) + '';
+                let tableId = '#data-table-analizador-producto-' + getId(row.data()) + '';
 
                 //console.log(row.data());
                 //console.log(tableId);

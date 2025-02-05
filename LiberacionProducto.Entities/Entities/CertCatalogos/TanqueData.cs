@@ -7,7 +7,6 @@ namespace LiberacionProducto.Entities.CertCatalogos
         public int IdTanque { get; set; }
         public int IdPlanta { get; set; }
         public int? IdProducto { get; set; }
-        public int? IdGrado { get; set; }
         public string? Descripcion { get; set; }
         public short IdStatus { get; set; }
         public string? ClavePals { get; set; }

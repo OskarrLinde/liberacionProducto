@@ -83,8 +83,9 @@
 							<thead>
 								<tr>
 									<th class="no-sort" style="width:1%"></th>
+									<th style="white-space: nowrap; display: none;">IdPlanta</th>
                                     <th style="white-space: nowrap">País</th>
-                                    <th style="white-space: nowrap">Tipo Suministro</th>
+                                    <th style="white-space: nowrap">Tipo Suministro</th> 
                                     <th style="white-space: nowrap">Descripción</th>
                                     <th style="white-space: nowrap">Identificador</th>
                                     <th style="white-space: nowrap">Clave Certificado</th>
@@ -99,6 +100,9 @@
 								{
 									<tr>
 										<td></td>
+										<td style="display: none;">
+											@entry.iD_PLANTA
+										</td>
 										<td>
 											@{
 												foreach (var item in Model.PaisesList)
@@ -189,94 +193,6 @@
 									</tr>
 								}
 
-							</tbody>
-						</table>
-					</div>
-				</div>
-
-				<div class="panel-body" style="display:none;">
-					<div>
-						<table id="data-table-export-to-excel" class="display compact table table-bordered table-hover">
-							<thead>
-								<tr>
-									<th style="white-space: nowrap">Planta</th>
-									<th style="white-space: nowrap">Parámetro</th>
-									<th style="white-space: nowrap">Metodo</th>
-									<th style="white-space: nowrap">Límite Inferior</th>
-									<th style="white-space: nowrap">Leyenda Reporte</th>
-									<th style="white-space: nowrap">Estatus</th>
-								</tr>
-							</thead>
-							<tbody>
-
-								@foreach (var entry in Model.AnalizadorParametrosExportExcelList)
-								{
-									<tr>
-										<td>
-											@{
-												foreach (var item in Model.PlantasList)
-												{
-													if (item.iD_PLANTA == entry.iD_PLANTA)
-													{
-															@item.descripcion
-													}
-													else
-													{
-															@:
-													}
-												}
-											}
-										</td>
-										<td>
-											@{
-												foreach (var item in Model.ParametrosList)
-												{
-													if (item.iD_PARAMETRO == entry.iD_PARAMETRO)
-													{
-															@item.descripcion
-													}
-													else
-													{
-															@:
-													}
-												}
-											}
-										</td>
-										<td>
-											@{
-												foreach (var item in Model.MetodoList)
-												{
-													if (item.iD_METODO == entry.iD_METODO)
-													{
-															@item.descripcion
-													}
-													else
-													{
-															@:
-													}
-												}
-											}
-										</td>
-										<td>
-											@entry.limitE_INFERIOR
-										</td>
-										<td>
-											@entry.leyendA_REPORTE
-										</td>
-										<td>
-											@{
-												if (Convert.ToBoolean(entry.iD_STATUS))
-												{
-														@: Activo
-												}
-												else
-												{
-														@: Inactivo
-												}
-											}
-										</td>
-									</tr>
-								}
 							</tbody>
 						</table>
 					</div>
@@ -429,28 +345,16 @@
 				idTag += "</select>";
 			}
 
-			var productoTag = "<select id='iD_PRODUCTO' class='form-control' data-style='btn-white'  title='Selecciona'>";
+			var analizadorTag = "<select id='iD_ANALIZADOR' class='form-control' data-style='btn-white'  title='Selecciona'>";
 
-			if (Model.ProductosFilter != null)
+			if (Model.AnalizadorFilter != null)
 			{
-				foreach (var item in Model.ProductosFilter)
+				foreach (var item in Model.AnalizadorFilter)
 				{
-					productoTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+					analizadorTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
 				}
 
-				productoTag += "</select>";
-			}
-
-			var plantaTag = "<select id='iD_PLANTA' class='form-control' data-style='btn-white'  title='Selecciona'>";
-
-			if (Model.PlantasFilter != null)
-			{
-				foreach (var item in Model.PlantasFilter)
-				{
-					plantaTag += "<option value='" + item.Value + "'>" + item.Text + "</option>";
-				}
-
-				plantaTag += "</select>";
+				analizadorTag += "</select>";
 			}
 
 			var parametroTag = "<select id='iD_PARAMETRO' class='form-control' data-style='btn-white'  title='Selecciona'>";
@@ -493,15 +397,17 @@
 		};
 
 		var getNewRowAnalizadorParametro = function (Id) {
+			console.log(Id);
 			var result = "<tr>" +
 				"<td> <a href='javascript:void(0)' onclick='removeOnClick(this);return false;'  class='delete-data btn btn-danger btn-xs btn-space' data-id='-1' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
 				"<a href='javascript:void(0)' onclick='saveOnClickAnalizadorParametros(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
-				"<td style='display: none;'><input class='form-control' id='iD_ANALIZADOR' value='" + Id + "' type='text'></td>" +
-				"<td>@Html.Raw(plantaTag)</td>" +
+				"<td style='display: none;'><input class='form-control' id='iD_PLANTA' value='" + Id + "' type='text'></td>" +
+				"<td>@Html.Raw(analizadorTag)</td>" +
 				"<td>@Html.Raw(parametroTag)</td>" +
 				"<td>@Html.Raw(metodoTag)</td>" +
 				"<td><input class='form-control' id='limitE_INFERIOR' type='number'></td>" +
 				"<td><input class='form-control' maxlength='25' id='leyendA_REPORTE' type='text'></td>" +
+				"<td><input class='form-control' maxlength='' id='clavE_PALS' type='text'></td>" +
 				"<td><select id='iD_STATUS' class='form-control'><option value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
 				"</tr>"
 			return result;
@@ -548,89 +454,6 @@
 			}
 		};
 
-		var saveConfirm = function (event) {
-
-			if (isEdit) {
-				$("#add-entry").removeClass("disabled");
-				$("#ExporttoExcel").removeClass("disabled");
-			}
-
-			isEdit = false;
-			isCreate = false;
-
-			var id = $(event).data("id");
-
-			if (id === -1) {
-				id = "";
-			}
-
-			var iD_ANALIZADOR = "";
-			var iD_PRODUCTO = "";
-			var descripcion = "";
-			var iD_STATUS = "";
-			var clavE_PALS = "";
-
-			$(event).closest("tr").each(function () {
-				$.each(this.cells, function () {
-					//gets values for each cell
-
-					if ($(this).find("#iD_ANALIZADOR").length) {
-						iD_ANALIZADOR = $(this).find("#iD_ANALIZADOR").val();
-					}
-
-					if ($(this).find("#iD_PRODUCTO").length) {
-						iD_PRODUCTO = $(this).find("#iD_PRODUCTO").val();
-					}
-
-					if ($(this).find("#descripcion").length) {
-						descripcion = $(this).find("#descripcion").val();
-					}
-
-					if ($(this).find("#clavE_PALS").length) {
-						clavE_PALS = $(this).find("#clavE_PALS").val();
-					}
-
-					if ($(this).find("#iD_STATUS").length) {
-						iD_STATUS = $(this).find("#iD_STATUS").val();
-					}
-				});
-			});
-
-			$.ajax({
-				type: "POST",
-				url: pb.base + "/CertCatalogos/SaveOrEditAnalizador",
-				beforeSend: function (xhr) {
-					xhr.setRequestHeader("XSRF-TOKEN",
-						$('input:hidden[name="__RequestVerificationToken"]').val());
-				},
-				data: JSON.stringify({
-					iD_ANALIZADOR: String(id),
-					iD_PRODUCTO: iD_PRODUCTO,
-					descripcion: descripcion,
-					iD_STATUS: iD_STATUS,
-					clavE_PALS: clavE_PALS
-				}),
-				contentType: "application/json",
-				dataType: "json",
-				success: function (response) {
-					if (response.message) {
-						$.gritter.add({
-							title: "Error",
-							text: response.message,
-							class_name: "gritter-light"
-						})
-					} else {
-						//sucess add, needs to refresh and show message
-						window.location.href = '@Url.Action("AnalizadorParametros", "CertCatalogos")';
-					}
-				},
-				failure: function (response) {
-					//failure, shgow messahe with error
-					alert("Fail");
-				}
-			});
-		}
-
 		var saveConfirmAnalizadorParametros = function (event) {
 
 			if (isEdit) {
@@ -646,55 +469,62 @@
 			if (id === -1) {
 				id = "";
 			}
-
-			var iD_ANALIZADOR_PARAM = "";
-			var iD_ANALIZADOR = "";
-			var iD_PLANTA = "";
-			var iD_PARAMETRO = "";
-			var iD_METODO = "";
-			var descripcion = "";
-			var limitE_INFERIOR = "";
-			var leyendA_REPORTE = "";
-			var iD_STATUS = "";
+			
+			var request = {
+				iD_ANALIZADOR_PARAM: '',
+				iD_ANALIZADOR: '',
+				iD_PLANTA: '',
+				iD_PARAMETRO: '',
+				iD_METODO: '',
+				descripcion: '',
+				limitE_INFERIOR: '',
+				leyendA_REPORTE: '',
+				clave_Pals: '',
+				iD_STATUS: ''
+			};
 
 			$(event).closest("tr").each(function () {
 				$.each(this.cells, function () {
 					//gets values for each cell
 
 					if ($(this).find("#iD_ANALIZADOR_PARAM").length) {
-						iD_ANALIZADOR_PARAM = $(this).find("#iD_ANALIZADOR_PARAM").val();
+						request.iD_ANALIZADOR_PARAM = $(this).find("#iD_ANALIZADOR_PARAM").val();
 					}
 
 					if ($(this).find("#iD_ANALIZADOR").length) {
-						iD_ANALIZADOR = $(this).find("#iD_ANALIZADOR").val();
+						request.iD_ANALIZADOR = $(this).find("#iD_ANALIZADOR").val();
 					}
 
 					if ($(this).find("#iD_PLANTA").length) {
-						iD_PLANTA = $(this).find("#iD_PLANTA").val();
+						request.iD_PLANTA = $(this).find("#iD_PLANTA").val();
 					}
 
 					if ($(this).find("#iD_PARAMETRO").length) {
-						iD_PARAMETRO = $(this).find("#iD_PARAMETRO").val();
+						request.iD_PARAMETRO = $(this).find("#iD_PARAMETRO").val();
 					}
 
 					if ($(this).find("#iD_METODO").length) {
-						iD_METODO = $(this).find("#iD_METODO").val();
+						request.iD_METODO = $(this).find("#iD_METODO").val();
 					}
 
 					if ($(this).find("#descripcion").length) {
-						descripcion = $(this).find("#descripcion").val();
+						request.descripcion = $(this).find("#descripcion").val();
 					}
 
 					if ($(this).find("#limitE_INFERIOR").length) {
-						limitE_INFERIOR = $(this).find("#limitE_INFERIOR").val();
+						request.limitE_INFERIOR = $(this).find("#limitE_INFERIOR").val();
 					}
 
+					if ($(this).find("#clavE_PALS").length) {
+						request.clavE_PALS = $(this).find("#clavE_PALS").val();
+					}
+					
 					if ($(this).find("#leyendA_REPORTE").length) {
-						leyendA_REPORTE = $(this).find("#leyendA_REPORTE").val();
+						request.leyendA_REPORTE = $(this).find("#leyendA_REPORTE").val();
 					}
 
 					if ($(this).find("#iD_STATUS").length) {
-						iD_STATUS = $(this).find("#iD_STATUS").val();
+						request.iD_STATUS = $(this).find("#iD_STATUS").val();
 					}
 				});
 			});
@@ -706,17 +536,7 @@
 					xhr.setRequestHeader("XSRF-TOKEN",
 						$('input:hidden[name="__RequestVerificationToken"]').val());
 				},
-				data: JSON.stringify({
-					iD_ANALIZADOR_PARAM: String(id),
-					iD_ANALIZADOR: iD_ANALIZADOR,
-					iD_PLANTA: iD_PLANTA,
-					iD_PARAMETRO: iD_PARAMETRO,
-					iD_METODO: iD_METODO,
-					descripcion: descripcion,
-					limitE_INFERIOR: limitE_INFERIOR,
-					leyendA_REPORTE: leyendA_REPORTE,
-					iD_STATUS: iD_STATUS
-				}),
+				data: JSON.stringify(request),
 				contentType: "application/json",
 				dataType: "json",
 				success: function (response) {
@@ -738,58 +558,10 @@
 			});
 		}
 
-		var validateForm = function () {
-			let clavE_PALS = $("#clavE_PALS").val();
-			let descripcion = $("#descripcion").val();
-
-			let isValid = true;
-			let errors = [];
-
-			if (!clavE_PALS) {
-				errors.push('El campo Clave Pals es requerido');
-				isValid = false;
-			}
-
-			if (!descripcion) {
-				errors.push('El campo Descripción es requerido');
-				isValid = false;
-			}
-
-			if (!isValid) {
-				errors.forEach(error => {
-					$('#message').append('<div class="alert alert-danger"> <a class="close" data-dismiss="alert" href="#">&times;</a>' + error + '</div>');
-				});
-			}
-
-			return isValid;
-		}
-
-		var saveOnClick = function (event) {
-			if (validateForm()) {
-				bootbox.confirm({
-					message: "¿Deseas guardar los cambios?",
-					buttons: {
-						confirm: {
-							label: 'Si',
-							className: 'btn-success'
-						},
-						cancel: {
-							label: 'No',
-							className: 'btn-danger'
-						}
-					},
-					callback: function (result) {
-						if (result) {
-							saveConfirm(event);
-						}
-					}
-				});
-			}
-		};
-
 		var validateFormAnalizadorParametros = function () {
 			let limitE_INFERIOR = $("#limitE_INFERIOR").val();
 			let leyendA_REPORTE = $("#leyendA_REPORTE").val();
+			let clavE_PALS = $("#clavE_PALS").val();
 
 			let isValid = true;
 			let errors = [];
@@ -801,6 +573,11 @@
 
 			if (!leyendA_REPORTE) {
 				errors.push('El campo Leyenda Reporte es requerido');
+				isValid = false;
+			}
+
+			if (!clavE_PALS) {
+				errors.push('El campo clave pals es requerido');
 				isValid = false;
 			}
 
@@ -998,7 +775,7 @@
 			}
 
 			function getId(event) {
-
+				console.log(event);
 				var id = event[1];
 
 				if (id === -1) {

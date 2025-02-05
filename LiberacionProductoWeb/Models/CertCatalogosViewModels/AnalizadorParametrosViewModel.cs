@@ -83,6 +83,7 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         public string descripcion { get; set; }
         public string limitE_INFERIOR { get; set; }
         public string leyendA_REPORTE { get; set; }
+        public string clave_Pals { get; set; }
         public string iD_STATUS { get; set; }
     }
 }
