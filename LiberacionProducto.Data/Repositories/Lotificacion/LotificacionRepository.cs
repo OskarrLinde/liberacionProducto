@@ -583,6 +583,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             command.Parameters.Add(new SqlParameter("@NivelFin", Convert.ToDecimal(data.MasterData.NivelFin, culture)));
                             command.Parameters.Add(new SqlParameter("@IdUMedidaFin", Convert.ToInt32(data.MasterData.IdUMedidaFin)));
                             command.Parameters.Add(new SqlParameter("@EstatusAnalisis", Convert.ToInt32(data.MasterData.Estatus_Analisis)));
+                            command.Parameters.Add(new SqlParameter("@EstatusRevision", Convert.ToInt32(data.MasterData.Estatus_Revision)));
 
                             command.Parameters.Add(CommitIdAnalisis);
 

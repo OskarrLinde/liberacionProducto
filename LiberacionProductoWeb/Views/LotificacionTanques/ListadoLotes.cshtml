@@ -619,7 +619,7 @@
                                 },
                                 { "data": "permisoRevisionLote", "className": "hiddenListadoLotes_permisoRevisionLote" },
                                 {
-                                    "data": "estatus_Revision",
+                                    "data": "estatus_Revision", "className":"estatusRevisionText",
                                     "defaultContent": "N/A",
                                     "render": function (data, type, row, meta) {
                                         return data;
@@ -799,6 +799,16 @@
                                 if(rowData.permisoUser)
                                 {
                                     actionsCell.html('<button class="btn btn-primary editarlote">Editar Lote</button>');
+
+                                    var cellValueNivelInicial = tr.find(".nivelinicial");
+                                    var ValueNivelInicial = tr.find(".hiddenListadoLotes_NIValue").text();
+                                    var ValueNivelInicialUM = tr.find(".hiddenListadoLotes_UMNIValue").text();
+                                    cellValueNivelInicial.html(ValueNivelInicial + (ValueNivelInicialUM == "25" ? " kg" : " psig"));
+
+                                    var cellValueNivelFinal = tr.find(".nivelfinal");
+                                    var ValueNivelFinal = tr.find(".hiddenListadoLotes_NFValue").text();
+                                    var ValueNivelFinalUM = tr.find(".hiddenListadoLotes_UMNFValue").text();
+                                    cellValueNivelFinal.html(ValueNivelFinal + (ValueNivelFinalUM == "25" ? " kg" : " psig"));
                                 }
 
                             }
@@ -864,7 +874,7 @@
                             console.log(estatus_RevisionVal);
                             if (flagPermisoRevisionEstatus && estatus_RevisionVal == 3) //PENDIENTE
                             {
-                                       permisoRevisionEstatusDetalleHtml = ' <br> <div id="" class="mt-3 target-div">' +
+                                       permisoRevisionEstatusDetalleHtml = ' <br> <div id="idestatusrevision" class="mt-3 target-div">' +
                                                         '<div class="row">' +
                                                            '<div class="col-12 text-left">' + // Botones alineados a la izquierda ocupando 12 columnas
                                                               '<button class="cumplelote">Cumple</button>' +
@@ -1065,11 +1075,11 @@
                             var idLoteEstatusRevision = previousRow.find('.noLoteDesc').text();
 
                            
-                            var row = table.row(previousRow);
+                            // var row = table.row(previousRow);
 
-                            // Almacenar los datos originales de la fila utilizando el index de la fila como clave
-                            var rowIndex = row.index();
-                            originalData[rowIndex] = $.extend(true, {}, row.data());
+                            // // Almacenar los datos originales de la fila utilizando el index de la fila como clave
+                            // var rowIndex = row.index();
+                            // originalData[rowIndex] = $.extend(true, {}, row.data());
 
                             var datosEstatusRevision = {
                                     IdAnalisis: idAnalisisEstatusRevision,
@@ -1097,35 +1107,42 @@
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
                                                     // Restaurar los datos originales de la fila utilizando el index de la fila como clave
-                                                    var rowIndex = row.index();
-                                                    if (originalData[rowIndex]) {
-                                                        row.data(originalData[rowIndex]).draw();
-                                                        delete originalData[rowIndex]; // Elimina los datos originales almacenados
-                                                    }
+                                                    var row = table.row(previousRow);
 
                                                     // Guardar la página actual
                                                     var currentPage = table.page();
-                                               
+
+                                                    // Obtener los datos actuales de la fila
+                                                    var datosActuales = row.data();
+
+                                                    var nuevosDatos = {
+                                                        estatus_RevisionVal: 9,
+                                                        estatus_Revision: "CUMPLE",
+                                                        estatus_RevisionNormalized: "cumple"
+                                                    };
+
+                                                    // Actualizar los campos específicos con los nuevos valores
+                                                    for (var campo in nuevosDatos) {
+                                                        if (nuevosDatos.hasOwnProperty(campo)) {
+                                                            datosActuales[campo] = nuevosDatos[campo];
+                                                        }
+                                                    }
+
+                                                    // Establecer los nuevos datos en la fila y redibujar la tabla
+                                                    row.data(datosActuales).draw();
 
                                                     if (row.child.isShown()) {
                                                         row.child.hide();
                                                         previousRow.removeClass('shown');
 
-                                                        // var rowData = row.data();
-                                                        // var actionsCell = currentRow.find('td:last');
+                                                        var estatusrevisionCell = previousRow.find('.estatusRevisionText');
+                                                        estatusrevisionCell.html("CUMPLE");
 
-                                                        // if (rowData.permisoUser) {
-                                                        //     actionsCell.html('<button class="btn btn-primary editarlote">Editar Lote</button>');
-
-                                                        //     var cellValueNivelInicial = currentRow.find(".nivelinicial");
-                                                        //     cellValueNivelInicial.html(valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"));
-
-                                                        //     var cellValueNivelFinal = currentRow.find(".nivelfinal");
-                                                        //     cellValueNivelFinal.html(valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"));
-                                                        // }
+                                                        //Encuentra y Elimina el div del estatus revision del mismo `tr`
+                                                        parentRow.find('#idestatusrevision').remove();
                                                     }
 
-                                                    // // Volver a la página guardada
+                                                    // Volver a la página guardada
                                                     table.page(currentPage).draw(false);
 
                                                      // Después de cada búsqueda, eliminar iconos de ordenamiento
@@ -1172,13 +1189,15 @@
                                 });
                         });
 
-                        $(document).off('click', '.nocumplelote').on('click', '.nocumplelote', function () {
-                             var allValid = true;
-                             // Obtener el botón "No Cumple" clickeado
+                        $(document).off('click', '.nocumplelote').on('click', '.nocumplelote', function () 
+                        {
+                            var allValid = true;
+                            
+                            // Obtener el botón "No Cumple" clickeado
                             var button = $(this);
 
                             // Obtener el `tr` que contiene el botón "No Cumple"
-                            var parentRow = button.closest('tr');
+                            var parentRow = button.closest('tr');                            
 
                             // Encontrar el `textarea` dentro del mismo `tr`
                             var textareaComentarios = parentRow.find('#comentarios_estatusrevision').val();
@@ -1196,11 +1215,23 @@
                             var idAnalisisEstatusRevision = previousRow.find('.hiddenListadoLotes_Analisis').text();
                             var idLoteEstatusRevision = previousRow.find('.noLoteDesc').text();
 
+
+                            // var row = table.row(previousRow);
+                            // console.log("Fila: ");
+                            // console.log(row.data());
+
+                            // // Almacenar los datos originales de la fila utilizando el index de la fila como clave
+                            // var rowIndex = row.index();
+                            // // console.log("Indice: ");
+                            // // console.log(rowIndex);
+                            // originalData[rowIndex] = $.extend(true, {}, row.data());
+
+
                             var datosEstatusRevision = {
                                     IdAnalisis: idAnalisisEstatusRevision,
                                     Estatus_Revision: 10,
                                     Comentarios: textareaComentarios
-                                };
+                            };
 
                             // console.log(datosEstatusRevision);
 
@@ -1224,16 +1255,46 @@
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
                                                     // Restaurar los datos originales de la fila utilizando el index de la fila como clave
-                                                    // var rowIndex = row.index();
-                                                    // if (originalData[rowIndex]) {
-                                                    //     row.data(originalData[rowIndex]).draw();
-                                                    //     delete originalData[rowIndex]; // Elimina los datos originales almacenados
-                                                    // }
+                                                    var row = table.row(previousRow);
 
+                                                    // Guardar la página actual
+                                                    var currentPage = table.page();
+                                                    
+                                                    // Obtener los datos actuales de la fila
+                                                    var datosActuales = row.data();        
 
+                                                    var nuevosDatos = {
+                                                        estatus_RevisionVal: 10,
+                                                        estatus_Revision: "NO CUMPLE",
+                                                        estatus_RevisionNormalized: "no cumple"
+                                                    };
 
-                                                    // // Volver a la página guardada
-                                                    // table.page(currentPage).draw(false);
+                                                    // Actualizar los campos específicos con los nuevos valores
+                                                    for (var campo in nuevosDatos) {
+                                                        if (nuevosDatos.hasOwnProperty(campo)) {
+                                                            datosActuales[campo] = nuevosDatos[campo];
+                                                        }
+                                                    }                                                    
+
+                                                    // Establecer los nuevos datos en la fila y redibujar la tabla
+                                                    row.data(datosActuales).draw();                                                 
+
+                                                    if (row.child.isShown()) {
+                                                        row.child.hide();
+                                                        previousRow.removeClass('shown');
+
+                                                        var estatusrevisionCell = previousRow.find('.estatusRevisionText');
+                                                        estatusrevisionCell.html("NO CUMPLE");
+
+                                                        //Encuentra y Elimina el div del estatus revision del mismo `tr`
+                                                        parentRow.find('#idestatusrevision').remove();
+                                                    }
+
+                                                    // Volver a la página guardada
+                                                    table.page(currentPage).draw(false);
+
+                                                    // Después de cada búsqueda, eliminar iconos de ordenamiento
+                                                    $('#lotificacionTable thead th').removeClass('sorting sorting_asc sorting_desc');
                                                 }
                                             });
                                         }
@@ -1316,6 +1377,7 @@
                             var currentRow = $(this).closest('tr');
                             var IdAnalisisRow = currentRow.find('.hiddenListadoLotes_Analisis').text().trim();
                             var IdLoteRow = currentRow.find('.noLoteDesc').text().trim();
+                            var EstatusRevisionRow = currentRow.find('.estatusRevisionText').text().trim();
                             console.log(IdAnalisisRow);
 
                             var allValid = true;
@@ -1494,8 +1556,6 @@
                             {
                                 
                                 var idUMInicial = currentRow.find('input[name="initial-unit' + IdAnalisisRow + '"]:checked').val();
-
-                               
                                 var idUMFinal = currentRow.find('input[name="final-unit' + IdAnalisisRow + '"]:checked').val();
 
                                 // Datos de la tabla maestra
@@ -1512,7 +1572,8 @@
                                     //Comentarios: $('#commentarios').val(),
                                     // LoteOrigen: $('#LoteOrigen').val(),
                                     UsrAlta: idUsuarioLogueado,
-                                    Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6
+                                    Estatus_Analisis: BanderaProductoConforme == false ? 7 : 6,
+                                    Estatus_Revision: (EstatusRevisionRow == "CUMPLE")  ||(EstatusRevisionRow == "NO CUMPLE")  || (EstatusRevisionRow == "PENDIENTE") ? 3 : 8
                                 };
 
                                 console.log("Maestro:")
@@ -1543,33 +1604,85 @@
                                             allowEnterKey: false // Bloquear la tecla Enter
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                // Este código se ejecuta después de que el usuario haga clic en "Aceptar"
-                                                // console.log("El usuario hizo clic en Aceptar");
 
-                                                // // Por ejemplo, puedes recargar la página o resetear el formulario:
-                                                //location.reload(); // Para recargar la página // o // $('form')[0].reset(); // Para resetear el primer formulario encontrado
 
-                                                var row = table.row(currentRow);
+                                                // Restaurar los datos originales de la fila utilizando el index de la fila como clave
+                                                    var row = table.row(currentRow);
 
-                                                if (row.child.isShown()) {
-                                                    row.child.hide();
-                                                    currentRow.removeClass('shown');
+                                                    // Guardar la página actual
+                                                    var currentPage = table.page();
+                                                    
+                                                    // Obtener los datos actuales de la fila
+                                                    var datosActuales = row.data();        
 
-                                                    var rowData = row.data();
-                                                    var actionsCell = currentRow.find('td:last');
+                                                    var nuevosDatos = {
+                                                        estatus_RevisionVal: 3,
+                                                        estatus_Revision: "PENDIENTE",
+                                                        estatus_RevisionNormalized: "pendiente"
+                                                    };
 
-                                                    if (rowData.permisoUser) {
-                                                        actionsCell.html('<button class="btn btn-primary editarlote">Editar Lote</button>');
+                                                    // Actualizar los campos específicos con los nuevos valores
+                                                    for (var campo in nuevosDatos) {
+                                                        if (nuevosDatos.hasOwnProperty(campo)) {
+                                                            datosActuales[campo] = nuevosDatos[campo];
+                                                        }
+                                                    }                                                    
 
-                                                        var cellValueNivelInicial = currentRow.find(".nivelinicial");                                                                                                                
-                                                        cellValueNivelInicial.html(valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"));
+                                                    // Establecer los nuevos datos en la fila y redibujar la tabla
+                                                    row.data(datosActuales).draw();                                                 
 
-                                                        var cellValueNivelFinal = currentRow.find(".nivelfinal");
-                                                        cellValueNivelFinal.html(valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"));
+                                                    if (row.child.isShown()) {
+                                                        row.child.hide();
+                                                        currentRow.removeClass('shown');
+
+                                                        var estatusrevisionCell = currentRow.find('.estatusRevisionText');
+                                                        estatusrevisionCell.html("PENDIENTE");
+
+                                                        var rowData = row.data();
+                                                        var actionsCell = currentRow.find('td:last');
+
+                                                        if (rowData.permisoUser) 
+                                                        {
+                                                            actionsCell.html('<button class="btn btn-primary editarlote">Editar Lote</button>');
+
+                                                            var cellValueNivelInicial = currentRow.find(".nivelinicial");
+                                                            cellValueNivelInicial.html(valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"));
+
+                                                            var cellValueNivelFinal = currentRow.find(".nivelfinal");
+                                                            cellValueNivelFinal.html(valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"));
+                                                        }
                                                     }
-                                                }
 
-                                                location.reload();
+                                                    // Volver a la página guardada
+                                                    table.page(currentPage).draw(false);
+
+                                                    // Después de cada búsqueda, eliminar iconos de ordenamiento
+                                                    $('#lotificacionTable thead th').removeClass('sorting sorting_asc sorting_desc');
+
+
+                                                // Este código se ejecuta después de que el usuario haga clic en "Aceptar"
+                                               
+                                                // var row = table.row(currentRow);
+
+                                                // if (row.child.isShown()) {
+                                                //     row.child.hide();
+                                                //     currentRow.removeClass('shown');
+
+                                                //     var rowData = row.data();
+                                                //     var actionsCell = currentRow.find('td:last');
+
+                                                //     if (rowData.permisoUser) {
+                                                //         actionsCell.html('<button class="btn btn-primary editarlote">Editar Lote</button>');
+
+                                                //         var cellValueNivelInicial = currentRow.find(".nivelinicial");                                                                                                                
+                                                //         cellValueNivelInicial.html(valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"));
+
+                                                //         var cellValueNivelFinal = currentRow.find(".nivelfinal");
+                                                //         cellValueNivelFinal.html(valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"));
+                                                //     }
+                                                // }
+
+                                                // location.reload();
                                             }
                                         });
                                     },
