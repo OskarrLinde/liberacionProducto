@@ -996,6 +996,9 @@
                         // Remover resaltado si es válido (opcional)
                     }
 
+                    initialLevel = parseFloat(initialLevel);
+                    finalLevel = parseFloat(finalLevel);
+
                     if (initialLevel > finalLevel) {
                         allValid = false;
                         $('#final-level').addClass('invalid');

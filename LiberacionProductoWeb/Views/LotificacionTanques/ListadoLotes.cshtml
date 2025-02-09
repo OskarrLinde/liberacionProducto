@@ -738,6 +738,7 @@
                                         // Filtrar los datos en función del estado de búsqueda de todas las columnas
                                         var filteredData = response.filter(function (item) {
                                             for (var colIndex in searchStates) {
+                                                console.log(colIndex);
                                                 var columnName;
                                                 switch (parseInt(colIndex))
                                                 {
@@ -751,17 +752,17 @@
                                                         columnName = 'idTanqueNormalized'; break;
                                                     case 5:
                                                         columnName = 'nivelIniNormalized'; break;
-                                                    case 6:
-                                                        columnName = 'nivelFinNormalized'; break;
-                                                    case 7:
-                                                        columnName = 'comentariosNormalized'; break;
                                                     case 8:
-                                                        columnName = 'fechaAltaNormalized'; break;
-                                                    case 9:
-                                                        columnName = 'estatusNormalized'; break;
-                                                    case 10:
-                                                        columnName = 'estatusRevisionNormalized'; break;
+                                                        columnName = 'nivelFinNormalized'; break;
                                                     case 11:
+                                                        columnName = 'comentariosNormalized'; break;
+                                                    case 12:
+                                                        columnName = 'fechaAltaNormalized'; break;
+                                                    case 13:
+                                                        columnName = 'estatusNormalized'; break;
+                                                    case 15:
+                                                        columnName = 'estatus_RevisionNormalized'; break;
+                                                    case 16:
                                                         columnName = 'usrAltaNormalized'; break;
                                                     default: columnName = '';
                                                 }
@@ -1084,7 +1085,8 @@
                             var datosEstatusRevision = {
                                     IdAnalisis: idAnalisisEstatusRevision,
                                     Estatus_Revision: 9,
-                                    Comentarios: textareaComentarios
+                                    Comentarios: textareaComentarios,
+                                    UsrBitac: idUsuarioLogueado
                                 };
 
                             // console.log(datosEstatusRevision);
@@ -1230,7 +1232,8 @@
                             var datosEstatusRevision = {
                                     IdAnalisis: idAnalisisEstatusRevision,
                                     Estatus_Revision: 10,
-                                    Comentarios: textareaComentarios
+                                    Comentarios: textareaComentarios,
+                                    UsrBitac: idUsuarioLogueado
                             };
 
                             // console.log(datosEstatusRevision);
@@ -2053,26 +2056,11 @@
                                                 allowEnterKey: false // Bloquear la tecla Enter
                                             }).then((result) => {
                                                 if (result.isConfirmed) {
-                                                    // Restaurar los datos originales de la fila utilizando el index de la fila como clave
-                                                    var rowIndex = row.index();
-                                                    if (originalData[rowIndex]) {
-                                                        row.data(originalData[rowIndex]).draw();
-                                                        delete originalData[rowIndex]; // Elimina los datos originales almacenados
-                                                    }
-
-                                                    // // Quitar la clase de difuminado de la fila
-                                                    $('td', tr).removeClass('difuminado no-difuminar' );
-
-                                                    $('td', tr).eq(18).html('<span style="color: red; font-weight: bold;">CANCELADO</span>');
-
-                                                    // Cambiar el botón "Reactivar"
-                                                    // $('td', tr).eq(17).html('<button class="btn btn-success reactivar-btnRow" disabled>Reactivar</button>');
-
-                                                    mensajes[idAnalisisCancel] = "<span style='color:red;'>" + 'ESTE LOTE FUE CANCELADO POR <strong>' + textUserCancelado + '</strong>. El dia ' + fechaFormateada + '<br>' + 'JUSTIFICACION: <strong>' + inputComentario.val() + "</strong> </span>";
-
 
                                                     // Encuentra el siguiente tr
                                                     var nextTr = tr.next('tr');
+                                                    // console.log(nextTr);
+
                                                     if (nextTr.length > 0)
                                                     {
                                                         // Encuentra el div dentro de la siguiente fila
@@ -2085,8 +2073,35 @@
                                                         }
                                                     }
 
+                                                    // Restaurar los datos originales de la fila utilizando el index de la fila como clave
+                                                    var rowIndex = row.index();
+                                                    if (originalData[rowIndex]) {
+                                                        row.data(originalData[rowIndex]).draw();
+                                                        delete originalData[rowIndex]; // Elimina los datos originales almacenados
+                                                    }
+
+                                                    // // Quitar la clase de difuminado de la fila
+                                                    $('td', tr).removeClass('difuminado no-difuminar' );
+
+                                                    // Deja la ultima columna vacia sin botones
+                                                    $('td', tr).eq(18).html('');
+
+                                                    // Coloca  a la columna de Estatus "CANCELADO"
+                                                    $('td', tr).eq(13).html('<span style="color: red; font-weight: bold;">CANCELADO</span>');
+
+                                                    // Cambiar el botón "Reactivar"
+                                                    // $('td', tr).eq(17).html('<button class="btn btn-success reactivar-btnRow" disabled>Reactivar</button>');
+
+                                                    //Guarda el mensaje en el indice de idAnalisis
+                                                    mensajes[idAnalisisCancel] = "<span style='color:red;'>" + 'ESTE LOTE FUE CANCELADO POR <strong>' + textUserCancelado + '</strong>. El dia ' + fechaFormateada + '<br>' + 'JUSTIFICACION: <strong>' + inputComentario.val() + "</strong> </span>";
+
+                                                    
+
                                                     // Volver a la página guardada
                                                     table.page(currentPage).draw(false);
+
+                                                     // Después de cada búsqueda, eliminar iconos de ordenamiento
+                                                    $('#lotificacionTable thead th').removeClass('sorting sorting_asc sorting_desc');
                                                 }
                                             });
                                         }

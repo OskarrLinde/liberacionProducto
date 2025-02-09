@@ -12,5 +12,6 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
         public string IdLote { get; set; } // Id del lote
         public int? Estatus_Revision { get; set; }
         public string? Comentarios { get; set; }
+        public int UsrBitac { get; set; }
     }
 }

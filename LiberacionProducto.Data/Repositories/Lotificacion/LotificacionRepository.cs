@@ -897,6 +897,7 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                             command.Parameters.Add(new SqlParameter("@IdAnalisis", data.IdAnalisis));                            
                             command.Parameters.Add(new SqlParameter("@EstatusRevision", Convert.ToInt32(data.Estatus_Revision)));
                             command.Parameters.Add(new SqlParameter("@Comentarios", data.Comentarios));
+                            command.Parameters.Add(new SqlParameter("@UserBitacora", data.UsrBitac));
                             command.Parameters.Add(ResultadoParam);
 
                             command.ExecuteNonQuery();
