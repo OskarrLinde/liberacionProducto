@@ -709,6 +709,22 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
 
                                         UsrAlta = reader.IsDBNull(reader.GetOrdinal("nomUsuarioAlta")) ? null : reader.GetString(reader.GetOrdinal("nomUsuarioAlta")),
                                         GetUseralta = reader.GetInt32("Usr_Alta"),
+
+                                        motivo_bitacLotif_RevisionCumple = reader.IsDBNull(reader.GetOrdinal("motivo_bitacLotif_RevisionCumple")) ? null : reader.GetString(reader.GetOrdinal("motivo_bitacLotif_RevisionCumple")),
+                                        fec_bitaclotif_RevisionCumple = reader.IsDBNull(reader.GetOrdinal("fec_bitaclotif_RevisionCumple")) ? null : reader.GetDateTime(reader.GetOrdinal("fec_bitaclotif_RevisionCumple")),
+                                        usr_bitaclotif_RevisionCumple = reader.IsDBNull(reader.GetOrdinal("usr_bitaclotif_RevisionCumple")) ? null : reader.GetInt32("usr_bitaclotif_RevisionCumple"),
+                                        descusr_bitaclotif_RevisionCumple = reader.IsDBNull(reader.GetOrdinal("descUsr_bitaclotifCumple")) ? null : reader.GetString(reader.GetOrdinal("descUsr_bitaclotifCumple")),
+
+
+                                        motivo_bitacLotif_RevisionNoCumple = reader.IsDBNull(reader.GetOrdinal("motivo_bitacLotif_RevisionNoCumple")) ? null : reader.GetString(reader.GetOrdinal("motivo_bitacLotif_RevisionNoCumple")),
+                                        fec_bitaclotif_RevisionNoCumple = reader.IsDBNull(reader.GetOrdinal("fec_bitaclotif_RevisionNoCumple")) ? null : reader.GetDateTime(reader.GetOrdinal("fec_bitaclotif_RevisionNoCumple")),
+                                        usr_bitaclotif_RevisionNoCumple = reader.IsDBNull(reader.GetOrdinal("usr_bitaclotif_RevisionNoCumple")) ? null : reader.GetInt32("usr_bitaclotif_RevisionNoCumple"),
+                                        descusr_bitaclotif_RevisionNoCumple = reader.IsDBNull(reader.GetOrdinal("descUsr_bitaclotifNoCumple")) ? null : reader.GetString(reader.GetOrdinal("descUsr_bitaclotifNoCumple")),
+
+
+
+
+
                                         //UsrAlta = reader.GetInt32(9), 
                                         //IdProducto = reader.GetInt32(10), 
                                         Detalles = new List<DetalleAnalisisTanque>()

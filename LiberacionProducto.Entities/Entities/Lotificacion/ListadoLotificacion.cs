@@ -35,6 +35,20 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
             public bool PermisoUser { get; set; }
             public bool PermisoUserAdmin { get; set; }
             public bool PermisoRevisionLote { get; set; }
+
+            public string? motivo_bitacLotif_RevisionCumple { get; set; }
+            public DateTime? fec_bitaclotif_RevisionCumple { get; set; }
+            public int? usr_bitaclotif_RevisionCumple { get; set; }
+            public string? descusr_bitaclotif_RevisionCumple { get; set; }
+
+
+            public string? motivo_bitacLotif_RevisionNoCumple { get; set; }
+            public DateTime? fec_bitaclotif_RevisionNoCumple { get; set; }
+            public int? usr_bitaclotif_RevisionNoCumple { get; set; }
+            public string? descusr_bitaclotif_RevisionNoCumple { get; set; }
+
+
+
             public List<DetalleAnalisisTanque> Detalles { get; set; }
         }
 
