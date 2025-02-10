@@ -823,7 +823,7 @@
                                 console.log(rowData);
                                 if (rowData && rowData.hasOwnProperty('detalles')) {
                                     var detalle = rowData.detalles;
-                                    row.child(generarDetalle(detalle, rowData.idAnalisis, false, rowData.permisoRevisionLote, rowData.estatus_RevisionVal)).show();
+                                        row.child(generarDetalle(detalle, rowData.idAnalisis, false, rowData.permisoRevisionLote, rowData.estatus_RevisionVal, rowData)).show();
                                     tr.addClass('shown');
                                 }
                                 else {
@@ -839,7 +839,7 @@
                             }
                         });
 
-                        function generarDetalle(detalleData, rowIdAnalisis, flagPermisoUser, flagPermisoRevisionEstatus, estatus_RevisionVal) {
+                            function generarDetalle(detalleData, rowIdAnalisis, flagPermisoUser, flagPermisoRevisionEstatus, estatus_RevisionVal, rowDataInfo) {
                             // console.log("Objeto recibido: ");
                             console.log(detalleData);
 
@@ -867,16 +867,39 @@
                                 var FechaCancelBitacora = detalleData[0].fechaCancelBitacora;
                                 var UserCancelBitacora = detalleData[0].userNameCancelBitacora == null ? '' : detalleData[0].userNameCancelBitacora;
 
-                                mensaje = "<span style='color:red;'>ESTE LOTE FUE CANCELADO POR <strong>" + UserCancelBitacora + "</strong>. El dia " + FechaCancelBitacora + "<br> JUSTIFICACION: <strong>" + motivoCancelBitacora + "</strong> </span>";
+                                mensaje = "<span style='color:red;'>ESTE LOTE FUE CANCELADO POR <strong>" + UserCancelBitacora + "</strong>. El dia " + FechaCancelBitacora + "<br> JUSTIFICACION: <strong>" + motivoCancelBitacora + "</strong> </span><br>";
                             }
                             else if(mensajeGuardado != "")
                             {
                                 mensaje = mensajeGuardado;
                             }
 
+                            //Mostrar mensajes de Bitacora para Cuando estatus tiene "CUMPLE"
+                            if (rowDataInfo.descusr_bitaclotif_RevisionCumple !== null)
+                            {
+                                var userbitacRevisionCumple = rowDataInfo.descusr_bitaclotif_RevisionCumple;
+                                var fechabitacRevisionCumple = rowDataInfo.fec_bitaclotif_RevisionCumple;
+                                var motivobitacRevisionCumple = rowDataInfo.motivo_bitacLotif_RevisionCumple;
+
+                                mensaje += "<span style='color:green;'> <strong>" + userbitacRevisionCumple + " - " + fechabitacRevisionCumple + "<br> COMENTARIOS: " + motivobitacRevisionCumple + "</strong> </span><br>";
+                            }
+
+                            //Mostrar mensajes de Bitacora para Cuando estatus tiene "NO CUMPLE"
+                            if (rowDataInfo.descusr_bitaclotif_RevisionNoCumple !== null)
+                            {
+                                var userbitacRevisionNoCumple = rowDataInfo.descusr_bitaclotif_RevisionNoCumple;
+                                var fechabitacRevisionNoCumple = rowDataInfo.fec_bitaclotif_RevisionNoCumple;
+                                var motivobitacRevisionNoCumple = rowDataInfo.motivo_bitacLotif_RevisionNoCumple;
+
+                                mensaje += "<span style='color:red;'> <strong>" + userbitacRevisionNoCumple + " - " + fechabitacRevisionNoCumple + "<br> COMENTARIOS: " + motivobitacRevisionNoCumple + "</strong> </span>";
+                            }
+
+
+
+
                             var permisoRevisionEstatusDetalleHtml = '';
-                            console.log(flagPermisoRevisionEstatus);
-                            console.log(estatus_RevisionVal);
+                            // console.log(flagPermisoRevisionEstatus);
+                            // console.log(estatus_RevisionVal);
                             if (flagPermisoRevisionEstatus && estatus_RevisionVal == 3) //PENDIENTE
                             {
                                        permisoRevisionEstatusDetalleHtml = ' <br> <div id="idestatusrevision" class="mt-3 target-div">' +
@@ -991,7 +1014,7 @@
                             var rowData = row.data();
                             if (rowData && rowData.hasOwnProperty('detalles')) {
                                 var detalle = rowData.detalles;
-                                row.child(generarDetalle(detalle, rowData.idAnalisis, true, false, rowData.estatus_RevisionVal)).show();
+                                    row.child(generarDetalle(detalle, rowData.idAnalisis, true, false, rowData.estatus_RevisionVal, rowData)).show();
                                 tr.addClass('shown');
 
                                 // Aqui iria la logica de edicion por cada registro mostrado en la tabla de deetalle
