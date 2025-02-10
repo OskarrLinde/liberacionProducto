@@ -865,9 +865,23 @@
                             {
                                 var motivoCancelBitacora = detalleData[0].motivoCancelBitacora;
                                 var FechaCancelBitacora = detalleData[0].fechaCancelBitacora;
+
+                                // Crear un objeto Date a partir de la cadena de fecha FechaCancelBitacora
+                                var fechaCanc = new Date(FechaCancelBitacora);
+
+                                // Obtener los componentes de la fecha
+                                var yearCan = fechaCanc.getFullYear();
+                                var monthCan = ("0" + (fechaCanc.getMonth() + 1)).slice(-2);
+                                var dayCan = ("0" + fechaCanc.getDate()).slice(-2);
+                                var hoursCan = ("0" + fechaCanc.getHours()).slice(-2);
+                                var minutesCan = ("0" + fechaCanc.getMinutes()).slice(-2);
+
+                                // Formatear la fecha en el nuevo formato
+                                var fechaFormateadaCan = `${yearCan}-${monthCan}-${dayCan} ${hoursCan}:${minutesCan}`;
+
                                 var UserCancelBitacora = detalleData[0].userNameCancelBitacora == null ? '' : detalleData[0].userNameCancelBitacora;
 
-                                mensaje = "<span style='color:red;'>ESTE LOTE FUE CANCELADO POR <strong>" + UserCancelBitacora + "</strong>. El dia " + FechaCancelBitacora + "<br> JUSTIFICACION: <strong>" + motivoCancelBitacora + "</strong> </span><br>";
+                                    mensaje = "<span style='color:red;'>ESTE LOTE FUE CANCELADO POR <strong>" + UserCancelBitacora + "</strong>. El dia " + fechaFormateadaCan + "<br> JUSTIFICACION: <strong>" + motivoCancelBitacora + "</strong> </span><br>";
                             }
                             else if(mensajeGuardado != "")
                             {
@@ -879,9 +893,24 @@
                             {
                                 var userbitacRevisionCumple = rowDataInfo.descusr_bitaclotif_RevisionCumple;
                                 var fechabitacRevisionCumple = rowDataInfo.fec_bitaclotif_RevisionCumple;
+                                
+                                // Crear un objeto Date a partir de la cadena de fecha fechabitacRevisionCumple
+                                var fecha = new Date(fechabitacRevisionCumple);
+
+                                // Obtener los componentes de la fecha
+                                var year = fecha.getFullYear();
+                                var month = ("0" + (fecha.getMonth() + 1)).slice(-2);
+                                var day = ("0" + fecha.getDate()).slice(-2);
+                                var hours = ("0" + fecha.getHours()).slice(-2);
+                                var minutes = ("0" + fecha.getMinutes()).slice(-2);
+
+                                // Formatear la fecha en el nuevo formato
+                                var fechaFormateada = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+
                                 var motivobitacRevisionCumple = rowDataInfo.motivo_bitacLotif_RevisionCumple;
 
-                                mensaje += "<span style='color:green;'> ESTE LOTE FUE APROBADO POR: <strong>  " + userbitacRevisionCumple + "</strong>. El dia  " + fechabitacRevisionCumple + "<br> COMENTARIOS:  <strong>" + motivobitacRevisionCumple + "</strong> </span><br>";
+                                    mensaje += "<span style='color:green;'> ESTE LOTE FUE APROBADO POR: <strong>  " + userbitacRevisionCumple + "</strong>. El dia  " + fechaFormateada + "<br> COMENTARIOS:  <strong>" + motivobitacRevisionCumple + "</strong> </span><br>";
                             }
 
                             //Mostrar mensajes de Bitacora para Cuando estatus tiene "NO CUMPLE"
@@ -889,9 +918,23 @@
                             {
                                 var userbitacRevisionNoCumple = rowDataInfo.descusr_bitaclotif_RevisionNoCumple;
                                 var fechabitacRevisionNoCumple = rowDataInfo.fec_bitaclotif_RevisionNoCumple;
+
+                                // Crear un objeto Date a partir de la cadena de fecha fechabitacRevisionNoCumple
+                                var fechaNo = new Date(fechabitacRevisionNoCumple);
+
+                                // Obtener los componentes de la fecha
+                                var yearNo = fechaNo.getFullYear();
+                                var monthNo = ("0" + (fechaNo.getMonth() + 1)).slice(-2);
+                                var dayNo = ("0" + fechaNo.getDate()).slice(-2);
+                                var hoursNo = ("0" + fechaNo.getHours()).slice(-2);
+                                var minutesNo = ("0" + fechaNo.getMinutes()).slice(-2);
+
+                                // Formatear la fecha en el nuevo formato
+                                var fechaFormateadaNo = `${yearNo}-${monthNo}-${dayNo} ${hoursNo}:${minutesNo}`;
+
                                 var motivobitacRevisionNoCumple = rowDataInfo.motivo_bitacLotif_RevisionNoCumple;
 
-                                mensaje += "<span style='color:red;'> ESTE LOTE FUE RECHAZADO POR: <strong> " + userbitacRevisionNoCumple + " </strong>. El dia " + fechabitacRevisionNoCumple + "<br> COMENTARIOS: <strong>" + motivobitacRevisionNoCumple + "</strong> </span>";
+                                mensaje += "<span style='color:red;'> ESTE LOTE FUE RECHAZADO POR: <strong> " + userbitacRevisionNoCumple + " </strong>. El dia " + fechaFormateadaNo + "<br> COMENTARIOS: <strong>" + motivobitacRevisionNoCumple + "</strong> </span>";
                             }
 
 
