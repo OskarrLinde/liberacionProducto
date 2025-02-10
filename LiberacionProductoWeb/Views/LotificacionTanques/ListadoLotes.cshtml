@@ -881,7 +881,7 @@
                                 var fechabitacRevisionCumple = rowDataInfo.fec_bitaclotif_RevisionCumple;
                                 var motivobitacRevisionCumple = rowDataInfo.motivo_bitacLotif_RevisionCumple;
 
-                                mensaje += "<span style='color:green;'> <strong>" + userbitacRevisionCumple + " - " + fechabitacRevisionCumple + "<br> COMENTARIOS: " + motivobitacRevisionCumple + "</strong> </span><br>";
+                                mensaje += "<span style='color:green;'> ESTE LOTE FUE APROBADO POR: <strong>  " + userbitacRevisionCumple + "</strong>. El dia  " + fechabitacRevisionCumple + "<br> COMENTARIOS:  <strong>" + motivobitacRevisionCumple + "</strong> </span><br>";
                             }
 
                             //Mostrar mensajes de Bitacora para Cuando estatus tiene "NO CUMPLE"
@@ -891,7 +891,7 @@
                                 var fechabitacRevisionNoCumple = rowDataInfo.fec_bitaclotif_RevisionNoCumple;
                                 var motivobitacRevisionNoCumple = rowDataInfo.motivo_bitacLotif_RevisionNoCumple;
 
-                                mensaje += "<span style='color:red;'> <strong>" + userbitacRevisionNoCumple + " - " + fechabitacRevisionNoCumple + "<br> COMENTARIOS: " + motivobitacRevisionNoCumple + "</strong> </span>";
+                                mensaje += "<span style='color:red;'> ESTE LOTE FUE RECHAZADO POR: <strong> " + userbitacRevisionNoCumple + " </strong>. El dia " + fechabitacRevisionNoCumple + "<br> COMENTARIOS: <strong>" + motivobitacRevisionNoCumple + "</strong> </span>";
                             }
 
 
