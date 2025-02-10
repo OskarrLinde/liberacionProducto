@@ -756,7 +756,15 @@ namespace LiberacionProducto.Data.Repositories.Lotificacion
                                         IdAnalizadorVal = reader.IsDBNull(reader.GetOrdinal("ID_ANALIZADOR")) ? null : reader.GetInt32(reader.GetOrdinal("ID_ANALIZADOR"))
                                     };
 
-                                    analisisDict[idAnalisis].Detalles.Add(detalle);
+                                    // Verificar si el detalle ya existe en la lista antes de agregarlo
+                                    if (!analisisDict[idAnalisis].Detalles.Any(d =>
+                                        d.IdParametro == detalle.IdParametro && 
+                                        d.IdAnalisisDetail == detalle.IdAnalisisDetail))
+                                    {
+                                        analisisDict[idAnalisis].Detalles.Add(detalle);
+                                    }
+
+                                                                   
                                 }
                             }
                         }
