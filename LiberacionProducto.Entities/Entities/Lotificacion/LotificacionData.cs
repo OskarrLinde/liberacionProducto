@@ -41,7 +41,9 @@ namespace LiberacionProducto.Entities.Entities.Lotificacion
         public string ValorAnalisis { get; set; } // Valor del análisis
         public string IdUnidadMedida { get; set; }
         public string IdAnalizador { get; set; } // Id del analizador
+        public string descAnalizador { get; set; }
         public int IdMetodo { get; set; }
+        public string descIdMetodo { get; set; }
         public int UsrAlta { get; set; }
     }
 

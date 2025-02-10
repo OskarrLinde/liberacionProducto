@@ -1545,7 +1545,11 @@
                                             ValorAnalisis: registro.find('.idValorAnalisis').text().trim(),
                                             //IdUnidadMedida: currentRow.find('.idUnidadMedida').text().trim(),
                                             IdAnalizador: registro.find('.idAnalizadorValue').text().trim(),
+                                            descAnalizador: registro.find('.idAnalizador').text().trim(),
+
                                             IdMetodo: registro.find('.idMetodo').text().trim(),
+                                            descIdMetodo: registro.find('.descdMetodoOriginal').text().trim(),
+
                                             UsrAlta: idUsuarioLogueado
                                         };
 
@@ -1616,12 +1620,22 @@
                                                     var currentPage = table.page();
                                                     
                                                     // Obtener los datos actuales de la fila
-                                                    var datosActuales = row.data();        
+                                                    var datosActuales = row.data();
 
                                                     var nuevosDatos = {
                                                         estatus_RevisionVal: 3,
                                                         estatus_Revision: "PENDIENTE",
-                                                        estatus_RevisionNormalized: "pendiente"
+                                                        estatus_RevisionNormalized: "pendiente",
+
+                                                        nivelIni: valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"),
+                                                        nivelIniNormalized: valnivelInicial + (idUMInicial == "25" ? " kg" : " psig"),
+                                                        nivelIniVal: valnivelInicial,
+                                                        umInicial: idUMInicial,
+
+                                                        nivelFin: valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"),
+                                                        nivelFinNormalized: valnivelFinal + (idUMFinal == "25" ? " kg" : " psig"),
+                                                        nivelFinVal: valnivelFinal,
+                                                        umFinal: idUMFinal
                                                     };
 
                                                     // Actualizar los campos específicos con los nuevos valores
@@ -1629,10 +1643,46 @@
                                                         if (nuevosDatos.hasOwnProperty(campo)) {
                                                             datosActuales[campo] = nuevosDatos[campo];
                                                         }
-                                                    }                                                    
+                                                    }
 
+                                                    // Nuevos valores para el detalle 'valorAnalisis'
+                                                    var datosActualesDetalle = datosActuales.detalles; // Obtener los datos actuales de 'detalle' de la fila                                                    
+                                                    
+                                                    // Acceder y actualizar el campo 'ValorAnalisis' en 'detalle' basado en 'IdAnalisis'
+                                                    for (var i = 0; i < tableData.length; i++) {
+                                                        var idAnalisisBuscado = tableData[i].IdAnalisis.toString();                                                        
+                                                        var nuevoValorAnalisis = tableData[i].ValorAnalisis.toString();                                                        
+                                                        var idParametroBuscado = tableData[i].IdParametro.toString();
+                                                        var idAnalizadorBuscado = tableData[i].IdAnalizador.toString();
+                                                        var idAnalizadorTextBuscado = tableData[i].descAnalizador.toString();
+                                                        var idMetodoBuscado = tableData[i].IdMetodo.toString();
+                                                        var idMetodoTextBuscado = tableData[i].descIdMetodo.toString();
+                                                        
+                                                        for (var j = 0; j < datosActualesDetalle.length; j++) {
+                                                            if (datosActualesDetalle[j].idAnalisisDetail.toString() === idAnalisisBuscado
+                                                                && datosActualesDetalle[j].idParametro.toString() === idParametroBuscado)
+                                                                {
+                                                                    datosActualesDetalle[j].valorAnalisis = nuevoValorAnalisis;
+                                                                    datosActualesDetalle[j].valorAnalisisNormalized = nuevoValorAnalisis;
+
+                                                                    datosActualesDetalle[j].idAnalizadorVal = idAnalizadorBuscado;
+                                                                    datosActualesDetalle[j].idAnalizador = idAnalizadorTextBuscado;
+                                                                    datosActualesDetalle[j].idAnalizadorNormalized = idAnalizadorTextBuscado;
+
+                                                                    datosActualesDetalle[j].idMetodoVal = idMetodoBuscado;
+                                                                    datosActualesDetalle[j].idMetodo = idMetodoTextBuscado;
+                                                                    datosActualesDetalle[j].idMetodoNormalized = idMetodoTextBuscado;
+
+                                                                    break; // Salir del bucle una vez que se ha encontrado y actualizado
+                                                                }
+                                                        }
+                                                    }
+                                                    
+                                                    // Reasignar los detalles actualizados a datosActuales
+                                                    datosActuales.detalles = datosActualesDetalle;
+                                                    
                                                     // Establecer los nuevos datos en la fila y redibujar la tabla
-                                                    row.data(datosActuales).draw();                                                 
+                                                    row.data(datosActuales).draw();
 
                                                     if (row.child.isShown()) {
                                                         row.child.hide();
@@ -2182,7 +2232,7 @@
                                 // Si no hay detalles, simplemente agregamos la fila padre
                                 if (detalles.length === 0)
                                 {
-                                    dataExport.push([ data.idAnalisis, data.idLote, data.loteOrigen, data.idTanque, data.nivelIni, data.nivelFin, data.comentarios, data.fechaAlta, data.estatus, 'N/A', // Estatus Revisión
+                                    dataExport.push([ data.idAnalisis, data.idLote, data.loteOrigen, data.idTanque, data.nivelIni, data.nivelFin, data.comentarios, data.fechaAlta, data.estatus, data.estatus_Revision, // Estatus Revisión
                                         data.usrAlta, data.getUseralta, data.permisoUser ? (data.estatus == 'CANCELADO' ? 'Reactivar' : 'Editar') : '', '', '', '', '', '', '', '' // Columnas de detalle vacías
                                     ]);
                                 }
@@ -2190,7 +2240,7 @@
                                 { // Si hay detalles, creamos una fila por cada detalle
                                     detalles.forEach(function(detalle)
                                     {
-                                        dataExport.push([ data.idAnalisis, data.idLote, data.loteOrigen, data.idTanque, data.nivelIni, data.nivelFin, data.comentarios, data.fechaAlta, data.estatus, 'N/A', // Estatus Revisión
+                                        dataExport.push([ data.idAnalisis, data.idLote, data.loteOrigen, data.idTanque, data.nivelIni, data.nivelFin, data.comentarios, data.fechaAlta, data.estatus, data.estatus_Revision, // Estatus Revisión
                                         data.usrAlta, data.getUseralta, data.permisoUser ? (data.estatus == 'CANCELADO' ? 'Reactivar' : 'Editar') : '',
                                         detalle.descParametro, detalle.valorLimiteInf, detalle.valorLimiteSup, detalle.valorAnalisis, detalle.descUnidadMedida, detalle.idAnalizador, detalle.idMetodo
                                         ]);
