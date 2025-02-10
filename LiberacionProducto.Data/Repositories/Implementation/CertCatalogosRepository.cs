@@ -195,13 +195,13 @@ namespace LiberacionProducto.Data.Implementation
 		{
 			var lstParameters = new List<SqlParameter>();
 
-			lstParameters.Add(new SqlParameter("@ID_TANQUE_GRADO", tanqueGrado.IdTanqueGrado));
+			lstParameters.Add(new SqlParameter("@ID_TANQUE", tanqueGrado.IdTanque));
 			lstParameters.Add(new SqlParameter("@ID_GRADO", tanqueGrado.IdGrado));
 			lstParameters.Add(new SqlParameter("@ID_STATUS", tanqueGrado.IdStatus));
 			lstParameters.Add(new SqlParameter("@USR_MODIFICA", tanqueGrado.UsrModifica));
-			lstParameters.Add(new SqlParameter("@IS_DELETE", tanqueGrado.IsDelete));
+            lstParameters.Add(new SqlParameter("@IS_DELETE", tanqueGrado.IsDelete));
 
-			return AdoHelper.ExecuteNonQueryAsync("[dbo].[CAB_SP_UpdateTanqueGrado]", lstParameters, new SqlConnection(_connectionString));
+            return AdoHelper.ExecuteNonQueryAsync("[dbo].[CAB_SP_UpdateTanqueGrado]", lstParameters, new SqlConnection(_connectionString));
 		}
 		#endregion
 	}

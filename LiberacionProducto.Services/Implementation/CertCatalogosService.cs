@@ -14,86 +14,124 @@ namespace LiberacionProducto.Services.Implementation
 			this.certCatalogosRepository = certCatalogosRepository;
 		}
 
-		public async Task<int> DeletePlanta(int IdPlanta)
+		public async Task<int> HandleDeletePlanta(int IdPlanta)
 		{
 			return await this.certCatalogosRepository.DeletePlanta(IdPlanta);
 		}
 
-		public async Task<List<FuenteSuministroData>> GetFuenteSuministro()
+		public async Task<List<FuenteSuministroData>> HandleGetFuenteSuministro()
 		{
 			return await this.certCatalogosRepository.GetFuenteSuministro();
 		}
 
-		public async Task<List<PlantaAprobadaData>> GetPlantaAprobada()
+		public async Task<List<PlantaAprobadaData>> HandleGetPlantaAprobada()
 		{
 			return await this.certCatalogosRepository.GetPlantaAprobada();
 		}
 
 		#region TANQUES
-		public async Task<List<TanqueData>> GetTanques()
+		public async Task<List<TanqueData>> HandleGetTanques()
         {
             return await this.certCatalogosRepository.GetTanques();
         }
 
-        public async Task<int> UpdateTanque(TanqueData tanque)
+        public async Task<int> HandleUpdateTanque(TanqueData tanque)
         {
             return await this.certCatalogosRepository.UpdateTanque(tanque);
         }
-        public async Task<int> InsertTanque(TanqueData tanque)
+        public async Task<int> HandleInsertTanque(TanqueData tanque)
         {
             return await this.certCatalogosRepository.InsertTanque(tanque);
         }
 		#endregion
 
 		#region PLANTA PARAMETRO ANALIZADOR
-		public async Task<List<PlantaParametroAnalizadorData>> GetPlantaParametroAnalizador(int? plantaId)
+		public async Task<List<PlantaParametroAnalizadorData>> HandleGetPlantaParametroAnalizador(int? plantaId)
 		{
 			return await this.certCatalogosRepository.GetPlantaParametroAnalizador(plantaId);
 		}
 
-		public async Task<int> UpdatePlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador)
+		public async Task<int> HandleUpdatePlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador)
 		{
 			return await this.certCatalogosRepository.UpdatePlantaParametroAnalizador(plantaParametroAnalizador);
 		}
 
-		public async Task<int> InsertPlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador)
+		public async Task<int> HandleInsertPlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador)
 		{
 			return await this.certCatalogosRepository.InsertPlantaParametroAnalizador(plantaParametroAnalizador);
 		}
         #endregion
 
         #region ANALIZADOR PRODUCTO
-        public async Task<List<AnalizadorProductoData>> GetAnalizadorProducto(int? analizadorId)
+        public async Task<List<AnalizadorProductoData>> HandleGetAnalizadorProducto(int? analizadorId)
         {
             return await this.certCatalogosRepository.GetAnalizadorProducto(analizadorId);
         }
 
-        public async Task<int> InsertAnalizadorProducto(AnalizadorProductoData analizadorProducto)
+        public async Task<int> HandleInsertAnalizadorProducto(AnalizadorProductoData analizadorProducto)
         {
 			return await this.certCatalogosRepository.InsertAnalizadorProducto(analizadorProducto);
         }
 
-        public async Task<int> UpdateAnalizadorProducto(AnalizadorProductoData analizadorProducto)
+        public async Task<int> HandleUpdateAnalizadorProducto(AnalizadorProductoData analizadorProducto)
         {
 			return await this.certCatalogosRepository.UpdateAnalizadorProducto(analizadorProducto);
         }
 		#endregion
 
 		#region TANQUE GRADO
-		public async Task<List<TanqueGradoData>> GetTanqueGrado(int? tanqueId)
+		public async Task<List<TanqueGradoData>> HandleGetTanqueGrado(int? tanqueId)
 		{
 			return await this.certCatalogosRepository.GetTanqueGrado(tanqueId);
 		}
 
-		public async Task<int> InsertTanqueGrado(TanqueGradoData tanqueGrado)
+		public async Task<int> HandleInsertTanqueGrado(TanqueGradoData tanqueGrado)
 		{
-			return await this.certCatalogosRepository.InsertTanqueGrado(tanqueGrado);
+			var idGradosArr = tanqueGrado.gradosString.Split(',');
+
+			if (idGradosArr.Length > 0)
+			{
+                foreach (var idGrado in idGradosArr)
+                {
+					var tanqueGradoData = new TanqueGradoData()
+					{
+						IdTanque = tanqueGrado.IdTanque,
+						IdGrado = Convert.ToInt32(idGrado),
+						IdStatus = 1
+					};
+
+                    await this.certCatalogosRepository.InsertTanqueGrado(tanqueGradoData);
+                }
+            }
+
+			return 0;
 		}
 
-		public async Task<int> UpdateTanqueGrado(TanqueGradoData tanqueGrado)
+		public async Task<int> HandleUpdateTanqueGrado(TanqueGradoData tanqueGrado)
 		{
-			return await this.certCatalogosRepository.UpdateTanqueGrado(tanqueGrado);
-		}
+            var idGradosArr = tanqueGrado.gradosString.Split(',');
+
+            if (idGradosArr.Length > 0)
+            {
+				var counter = 0;
+                foreach (var idGrado in idGradosArr)
+                {
+                    var tanqueGradoData = new TanqueGradoData()
+                    {
+                        IdTanque = tanqueGrado.IdTanque,
+                        IdGrado = Convert.ToInt32(idGrado),
+                        IdStatus = 1,
+						IsDelete = counter == 0
+                    };
+
+                    await this.certCatalogosRepository.UpdateTanqueGrado(tanqueGradoData);
+
+					counter++;
+                }
+            }
+
+            return 0;
+        }
 		#endregion
 	}
 }

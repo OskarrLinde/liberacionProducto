@@ -879,26 +879,26 @@
                 }
             });
 
-            // $("#ExporttoExcel").on("click", function () {
-            // 	table.button('.buttons-csv').trigger();
-            // });
+            $("#ExporttoExcel").on("click", function () {
+            	table.button('.buttons-csv').trigger();
+            });
 
             // Exportacion Excel
 
-            var tableExportToExcel = $("#data-table-export-to-excel").DataTable(
-                {
-                    buttons: [
-                        {
-                            extend: 'csv',
-                            charset: 'utf-8',
-                            bom: true
-                        }
-                    ]
-                });
+            // var tableExportToExcel = $("#data-table-export-to-excel").DataTable(
+            //     {
+            //         buttons: [
+            //             {
+            //                 extend: 'csv',
+            //                 charset: 'utf-8',
+            //                 bom: true
+            //             }
+            //         ]
+            //     });
 
-            $("#ExporttoExcel").on("click", function () {
-                tableExportToExcel.button('.buttons-csv').trigger();
-            });
+            // $("#ExporttoExcel").on("click", function () {
+            //     tableExportToExcel.button('.buttons-csv').trigger();
+            // });
 
             $("#ClearFilters").on("click", function () {
                 $('#data-table thead tr:eq(1) th').each(function (i) {

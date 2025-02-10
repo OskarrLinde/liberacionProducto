@@ -5,25 +5,25 @@ namespace LiberacionProducto.Services.Interfaces
 {
 	public interface ICertCatalogosService
     {
-		public Task<int> DeletePlanta(int IdPlanta);
+		public Task<int> HandleDeletePlanta(int IdPlanta);
 
-        public Task<List<FuenteSuministroData>> GetFuenteSuministro();
-		public Task<List<PlantaAprobadaData>> GetPlantaAprobada();
+        public Task<List<FuenteSuministroData>> HandleGetFuenteSuministro();
+		public Task<List<PlantaAprobadaData>> HandleGetPlantaAprobada();
 
-		public Task<List<TanqueData>> GetTanques();	
-		public Task<int> UpdateTanque(TanqueData tanque);
-        public Task<int> InsertTanque(TanqueData tanque);
+		public Task<List<TanqueData>> HandleGetTanques();	
+		public Task<int> HandleUpdateTanque(TanqueData tanque);
+        public Task<int> HandleInsertTanque(TanqueData tanque);
 
-		public Task<List<PlantaParametroAnalizadorData>> GetPlantaParametroAnalizador(int? plantaId);
-		public Task<int> UpdatePlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador);
-		public Task<int> InsertPlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador);
+		public Task<List<PlantaParametroAnalizadorData>> HandleGetPlantaParametroAnalizador(int? plantaId);
+		public Task<int> HandleUpdatePlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador);
+		public Task<int> HandleInsertPlantaParametroAnalizador(PlantaParametroAnalizadorData plantaParametroAnalizador);
 
-        public Task<List<AnalizadorProductoData>> GetAnalizadorProducto(int? analizadorId);
-        public Task<int> InsertAnalizadorProducto(AnalizadorProductoData analizadorProducto);
-        public Task<int> UpdateAnalizadorProducto(AnalizadorProductoData analizadorProducto);
+        public Task<List<AnalizadorProductoData>> HandleGetAnalizadorProducto(int? analizadorId);
+        public Task<int> HandleInsertAnalizadorProducto(AnalizadorProductoData analizadorProducto);
+        public Task<int> HandleUpdateAnalizadorProducto(AnalizadorProductoData analizadorProducto);
 
-		public Task<List<TanqueGradoData>> GetTanqueGrado(int? tanqueId);
-		public Task<int> InsertTanqueGrado(TanqueGradoData tanqueGrado);
-		public Task<int> UpdateTanqueGrado(TanqueGradoData tanqueGrado);
+		public Task<List<TanqueGradoData>> HandleGetTanqueGrado(int? tanqueId);
+		public Task<int> HandleInsertTanqueGrado(TanqueGradoData tanqueGrado);
+		public Task<int> HandleUpdateTanqueGrado(TanqueGradoData tanqueGrado);
 	}
 }

@@ -14,6 +14,7 @@ namespace LiberacionProducto.Data.Builders
                 IdPlanta = Convert.ToInt32(reader["ID_PLANTA"]),
                 IdProducto = !(reader["ID_PRODUCTO"] is DBNull) ? Convert.ToInt32(reader["ID_PRODUCTO"]) : (int?)null,
                 Descripcion = reader["DESCRIPCION"].ToString(),
+                Grados = reader["GRADOS"].ToString(),
                 IdStatus = Convert.ToInt16(reader["ID_STATUS"]),
                 ClavePals = reader["CLAVE_PALS"].ToString()
             };

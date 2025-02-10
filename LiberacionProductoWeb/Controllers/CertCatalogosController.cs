@@ -115,7 +115,7 @@ namespace LiberacionProductoWeb.Controllers
 
 			_model = JsonConvert.DeserializeObject<List<AnalizadorParametros>>(JSONObj["data"]);
 
-			return _model;
+			return _model.Where(x => x.iD_STATUS == 1).ToList();
 		}
 
 		public List<Clientes> getClientes()
@@ -482,13 +482,13 @@ namespace LiberacionProductoWeb.Controllers
 		}
 
 		public async Task<List<FuenteSuministro>> getFuenteSuministro() =>
-			CerCatalogosMappers.MapFuenteSuministroDataToFuenteSuministro(await _certCatalogosService.GetFuenteSuministro());
+			CerCatalogosMappers.MapFuenteSuministroDataToFuenteSuministro(await _certCatalogosService.HandleGetFuenteSuministro());
 
 		public async Task<List<PlantaAprobada>> getPlantaAprobada() =>
-			CerCatalogosMappers.MapPlantaAprobadaDataToPlantaAprobada(await _certCatalogosService.GetPlantaAprobada());
+			CerCatalogosMappers.MapPlantaAprobadaDataToPlantaAprobada(await _certCatalogosService.HandleGetPlantaAprobada());
 
 		public async Task<List<Tanque>> getTanque() =>
-			CerCatalogosMappers.MapTanqueDataToTanque(await _certCatalogosService.GetTanques());
+			CerCatalogosMappers.MapTanqueDataToTanque(await _certCatalogosService.HandleGetTanques());
 
 		public List<TipoCertificado> getTipoCertificado()
 		{
@@ -895,7 +895,7 @@ namespace LiberacionProductoWeb.Controllers
 				{
 					analizadorParametroData.UsrAlta = 1;
 
-					await _certCatalogosService.InsertPlantaParametroAnalizador(analizadorParametroData);
+					await _certCatalogosService.HandleInsertPlantaParametroAnalizador(analizadorParametroData);
 				}
 				else
 				{
@@ -903,7 +903,7 @@ namespace LiberacionProductoWeb.Controllers
 					analizadorParametroData.UsrModifica = 1;
 					analizadorParametroData.IsDelete = false;
 
-					await _certCatalogosService.UpdatePlantaParametroAnalizador(analizadorParametroData);
+					await _certCatalogosService.HandleUpdatePlantaParametroAnalizador(analizadorParametroData);
 				}
 
 				return Json(new { Result = "Ok" });
@@ -923,7 +923,7 @@ namespace LiberacionProductoWeb.Controllers
 				analizadorParametroData.UsrModifica = 1;
 				analizadorParametroData.IsDelete = true;
 
-				await _certCatalogosService.UpdatePlantaParametroAnalizador(analizadorParametroData);
+				await _certCatalogosService.HandleUpdatePlantaParametroAnalizador(analizadorParametroData);
 
 				return Json(new { Result = "Ok" });
 			}
@@ -937,7 +937,7 @@ namespace LiberacionProductoWeb.Controllers
 		{
 			var response = string.Empty;
 			
-			var analizadorParametro = await _certCatalogosService.GetPlantaParametroAnalizador(null);
+			var analizadorParametro = await _certCatalogosService.HandleGetPlantaParametroAnalizador(null);
 			var analizador = getAnalizador();
 			var parametro = getParametro();
 			var metodo = getMetodo();
@@ -1017,7 +1017,7 @@ namespace LiberacionProductoWeb.Controllers
 		public async Task<JsonResult> GetAnalyzerParameterById(string Id)
 		{
 			var response = string.Empty;
-			var lstAnalyzerParameter = await _certCatalogosService.GetPlantaParametroAnalizador(Convert.ToInt32(Id));
+			var lstAnalyzerParameter = await _certCatalogosService.HandleGetPlantaParametroAnalizador(Convert.ToInt32(Id));
 			var analizador = getAnalizador();
 			var parametro = getParametro();
 			var metodo = getMetodo();
@@ -1137,14 +1137,14 @@ namespace LiberacionProductoWeb.Controllers
                 {
                     analizadorProductoData.UsrAlta = 1;
 
-                    await _certCatalogosService.InsertAnalizadorProducto(analizadorProductoData);
+                    await _certCatalogosService.HandleInsertAnalizadorProducto(analizadorProductoData);
                 }
                 else
                 {
                     analizadorProductoData.UsrModifica = 1;
                     analizadorProductoData.IsDelete = false;
 
-                    await _certCatalogosService.UpdateAnalizadorProducto(analizadorProductoData);
+                    await _certCatalogosService.HandleUpdateAnalizadorProducto(analizadorProductoData);
                 }
 
                 return Json(new { Result = "Ok" });
@@ -1164,7 +1164,7 @@ namespace LiberacionProductoWeb.Controllers
                 analizadorProductoData.UsrModifica = 1;
                 analizadorProductoData.IsDelete = true;
 
-                await _certCatalogosService.UpdateAnalizadorProducto(analizadorProductoData);
+                await _certCatalogosService.HandleUpdateAnalizadorProducto(analizadorProductoData);
 
                 return Json(new { Result = "Ok" });
             }
@@ -1177,7 +1177,7 @@ namespace LiberacionProductoWeb.Controllers
         public async Task<JsonResult> GetAnalizadorProductoById(string Id)
         {
             var response = string.Empty;
-            var lstAnalizadorProducto = await _certCatalogosService.GetAnalizadorProducto(Convert.ToInt32(Id));
+            var lstAnalizadorProducto = await _certCatalogosService.HandleGetAnalizadorProducto(Convert.ToInt32(Id));
 			var producto = getProductos();
 
             List<Productos> _lstProductos = new List<Productos>();
@@ -1247,7 +1247,7 @@ namespace LiberacionProductoWeb.Controllers
         {
             var response = string.Empty;
 
-            var analizadorProductos = await _certCatalogosService.GetAnalizadorProducto(null);
+            var analizadorProductos = await _certCatalogosService.HandleGetAnalizadorProducto(null);
             var productos = getProductos();
 
             var entity = analizadorProductos.Where(x => x.IdAnalizadorProducto == Convert.ToInt32(Id)).FirstOrDefault();
@@ -4657,7 +4657,7 @@ namespace LiberacionProductoWeb.Controllers
 
 		public JsonResult DeletePlanta(String Id)
 		{
-			var result = _certCatalogosService.DeletePlanta(Convert.ToInt32(Id));
+			var result = _certCatalogosService.HandleDeletePlanta(Convert.ToInt32(Id));
 
 			return Json(new { Result = "Ok" });
 		}
@@ -7229,17 +7229,34 @@ namespace LiberacionProductoWeb.Controllers
 				{
 					tanqueData.UsrAlta = 1;
 
-					await _certCatalogosService.InsertTanque(tanqueData);
+					await _certCatalogosService.HandleInsertTanque(tanqueData);
+
+					var tanques = await getTanque();
+					var lastTanqueId = tanques.Max(x => x.iD_TANQUE);
+
+					await _certCatalogosService.HandleInsertTanqueGrado(new TanqueGradoData()
+					{
+						IdTanque = (int)lastTanqueId,
+						gradosString = data.iD_GRADO,
+						UsrAlta = tanqueData.UsrAlta
+					});
 				}
 				else
 				{
 					tanqueData.IdTanque = ParseMandatoryInt(data.iD_TANQUE, "El ID del tanque es inválido.");
 					tanqueData.UsrModifica = 1;
 
-					await _certCatalogosService.UpdateTanque(tanqueData);
+					await _certCatalogosService.HandleUpdateTanque(tanqueData);
+
+					await _certCatalogosService.HandleUpdateTanqueGrado(new TanqueGradoData()
+					{
+						IdTanque = tanqueData.IdTanque,
+						UsrModifica = tanqueData.UsrModifica,
+						gradosString = data.iD_GRADO
+					});
 				}
 
-				return Json(new { Result = "Ok" });
+                return Json(new { Result = "Ok" });
 			}
 			catch (Exception ex)
 			{
@@ -7289,14 +7306,10 @@ namespace LiberacionProductoWeb.Controllers
 			var plants = getPlantas();
 			var product = getProductos();
 			var grados = getGrado();
-			var _url = _catalogCertificate.urlCatalogs + "Tanque";
-			RestGenerico _rest = new RestGenerico();
-			var _result = _rest.getApi<Models.CertCatalogosViewModels.Tanque, Models.CertCatalogosViewModels.Tanque>(_url + "/" + Id);
-			JsonDeserializer deserial = new JsonDeserializer();
-			var JSONObj = deserial.Deserialize<Dictionary<string, string>>(_result);
-			var entity = JsonConvert.DeserializeObject<Models.CertCatalogosViewModels.Tanque>(JSONObj["data"]);
 
-			if (entity != null)
+			var entity = tanque.Where(x => x.iD_TANQUE == Convert.ToInt32(Id)).FirstOrDefault();
+
+            if (entity != null)
 			{
 				var plantasTag = "<select  id='iD_PLANTA' class='form-control' >";
 
@@ -7333,9 +7346,22 @@ namespace LiberacionProductoWeb.Controllers
 						productosTag += "<option value='" + item.iD_PRODUCTO + "' selected >" + item.nombre + " </option>";
 					else
 						productosTag += "<option value='" + item.iD_PRODUCTO + "'>" + item.nombre + " </option>";
-				}
+				}	
 
 				productosTag += "</select>";
+
+				var gradosTag = "<select multiple data-style='btn-white' id='IdGrado' class='selectpicker show-menu-arrow combobox' >";
+
+                foreach (var item in grados)
+				{
+                    if (entity.grados != null && entity.grados.Contains(item.descripcion))
+                        gradosTag += "<option value='" + item.iD_GRADO + "' selected>" + item.descripcion + "</option>";
+                    else
+                        gradosTag += "<option value='" + item.iD_GRADO + "'>" + item.descripcion + "</option>";
+
+                }
+
+                gradosTag += "</select>";
 
 				response += "<tr>" +
 				"<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
@@ -7343,185 +7369,15 @@ namespace LiberacionProductoWeb.Controllers
 				"<td><input class='form-control' id='descripcion' maxlength='20' type='text'  value='" + entity.descripcion + "'></td>" +
 				"<td><input class='form-control' id='clavE_PALS' maxlength='100' type='text'  value='" + entity.clavE_PALS + "'></td>" +
 				"<td>" + plantasTag + "</td>" +
-				"<td>" + productosTag + "</td>" +
-				"<td>" + estatusTag + "</td>" +
+                "<td>" + productosTag + "</td>" +
+                "<td>" + gradosTag + "</td>" +
+                "<td>" + estatusTag + "</td>" +
 				"</tr>";
 			}
 
 			return Json(new { Result = "Ok", Html = response });
 		}
 
-		#endregion
-
-		#region Tanque Grado
-		public async Task<JsonResult> SaveOrEditTanqueGrado([FromBody] TanqueGradoData tanqueGradoData)
-		{
-			try
-			{
-				if (tanqueGradoData == null)
-				{
-					throw new ArgumentNullException(nameof(tanqueGradoData), "La información proporcionada es nula.");
-				}
-
-				if (ValidateInsert(tanqueGradoData.IdTanqueGrado))
-				{
-					tanqueGradoData.UsrAlta = 1;
-
-					await _certCatalogosService.InsertTanqueGrado(tanqueGradoData);
-				}
-				else
-				{
-					tanqueGradoData.UsrModifica = 1;
-					tanqueGradoData.IsDelete = false;
-
-					await _certCatalogosService.UpdateTanqueGrado(tanqueGradoData);
-				}
-
-				return Json(new { Result = "Ok" });
-			}
-			catch (Exception ex)
-			{
-				return Json(new { Result = "Fail", Message = ex.Message });
-			}
-		}
-
-		public async Task<JsonResult> DeleteTanqueGrado(string Id)
-		{
-			try
-			{
-				var analizadorProductoData = new TanqueGradoData();
-				analizadorProductoData.IdTanqueGrado = ParseMandatoryInt(Id, "El ID del tanque es inválido.");
-				analizadorProductoData.UsrModifica = 1;
-				analizadorProductoData.IsDelete = true;
-
-				await _certCatalogosService.UpdateTanqueGrado(analizadorProductoData);
-
-				return Json(new { Result = "Ok" });
-			}
-			catch (Exception ex)
-			{
-				return Json(new { Result = "Fail", Message = ex.Message });
-			}
-		}
-
-		public async Task<JsonResult> GetTanqueGradoById(string Id)
-		{
-			var response = string.Empty;
-			var lstTanqueGrado = await _certCatalogosService.GetTanqueGrado(Convert.ToInt32(Id));
-			var grados = getGrado();
-
-			List<Grados> _lstGrados = new List<Grados>();
-
-			if (grados != null && grados.Any())
-				_lstGrados = grados;
-			else
-				_lstGrados = new List<Grados>();
-
-			foreach (var item in lstTanqueGrado)
-			{
-				string _estatus = string.Empty;
-
-				if (item.IdStatus == 1)
-					_estatus = "Activo";
-				else
-					_estatus = "Inactivo";
-
-				string _descripcionGado = string.Empty;
-
-				if (item.IdTanque > 0)
-					_descripcionGado = _lstGrados.FirstOrDefault(x => x.iD_GRADO == item.IdGrado).descripcion;
-				else
-					_descripcionGado = string.Empty;
-
-				response +=
-				"<tr>" +
-					"<td></td>" +
-					"<td>" + _descripcionGado + "</td>" +
-					"<td>" + _estatus + "</td>" +
-					"<td>" +
-						"<a href='javascript:void(0)' onclick='deleteOnClickTanqueGrado(this); return false;' data-id='" + item.IdTanqueGrado + "' class='btn btn-default btn-xs'>" +
-							"<i class='fa fa-trash-alt'></i>" +
-						"</a>" +
-						"<a href='javascript:void(0)' onclick='editOnClickTanqueGrado(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='" + item.IdTanqueGrado + "'>" +
-							"<i class='fa fa-edit'></i>" +
-						"</a>" +
-					"</td>" +
-				"</tr>";
-			}
-
-			string _tableHead = string.Empty;
-
-			_tableHead +=
-				"<table id='data-table-tanque-grado-" + Id + "' class='table table-bordered table-hover'>" +
-					"<thead>" +
-						"<tr>" +
-							"<th class='no-sort' style='width:1%'></th>" +
-							"<th style='white-space: nowrap'>Grado</th>" +
-							"<th style='white-space: nowrap'>Estatus</th>" +
-							"<th style='white-space: nowrap; width: 1%'>" +
-								"<a href='javascript:void(0)' onclick='addEntryTanqueGrado(this, " + Id + "); return false;' class='waves-effect waves-light btn btn-white m-r-5' id='add-entry'>" +
-									"<i class='fa fa-plus'></i>" +
-								"</a>" +
-							"</th> " +
-						"</tr>" +
-					"</thead>";
-
-			string _tableFoot = string.Empty;
-
-			_tableFoot += "</table>";
-
-			return Json(new { Result = "Ok", Html = _tableHead + "<tbody>" + response + "</tbody>" + _tableFoot });
-		}
-
-		public async Task<JsonResult> GetTanqueGradoHTMLTagsById(string Id)
-		{
-			var response = string.Empty;
-
-			var tanqueGrados = await _certCatalogosService.GetTanqueGrado(null);
-			var grados = getGrado();
-
-			var entity = tanqueGrados.Where(x => x.IdTanqueGrado == Convert.ToInt32(Id)).FirstOrDefault();
-
-			if (entity != null)
-			{
-				var estatusTag = "<select  id='IdStatus' class='form-control'>";
-
-				if (entity.IdStatus == 1)
-				{
-					estatusTag += "<option value='true' selected >Activo</option>";
-					estatusTag += "<option value='false' >Inactivo</option>";
-				}
-				else
-				{
-					estatusTag += "<option value='false' selected >Inactivo</option>";
-					estatusTag += "<option value='true' >Activo</option>";
-				}
-
-				estatusTag += "</select>";
-
-				var gradoTag = "<select id='IdGrado' class='form-control' >";
-
-				foreach (var item in grados)
-				{
-					if (entity.IdGrado == item.iD_GRADO)
-						gradoTag += "<option value='" + item.iD_GRADO + "' selected >" + item.descripcion + " </option>";
-					else
-						gradoTag += "<option value='" + item.iD_GRADO + "'>" + item.descripcion + " </option>";
-				}
-
-				gradoTag += "</select>";
-
-				response += "<tr>" +
-				"<td> <a href='javascript:void(0)' onclick='refresh();return false;'  class=' btn btn-danger btn-xs' data-id='-1' data-toggle='tooltip' title='Cancelar'><i class='fa fa-times-circle'></i></a>" +
-						"<a href='javascript:void(0)' onclick='saveOnClickTanqueGrado(this);return false;' id='editData' class='save-data btn btn-info btn-xs' data-id='" + entity.IdTanqueGrado + "' ><i class='fa fa-save'></i></a> </td>" +
-				"<td style='display: none'><input class='form-control' id='IdAnalizador' type='text' value='" + entity.IdTanqueGrado + "'></td>" +
-				"<td>" + gradoTag + "</td>" +
-				"<td>" + estatusTag + "</td>" +
-				"</tr>";
-			}
-
-			return Json(new { Result = "Ok", Html = response });
-		}
 		#endregion
 
 		#region Tipo Especificacion

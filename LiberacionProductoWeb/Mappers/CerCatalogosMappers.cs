@@ -51,6 +51,7 @@ namespace LiberacionProductoWeb.Mappers
                     iD_PLANTA = item.IdPlanta,
                     iD_PRODUCTO = item.IdProducto,
                     descripcion = item.Descripcion,
+                    grados = item.Grados,
                     iD_STATUS = item.IdStatus,
                     clavE_PALS = item.ClavePals
                 });

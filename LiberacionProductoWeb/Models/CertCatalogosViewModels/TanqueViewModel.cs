@@ -38,6 +38,7 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         public string clavE_PALS { get; set; }
         public int? iD_PLANTA { get; set; }
         public int? iD_PRODUCTO { get; set; }
+        public string? grados { get; set; }
         public int iD_STATUS { get; set; }        
         public int usR_ALTA { get; set; }
         public int usR_MODIFICA { get; set; }
@@ -48,7 +49,8 @@ namespace LiberacionProductoWeb.Models.CertCatalogosViewModels
         public string iD_TANQUE { get; set; }
         public string descripcion { get; set; }
         public string iD_PLANTA { get; set; }
-        public string iD_PRODUCTO { get; set; }
+        public String iD_PRODUCTO { get; set; }
+        public string iD_GRADO { get; set; }
         public string iD_STATUS { get; set; }
         public string clavE_PALS { get; set; }
     }
