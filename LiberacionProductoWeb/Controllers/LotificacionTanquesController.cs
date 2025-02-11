@@ -94,6 +94,7 @@ namespace LiberacionProductoWeb.Controllers
                 if (userInfo != null)
                 {
                     model.ExternalId = userInfo.ExternalId;
+                    model.NombreUsuario = userInfo.NombreUsuario;
                 }
 
                 var plantaxUsuario = await _lotificacionService.GetPlantasUsuario(userInfo.MexeUsuario);

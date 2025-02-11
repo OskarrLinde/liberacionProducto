@@ -319,6 +319,7 @@
             Demo.init();
 
             var idUsuarioLogueado = @Model.ExternalId;
+            var NombreUsuarioLogueado = '@Model.NombreUsuario';
 
             // Obtener la fecha actual
             var today = new Date();
@@ -859,7 +860,9 @@
                                 // console.log("Prueba: ");
                                 // console.log(mensajes);
                             }
-
+                            
+                            // console.log("mensajes guardados: ");
+                            // console.log(mensajeGuardado);
                             var mensaje = "";
                             if (detalleData[0].motivoCancelBitacora !== null)
                             {
@@ -910,7 +913,7 @@
 
                                 var motivobitacRevisionCumple = rowDataInfo.motivo_bitacLotif_RevisionCumple;
 
-                                    mensaje += "<span style='color:green;'> ESTE LOTE FUE APROBADO POR: <strong>  " + userbitacRevisionCumple + "</strong>. El dia  " + fechaFormateada + "<br> COMENTARIOS:  <strong>" + motivobitacRevisionCumple + "</strong> </span><br>";
+                                mensaje += "<span style='color:green;'> ESTE LOTE FUE APROBADO POR: <strong>  " + userbitacRevisionCumple + "</strong>. El dia  " + fechaFormateada + "<br> COMENTARIOS:  <strong>" + motivobitacRevisionCumple + "</strong> </span><br>";
                             }
 
                             //Mostrar mensajes de Bitacora para Cuando estatus tiene "NO CUMPLE"
@@ -1214,6 +1217,28 @@
                                                         parentRow.find('#idestatusrevision').remove();
                                                     }
 
+                                                   
+                                                    var userbitacRevisionCumple = NombreUsuarioLogueado;                                                    
+
+                                                    // Crear un objeto Date a partir de la cadena de fecha fechabitacRevisionCumple
+                                                    var fecha = new Date();
+
+                                                    // Obtener los componentes de la fecha
+                                                    var year = fecha.getFullYear();
+                                                    var month = ("0" + (fecha.getMonth() + 1)).slice(-2);
+                                                    var day = ("0" + fecha.getDate()).slice(-2);
+                                                    var hours = ("0" + fecha.getHours()).slice(-2);
+                                                    var minutes = ("0" + fecha.getMinutes()).slice(-2);
+
+                                                    // Formatear la fecha en el nuevo formato
+                                                    var fechaFormateada = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+                                                    var motivobitacRevisionCumple = textareaComentarios;   
+
+                                                    //Guarda el mensaje en el indice de idAnalisis
+                                                    mensajes[idAnalisisEstatusRevision] = "<span style='color:green;'> ESTE LOTE FUE APROBADO POR: <strong>  " + userbitacRevisionCumple + "</strong>. El dia  " + fechaFormateada + "<br> COMENTARIOS:  <strong>" + motivobitacRevisionCumple + "</strong> </span><br>";
+
+
                                                     // Volver a la página guardada
                                                     table.page(currentPage).draw(false);
 
@@ -1362,6 +1387,26 @@
                                                         //Encuentra y Elimina el div del estatus revision del mismo `tr`
                                                         parentRow.find('#idestatusrevision').remove();
                                                     }
+
+                                                    var userbitacRevisionNoCumple = NombreUsuarioLogueado;                                                    
+
+                                                    // Crear un objeto Date a partir de la cadena de fecha fechabitacRevisionNoCumple
+                                                    var fechaNo = new Date();
+
+                                                    // Obtener los componentes de la fecha
+                                                    var yearNo = fechaNo.getFullYear();
+                                                    var monthNo = ("0" + (fechaNo.getMonth() + 1)).slice(-2);
+                                                    var dayNo = ("0" + fechaNo.getDate()).slice(-2);
+                                                    var hoursNo = ("0" + fechaNo.getHours()).slice(-2);
+                                                    var minutesNo = ("0" + fechaNo.getMinutes()).slice(-2);
+
+                                                    // Formatear la fecha en el nuevo formato
+                                                    var fechaFormateadaNo = `${yearNo}-${monthNo}-${dayNo} ${hoursNo}:${minutesNo}`;
+
+                                                    var motivobitacRevisionNoCumple = textareaComentarios;  
+
+                                                    //Guarda el mensaje en el indice de idAnalisis
+                                                    mensajes[idAnalisisEstatusRevision] = "<span style='color:red;'> ESTE LOTE FUE RECHAZADO POR: <strong> " + userbitacRevisionNoCumple + " </strong>. El dia " + fechaFormateadaNo + "<br> COMENTARIOS: <strong>" + motivobitacRevisionNoCumple + "</strong> </span>";
 
                                                     // Volver a la página guardada
                                                     table.page(currentPage).draw(false);
@@ -1539,6 +1584,7 @@
                                 {
                                     alert('No se han guardado los datos en el parametro: ' + descripcionParametro);
                                     rowValid = false;
+                                    allValid = false;
                                 }
                                 else
                                 {

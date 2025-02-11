@@ -21,6 +21,7 @@ namespace LiberacionProductoWeb.Models.Lotificacion
         public List<CAB_EspecificacionProducto> lstEspecificProduct { get; set; }
         public List<CAB_TC_Analizadores> lstAnalizadores { get; set; }
         public int ExternalId { get; set; }
+        public string? NombreUsuario { get; set; }
 
         public String MensajeInfo { get; set; }
         public String MensajeError { get; set; }
