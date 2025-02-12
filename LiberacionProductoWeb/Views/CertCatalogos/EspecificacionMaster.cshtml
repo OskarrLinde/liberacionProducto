@@ -80,6 +80,9 @@
 			<div class="panel panel-primary">
 				<div class="panel-heading">
 					<div class="btn-group pull-left">
+						<a href="javascript:;" class="waves-effect waves-light btn btn-white m-r-5" id="add-entry">
+							<i class="fa fa-plus"></i> Agregar Registro
+						</a>
 						<a href="javascript:;" class="btn btn-white m-r-5" id="ExporttoExcel">
 							<i class="fa fa-file-excel"></i> Exportar a excel
 						</a>
@@ -119,6 +122,7 @@
 									<th style="white-space: nowrap; display: none;">Tipo Especificación</th>
 									<th style="white-space: nowrap">Observaciones</th>
 									<th style="white-space: nowrap">Estatus</th>
+									<th style="white-space: nowrap; width:1%"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -222,6 +226,14 @@
 													@: Inactivo
 												}
 											}
+										</td>
+										<td>
+											<a href="javascript:void(0)" onclick="deleteOnClick(this); return false;" data-id="@entry.iD_ESPECIFICACION" class="btn btn-default btn-xs">
+												<i class="fa fa-trash-alt"></i>
+											</a>
+											<a href='javascript:void(0)' onclick='editOnClick(this);return false;' id='editData' class='btn btn-default btn-xs' data-id='@entry.iD_ESPECIFICACION'>
+												<i class='fa fa-edit'></i>
+											</a>
 										</td>
 									</tr>
 								}
@@ -547,7 +559,7 @@
 				idTag += "</select>";
 			}
 
-			var plantaTag = "<select id='iD_PLANTA' class='form-control' data-style='btn-white'  title='Selecciona'>";
+			var plantaTag = "<select id='iD_PLANTA' onChange='onChangePlanta(this);' class='form-control' data-style='btn-white'  title='Selecciona'>";
 
 			if (Model.PlantasFilter != null)
 			{
@@ -630,7 +642,7 @@
 				"<a href='javascript:void(0)' onclick='saveOnClick(this);return false;' id='saveData' class='save-data btn btn-info btn-xs btn-space' data-id='-1' ><i class='fa fa-save'></i></a> </td>" +
 				"<td style='display: none'><input class='form-control' id='iD_ESPECIFICACION' type='text'></td>" +
 				"<td>@Html.Raw(plantaTag)</td>" +
-				"<td>@Html.Raw(productoTag)</td>" +
+				"<td><select id='iD_PRODUCTO' class='form-control' data-style='btn-white' title='Selecciona'><option value=''>Seleccione una planta primero</option></select></td>" +
 				"<td><input class='form-control' id='observaciones' type='text'></td>" +
 				"<td><select id='iD_STATUS' class='form-control'><option  value='true'>Activo</option><option value='false'>Inactivo</option></select> </td>" +
 				"</tr>"
@@ -978,15 +990,44 @@
 			});
 
 			function onSwitchActive() {
-				console.log('El switch está activo');
 				window.location.href = '@Url.Action("EspecificacionMaster", "CertCatalogos")?showAll=true';
 			}
 
 			function onSwitchInactive() {
-				console.log('El switch está inactivo');
 				window.location.href = '@Url.Action("EspecificacionMaster", "CertCatalogos")?showAll=false';
 			}
 		});
+
+		var onChangePlanta = function (e) {
+			var idPlanta = $(e).val();
+			var $productoSelect = $("#iD_PRODUCTO");
+			var allProductoOptions = $productoSelect.find("option").clone();
+
+			if (idPlanta) {
+				$.ajax({
+					type: "GET",
+					url: "/CertCatalogos/GetProductosByPlanta",
+					data: { idPlanta: idPlanta }, 
+					dataType: "json",
+					success: function (data) {
+						var $productoSelect = $("#iD_PRODUCTO");
+						$productoSelect.empty();
+
+						if (data.length > 0) {
+							$productoSelect.append('<option value="">Seleccione un producto</option>');
+							$.each(data, function (index, item) {
+								$productoSelect.append('<option value="' + item.value + '">' + item.text + '</option>');
+							});
+						} else {
+							$productoSelect.append('<option value="">No hay productos disponibles</option>');
+						}
+					}
+				});
+			}
+			else {
+				$("#iD_PRODUCTO").empty().append('<option value="">Seleccione una planta primero</option>');
+			}
+		};
 
 		$(document).ready(function () {
 			App.init();
