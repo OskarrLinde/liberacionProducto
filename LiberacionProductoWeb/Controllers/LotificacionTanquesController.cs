@@ -272,10 +272,10 @@ namespace LiberacionProductoWeb.Controllers
                             // Actualizar el campo PermisoUserAdmin a true donde GetUserAdmin 
                             datos.ForEach(item =>
                             {
-                                if (item.GetUseralta == userInfo.ExternalId)
-                                {
+                                //if (item.GetUseralta == userInfo.ExternalId)
+                                //{
                                     item.PermisoUserAdmin = true;
-                                }                                   
+                                //}                                   
 
                             });
                         }
