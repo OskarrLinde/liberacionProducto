@@ -1995,7 +1995,7 @@ namespace LiberacionProductoWeb.Controllers
                 "<td>" + unidadMedidaTag + "</td>" +
                 "<td><input class='form-control' id='valoR_LIMITE_SUP' type='text'  value='" + entity.valoR_LIMITE_SUP + "'></td>" +
                 "<td><input class='form-control' id='valoR_LIMITE_INF' type='text'  value='" + entity.valoR_LIMITE_INF + "'></td>" +
-                "<td><input class='form-control' id='observaciones' type='text'  value='" + entity.observaciones + "'></td>" +
+                "<td><textarea class='form-control' id='observaciones'>" + entity.observaciones + "</textarea></td>" +
                 "<td><input class='form-control' id='orden' type='text'  value='" + entity.orden + "'></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
@@ -2428,7 +2428,7 @@ namespace LiberacionProductoWeb.Controllers
                 "<td style='display: none;'><input class='form-control' id='tanquE_PX' type='text'  value='" + entity.tanquE_PX + "'></td>" +
                 "<td style='display: none;'><input class='form-control' id='iD_GRADO' type='text'  value='" + entity.iD_GRADO + "'></td>" +
                 "<td style='display: none;'><input class='form-control' id='iD_TIPO_ESPECIFICACION' type='text'  value='" + entity.iD_TIPO_ESPECIFICACION + "'></td>" +
-                "<td><input class='form-control' id='observaciones' type='text'  value='" + entity.observaciones + "'></td>" +
+                "<td><textarea class='form-control' id='observaciones'>" + entity.observaciones + "</textarea></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -3033,7 +3033,7 @@ namespace LiberacionProductoWeb.Controllers
                 "<td>" + productoTag + "</td>" +
                 "<td>" + gradoTag + "</td>" +
                 "<td style='display: none;'><input class='form-control' id='iD_TIPO_ESPECIFICACION' type='text'  value='" + entity.iD_TIPO_ESPECIFICACION + "'></td>" +
-                "<td><input class='form-control' id='observaciones' type='text'  value='" + entity.observaciones + "'></td>" +
+                "<td><textarea class='form-control' id='observaciones'>" + entity.observaciones + "</textarea></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
@@ -3447,7 +3447,7 @@ namespace LiberacionProductoWeb.Controllers
                 "<td style='display: none;'><input class='form-control' id='tanquE_PX' type='text'  value='" + entity.tanquE_PX + "'></td>" +
                 "<td>" + gradoTag + "</td>" +
                 "<td style='display: none;'><input class='form-control' id='iD_TIPO_ESPECIFICACION' type='text'  value='" + entity.iD_TIPO_ESPECIFICACION + "'></td>" +
-                "<td><input class='form-control' id='observaciones' type='text'  value='" + entity.observaciones + "'></td>" +
+                "<td><textarea class='form-control' id='observaciones'>" + entity.observaciones + "</textarea></td>" +
                 "<td>" + estatusTag + "</td>" +
                 "</tr>";
             }
